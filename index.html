@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Supervisor QA</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👔</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -25,15 +26,8 @@
         .dock-panel { transition: all 0.3s ease; backdrop-filter: blur(10px); transform: scale(1.15); }
         .counter-row { @apply flex justify-between items-center border-b border-gray-200/50 pb-2 mb-2 last:border-0 last:mb-0 last:pb-0; }
         
-        /* Tooltips (Solo Hover) */
-        .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: help; }
-        .tooltip-text { 
-            visibility: hidden; width: 200px; background-color: #1e293b; color: #fff; text-align: left; 
-            border-radius: 6px; padding: 10px; position: absolute; z-index: 50; 
-            bottom: 100%; left: 0; margin-bottom: 5px; opacity: 0; transition: opacity 0.2s; 
-            font-size: 10px; line-height: 1.3; box-shadow: 0 4px 6px rgba(0,0,0,0.3); pointer-events: none; 
-        }
-        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+        /* Tooltips Nativos */
+        .indicator-tooltip { cursor: help; border-bottom: 1px dotted #94a3b8; }
 
         /* Feedback Status */
         .feedback-done { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-style: italic; display: inline-block; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -61,7 +55,7 @@
     <div id="viewApp" class="hidden h-full flex flex-col relative">
         <nav class="bg-indigo-900 text-white px-6 py-2 flex justify-between items-center shadow-lg shrink-0 z-50">
             <div class="flex items-center gap-3">
-                <div class="bg-white/20 w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-inner"><i class="fas fa-chart-network text-xl"></i></div>
+                <img id="navAvatar" src="https://ui-avatars.com/api/?name=Supervisor&background=ffffff&color=312e81&bold=true" class="w-10 h-10 rounded-lg shadow-inner bg-white" alt="Avatar">
                 <div><h1 class="font-bold text-lg leading-none" id="navSupName">Supervisor</h1><p class="text-[10px] opacity-70 uppercase tracking-widest mt-1">Portal de Liderazgo</p></div>
             </div>
             <div class="flex gap-2 text-xs bg-black/20 p-1 rounded-lg">
@@ -104,16 +98,30 @@
                         <div class="flex gap-2"><button onclick="resetFiltros()" class="px-4 py-2.5 bg-slate-100 text-slate-500 rounded-lg font-bold text-xs hover:bg-slate-200 border border-slate-200"><i class="fas fa-eraser"></i></button><button onclick="updateData()" class="px-4 py-2.5 bg-blue-100 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-200 border border-blue-200"><i class="fas fa-sync-alt mr-1"></i> Actualizar</button></div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
                     <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-slate-500"><p class="text-[10px] text-slate-400 font-bold uppercase">Auditorías</p><p class="text-3xl font-black text-slate-700" id="kpiTotal">-</p></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-indigo-600"><p class="text-[10px] text-indigo-600 font-bold uppercase">Promedio</p><p class="text-3xl font-black text-indigo-600" id="kpiNota">-</p></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-indigo-600"><p class="text-[10px] text-indigo-600 font-bold uppercase">Promedio</p><p class="text-3xl font-black" id="kpiNota">-</p></div>
                     <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-red-500"><p class="text-[10px] text-red-500 font-bold uppercase">Críticos</p><p class="text-3xl font-black text-red-500" id="kpiPec">-</p></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-orange-400"><p class="text-[10px] text-orange-500 font-bold uppercase">Leves</p><p class="text-3xl font-black text-orange-500" id="kpiPenc">-</p></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-purple-500"><p class="text-[10px] text-purple-500 font-bold uppercase">Feedback</p><p class="text-3xl font-black text-purple-500" id="kpiFeed">-</p></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-purple-500"><p class="text-[10px] text-purple-500 font-bold uppercase">Feedback / Total</p><p class="text-3xl font-black text-purple-500" id="kpiFeedRatio">-</p></div>
                 </div>
+
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[600px]">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center shrink-0"><h3 class="font-bold text-slate-700 text-sm"><i class="fas fa-users-cog mr-2 text-slate-400"></i>Gestión de Equipo</h3><span class="text-[10px] text-slate-400 uppercase font-bold bg-slate-100 px-3 py-1 rounded-full" id="lblPeriodo">Todos</span></div>
-                    <div class="overflow-auto flex-1"><table class="w-full text-xs text-left"><thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 sticky top-0 z-10"><tr><th class="p-4">Ejecutivo</th><th class="p-4">Fecha</th><th class="p-4 text-center">Nota</th><th class="p-4 text-center">Feedback</th><th class="p-4 text-center">Acción</th></tr></thead><tbody id="tableDetail" class="divide-y divide-slate-100"></tbody></table></div>
+                    <div class="overflow-auto flex-1">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 sticky top-0 z-10">
+                                <tr>
+                                    <th class="p-4 cursor-pointer hover:bg-slate-100 transition" onclick="sortTable('NOMBRE')">Ejecutivo ↕</th>
+                                    <th class="p-4 cursor-pointer hover:bg-slate-100 transition" onclick="sortTable('FECHA')">Fecha ↕</th>
+                                    <th class="p-4 text-center cursor-pointer hover:bg-slate-100 transition" onclick="sortTable('NOTA')">Nota ↕</th>
+                                    <th class="p-4 text-center">Feedback</th>
+                                    <th class="p-4 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableDetail" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -164,6 +172,25 @@
             {nombre:"Diego Cea Briceño", codigo:"CC7625", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Edith Ossandon Montoya", codigo:"CC2762", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Johanna Herrera Merida", codigo:"CC7119", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Lesli Agudelo Viveros", codigo:"CC3118", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Maria Cristina Barón Barón", codigo:"CC1815", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Yessenia Gonzalez González", codigo:"CC6869", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Paola Herrera Barriga", codigo:"CC3898", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Adrian Manzanilla Rangel", codigo:"CC0506", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"María Farías Quintero", codigo:"CC0851", sup:"Carla Cabrera", serv:"Mesa Central"},
             {nombre:"Saymar Paéz García", codigo:"CC1992", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Katya Cáceres González", codigo:"CC1225", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Belfred Belis Mijares", codigo:"CC8219", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Carla Cabrera Lara", codigo:"S5388", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Aracely Torres Faúndez", codigo:"S7637", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Luis Cataldo Galaz", codigo:"S2065", sup:"Aracely Torres", serv:"HLF"}, {nombre:"María Angélica Ferrada Cea", codigo:"S7705", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Marco Lara Vera", codigo:"S0226", sup:"Aracely Torres", serv:"HLF"}
         ];
+        
+        const INDICADORES_INFO = {
+            "SEG_VALIDACION": { nombre: "Validación Identidad", desc: "Debe solicitar RUT y Nombre completo al inicio." },
+            "SEG_CONFIDENCIALIDAD": { nombre: "Confidencialidad", desc: "Resguarda datos sensibles. No entrega diagnósticos sin validar." },
+            "COND_NORMAS": { nombre: "Normas de Conducta", desc: "Mantiene el respeto, no grita, no corta la llamada." },
+            "OP_ABANDONO": { nombre: "Abandono", desc: "No deja al paciente en silencio por tiempos excesivos." },
+            "SIST_REGISTRO": { nombre: "Registro en CRM", desc: "Deja la nota o glosa de la gestión obligatoriamente." },
+            "PROT_SCRIPT": { nombre: "Script Inicio/Cierre", desc: "Usa el saludo institucional y la despedida cordial." },
+            "PROT_CORTESIA": { nombre: "Cortesía y Trato", desc: "Usa 'Usted', 'Por favor' y 'Gracias'." },
+            "GEST_SONDEO": { nombre: "Sondeo", desc: "Realiza las preguntas para entender la solicitud." },
+            "GEST_INFORMACION": { nombre: "Entrega Información", desc: "Información correcta, completa y veraz." },
+            "GEST_TIEMPOS": { nombre: "Manejo Tiempos", desc: "Retoma el contacto cada 45 segundos." },
+            "GEST_ASEGURAMIENTO": { nombre: "Aseguramiento", desc: "Pregunta '¿Le queda alguna otra duda?' al final." },
+            "HAB_PERSONALIZACION": { nombre: "Personalización", desc: "Llama al paciente por su nombre." },
+            "HAB_LENGUAJE": { nombre: "Lenguaje", desc: "Modulación clara, sin muletillas." },
+            "HAB_EMPATIA": { nombre: "Empatía", desc: "Demuestra interés y valida la emoción." },
+            "SIST_TIPIFICACION": { nombre: "Tipificación", desc: "Selecciona el motivo correcto en el sistema." }
+        };
+
         const pautaItems = [
             {cat:"PEC", label:"Validación Identidad", name:"item_validacion", tip:"Solicita RUT y Nombre completo."}, {cat:"PEC", label:"Confidencialidad", name:"item_confidencialidad", tip:"Resguardo de datos sensibles."}, {cat:"PEC", label:"Normas de Conducta", name:"item_normas", tip:"No grita, no corta llamada."}, {cat:"PEC", label:"Abandono", name:"item_abandono", tip:"No deja en mudo excesivo."}, {cat:"PEC", label:"Registro", name:"item_registro", tip:"Deja nota o glosa."},
             {cat:"PENC", label:"Script Inicio/Cierre (5%)", name:"item_script", w:5, tip:"Saludo institucional."}, {cat:"PENC", label:"Cortesía y Trato (5%)", name:"item_cortesia", w:5, tip:"Usa 'Usted', por favor."}, {cat:"PENC", label:"Sondeo (15%)", name:"item_sondeo", w:15, tip:"Preguntas correctas."}, {cat:"PENC", label:"Entrega Información (20%)", name:"item_info", w:20, tip:"Info correcta y completa."}, {cat:"PENC", label:"Manejo Tiempos (10%)", name:"item_tiempos", w:10, tip:"Retoma cada 45 segs."}, {cat:"PENC", label:"Aseguramiento (10%)", name:"item_aseguramiento", w:10, tip:"Valida entendimiento."}, {cat:"PENC", label:"Personalización (5%)", name:"item_personalizacion", w:5, tip:"Usa nombre paciente."}, {cat:"PENC", label:"Lenguaje (5%)", name:"item_lenguaje", w:5, tip:"Modulación clara."}, {cat:"PENC", label:"Empatía (10%)", name:"item_empatia", w:10, tip:"Conecta emocionalmente."}, {cat:"PENC", label:"Tipificación (15%)", name:"item_tipificacion", w:15, tip:"Motivo correcto CRM."}
@@ -172,6 +199,7 @@
 
         let ALL_DATA = [], TEAM_DATA = [], CURRENT_SUP = "";
         let timerInterval, seconds=0;
+        let currentSortCol = 'FECHA', currentSortAsc = false;
 
         window.onload = () => {
             const sel = document.getElementById('loginSupSelect');
@@ -214,7 +242,11 @@
                 document.getElementById('viewApp').classList.remove('hidden');
                 document.getElementById('navSupName').innerText = sup;
                 document.getElementById('inputAuditorReal').value = sup;
-                cambiarTab('tabDashboard'); // Default tab
+                
+                // ACTUALIZAR AVATAR DINÁMICO
+                document.getElementById('navAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(sup)}&background=random&color=fff&bold=true`;
+
+                cambiarTab('tabDashboard'); 
             }
             initDashboard();
         }
@@ -223,17 +255,14 @@
             ['tabDashboard', 'tabIngreso'].forEach(t => document.getElementById(t).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             
-            // Navbar styles
             ['btnTabDashboard', 'btnTabIngreso'].forEach(b => { document.getElementById(b).classList.remove('active-tab'); document.getElementById(b).classList.add('opacity-60'); });
             document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('active-tab');
             document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.remove('opacity-60');
 
-            // Manage Docks
             const showDocks = (id === 'tabIngreso');
             if (showDocks) {
                 document.getElementById('audioDock').classList.remove('hidden');
                 document.getElementById('auditTools').classList.remove('hidden');
-                // Ensure buttons are visible/hidden based on dock state
                 toggleDock('audioDock','btnOpenAudio', true); 
                 toggleDock('auditTools','btnOpenTools', true);
             } else {
@@ -246,11 +275,8 @@
 
         // --- DOCKS & TOOLS ---
         function toggleDock(dockId, btnId, forceOpen) {
-            const d = document.getElementById(dockId);
-            const b = document.getElementById(btnId);
-            // Si forceOpen no está definido, alterna. Si está definido, fuerza estado.
+            const d = document.getElementById(dockId), b = document.getElementById(btnId);
             if(forceOpen === true) { d.classList.remove('hidden'); b.classList.add('hidden'); return; }
-            
             if (d.classList.contains('hidden')) { d.classList.remove('hidden'); b.classList.add('hidden'); }
             else { d.classList.add('hidden'); b.classList.remove('hidden'); }
         }
@@ -269,7 +295,6 @@
             const meses = new Set();
             TEAM_DATA.forEach(d => { let f=d.FECHA_LLAMADA||d.FECHA; if(f&&f.length>=7)meses.add(f.substring(0,7)); });
             Array.from(meses).sort().reverse().forEach(m => { const [y, mo] = m.split('-'); sel.add(new Option(`📅 ${MESES[mo]||mo} ${y}`, m)); });
-            
             const dl = document.getElementById('lista-filtro-dash'); const execs = new Set(TEAM_DATA.map(d => d.NOMBRE));
             dl.innerHTML=""; execs.forEach(e => { dl.appendChild(new Option(e, e)); });
             aplicarFiltros();
@@ -288,15 +313,36 @@
         function renderStats(d) {
             const ns = d.map(x => parseFloat(x.NOTA.replace('%',''))||0);
             const tot=ns.length; const prom=tot?(ns.reduce((a,b)=>a+b,0)/tot).toFixed(0):0;
-            document.getElementById('kpiTotal').innerText = tot; document.getElementById('kpiNota').innerText = prom + "%";
+            
+            document.getElementById('kpiTotal').innerText = tot; 
+            const kpiNota = document.getElementById('kpiNota');
+            kpiNota.innerText = prom + "%";
+            kpiNota.className = prom > 84 ? "text-3xl font-black text-emerald-600" : "text-3xl font-black text-rose-600";
+
             document.getElementById('kpiPec').innerText = ns.filter(n=>n===0).length;
-            document.getElementById('kpiPenc').innerText = d.reduce((a,c)=>a+(c.DETALLE?Object.values(c.DETALLE).filter(v=>v==='NO').length:0),0); 
-            document.getElementById('kpiFeed').innerText = d.filter(x=>x.FEEDBACK_STATUS==="REALIZADO").length;
+            const feedCount = d.filter(x=>x.FEEDBACK_STATUS==="REALIZADO").length;
+            document.getElementById('kpiFeedRatio').innerText = `${feedCount} / ${tot}`;
+        }
+
+        function sortTable(col) {
+            if(currentSortCol === col) currentSortAsc = !currentSortAsc;
+            else { currentSortCol = col; currentSortAsc = true; }
+            renderTables(TEAM_DATA); 
+            aplicarFiltros(); 
         }
 
         function renderTables(d) {
             const tb = document.getElementById('tableDetail'); tb.innerHTML = "";
-            d.sort((a,b) => new Date(b.FECHA_LLAMADA||b.FECHA) - new Date(a.FECHA_LLAMADA||a.FECHA));
+            d.sort((a,b) => {
+                let valA, valB;
+                if(currentSortCol === 'NOTA') { valA = parseFloat(a.NOTA.replace('%','')); valB = parseFloat(b.NOTA.replace('%','')); }
+                else if(currentSortCol === 'FECHA') { valA = new Date(a.FECHA_LLAMADA||a.FECHA); valB = new Date(b.FECHA_LLAMADA||b.FECHA); }
+                else if(currentSortCol === 'NOMBRE') { valA = a.NOMBRE; valB = b.NOMBRE; }
+                if (valA < valB) return currentSortAsc ? -1 : 1;
+                if (valA > valB) return currentSortAsc ? 1 : -1;
+                return 0;
+            });
+
             d.forEach(x => {
                 const n = parseFloat(x.NOTA.replace('%',''));
                 const nc = n>=85?"text-emerald-600 bg-emerald-50":(n===0?"text-rose-600 bg-rose-50":"text-amber-600 bg-amber-50");
@@ -306,7 +352,6 @@
             });
         }
 
-        // --- WORKFLOW FEEDBACK ---
         async function registrarFeedback(cod, fecha, nota) {
             const { value: txt } = await Swal.fire({ title: 'Registrar Feedback', html: '<p class="text-xs text-slate-500 mb-4">Ingresa el compromiso:</p>', input: 'textarea', showCancelButton: true, confirmButtonText: 'Guardar', confirmButtonColor: '#6366f1', customClass: { popup: 'rounded-2xl' } });
             if (txt) {
@@ -322,21 +367,70 @@
             }
         }
 
+        // --- DETALLE MEJORADO (V14.0 - Avatar y AudioMsg) ---
         function verDetalleCompleto(d) {
-            let quiebresHtml = "", ok = true;
-            if(d.DETALLE) {
-                for(let [k,v] of Object.entries(d.DETALLE)) {
-                    if(v === 'NO') {
-                        ok = false;
-                        const isPec = ["Validación","Confidencialidad","Normas","Abandono","Registro"].some(pk=>k.includes(pk));
-                        const badge = isPec ? '<span class="bg-rose-100 text-rose-600 text-[9px] px-1 rounded font-bold">PEC</span>' : '<span class="bg-orange-100 text-orange-600 text-[9px] px-1 rounded font-bold">PENC</span>';
-                        quiebresHtml += `<li class="mb-2 pb-2 border-b border-slate-50"><div class="flex items-center gap-2 mb-1">${badge} <span class="font-bold text-xs text-slate-700">${k}</span></div></li>`;
+            let itemsHtml = "";
+            let tieneQuiebres = false;
+
+            if (d.DETALLE) {
+                for (let [keyExcel, valor] of Object.entries(d.DETALLE)) {
+                    if (valor === 'NO') {
+                        tieneQuiebres = true;
+                        const isPec = ["SEG_", "COND_", "OP_", "SIST_"].some(pre => keyExcel.startsWith(pre));
+                        const info = INDICADORES_INFO[keyExcel] || { nombre: keyExcel, desc: "Sin descripción" };
+                        let safeName = info.nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        let regex = new RegExp(`•\\s*${safeName}.*?:\\s*(.*?)(?:\\n|$)`, 'i');
+                        let match = d.OBS.match(regex);
+                        let comentarioEspecifico = match && match[1].trim() ? match[1].trim() : "Revisar observación general.";
+                        const colorClass = isPec ? "text-rose-600 border-rose-200 bg-rose-50" : "text-orange-600 border-orange-200 bg-orange-50";
+                        const badge = isPec ? "PEC" : "PENC";
+
+                        itemsHtml += `
+                        <li class="mb-3 pl-3 border-l-4 ${colorClass} rounded-r-lg p-2">
+                            <div class="flex justify-between items-center mb-1"><span class="font-bold text-xs indicator-tooltip" title="${info.desc}">${info.nombre} <i class="fas fa-info-circle text-[9px] opacity-50 ml-1"></i></span><span class="text-[9px] font-black uppercase opacity-60">${badge}</span></div>
+                            <p class="text-xs text-slate-600 italic">"${comentarioEspecifico}"</p>
+                        </li>`;
                     }
                 }
             }
-            if(ok) quiebresHtml = "<div class='text-center py-4 text-emerald-500 italic text-xs'>Sin errores.</div>";
-            const audioBtn = d.AUDIO ? `<a href="${d.AUDIO}" target="_blank" class="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center font-bold py-2 rounded-lg text-xs mb-3 shadow-md">Escuchar Audio</a>` : `<div class="text-center text-slate-300 text-xs py-2 bg-slate-50 rounded mb-3 italic">Audio no disponible</div>`;
-            Swal.fire({ html: `<div class="text-left"><div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3"><div><span class="text-[9px] font-bold text-slate-400 uppercase">Detalle Auditoría</span><h3 class="text-lg font-black text-slate-700">${d.NOMBRE}</h3><div class="flex gap-2 mt-1"><span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold">Sem: ${d.SEMANA}</span><span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold">${d.FECHA_LLAMADA||d.FECHA}</span></div></div><div class="text-right"><span class="block text-4xl font-black ${parseFloat(d.NOTA)>=85?'text-emerald-500':(parseFloat(d.NOTA)===0?'text-rose-500':'text-amber-500')}">${d.NOTA}</span></div></div>${audioBtn}<div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-3"><h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Observación</h4><p class="text-xs text-slate-600 italic">"${d.OBS}"</p></div><div class="bg-white border border-slate-200 rounded-xl p-3"><h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2 border-b border-slate-100 pb-1">Quiebres</h4><ul class="max-h-40 overflow-y-auto pr-1 custom-scrollbar">${quiebresHtml}</ul></div></div>`, showConfirmButton: false, showCloseButton: true, width: '500px', customClass: { popup: 'rounded-2xl' } });
+
+            if (!itemsHtml) itemsHtml = "<div class='text-center py-6 text-emerald-500 bg-emerald-50 rounded-xl border border-emerald-100 italic text-xs'><i class='fas fa-check-circle text-2xl mb-2 block'></i>¡Felicitaciones!<br>Auditoría sin quiebres detectados.</div>";
+
+            let audioSection = "";
+            if (d.AUDIO_URL && d.AUDIO_URL.length > 5) {
+                audioSection = `<div class="bg-slate-100 p-2 rounded border border-slate-200 mb-3"><p class="text-[9px] font-bold text-slate-400 uppercase mb-1"><i class="fas fa-play-circle"></i> Audio Llamada</p><audio controls src="${d.AUDIO_URL}" class="w-full h-8"></audio></div>`;
+            } else {
+                audioSection = `
+                <div class="bg-amber-50 p-3 rounded border border-amber-200 mb-3 flex items-center gap-3">
+                    <div class="bg-amber-100 text-amber-500 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-link-slash"></i></div>
+                    <div><p class="text-xs font-bold text-amber-700">Link de audio no ingresado</p><p class="text-[10px] text-amber-600">El auditor no adjuntó la grabación en este registro.</p></div>
+                </div>`;
+            }
+
+            const rutPac = d.RUT_PACIENTE || 'No registrado';
+
+            Swal.fire({
+                title: `<div class="text-left"><span class="text-xs text-slate-400 font-normal uppercase block">Detalle Evaluación</span>${d.NOMBRE}</div>`,
+                html: `
+                    <div class="text-left">
+                        <div class="flex justify-between items-center mb-4">
+                            <div><span class="block text-[9px] font-bold text-slate-400 uppercase">RUT Paciente</span><div class="flex items-center gap-2"><span class="font-mono text-xs font-bold bg-slate-100 px-2 rounded">${rutPac}</span><button onclick="navigator.clipboard.writeText('${rutPac}')" class="text-indigo-500 hover:text-indigo-700" title="Copiar"><i class="fas fa-copy"></i></button></div></div>
+                            <div class="text-right"><span class="text-6xl font-black ${parseFloat(d.NOTA)>=85?'text-emerald-500':(parseFloat(d.NOTA)===0?'text-red-500':'text-amber-500')} tracking-tighter leading-none">${d.NOTA}</span><span class="block text-[9px] text-slate-300 font-bold uppercase">Nota Final</span></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-2 rounded mb-3 border border-slate-100">
+                            <div><span class="font-bold text-slate-400">Fecha:</span> ${d.FECHA_LLAMADA||d.FECHA} ${d.HORA_LLAMADA||''}</div>
+                            <div><span class="font-bold text-slate-400">Semana:</span> ${d.SEMANA}</div>
+                            <div><span class="font-bold text-slate-400">Auditor:</span> ${d.AUDITOR_REAL || d.AUDITOR || 'Admin'}</div>
+                            <div><span class="font-bold text-slate-400">Supervisor:</span> ${d.SUPERVISOR}</div>
+                        </div>
+                        ${audioSection}
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Observación General</p>
+                        <div class="text-xs bg-slate-50 p-2 italic mb-3 border border-slate-100 rounded text-slate-600">"${d.OBS.split('---')[0]}"</div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Detalle Quiebres</p>
+                        <ul class="max-h-32 overflow-y-auto pr-1 mb-2 custom-scrollbar">${itemsHtml}</ul>
+                    </div>`,
+                width: '550px', showCloseButton: true, showConfirmButton: false, customClass: { popup: 'rounded-2xl' }
+            });
         }
 
         // --- FORMULARIO NUEVA AUDITORÍA ---
