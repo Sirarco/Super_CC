@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Supervisor QA</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👔</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; transition: background-color 0.3s; overflow: hidden; }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Navbar State */
+        .nav-btn { opacity: 0.6; transition: all 0.3s; border-bottom: 2px solid transparent; }
+        .nav-btn:hover { opacity: 1; background-color: rgba(255,255,255,0.1); }
+        .active-tab { opacity: 1 !important; font-weight: 700; border-bottom: 2px solid #34d399; background-color: rgba(255,255,255,0.15); }
+
+        /* Docks & Tools */
+        .dock-panel { transition: all 0.3s ease; backdrop-filter: blur(10px); transform: scale(1.15); }
+        .counter-row { @apply flex justify-between items-center border-b border-gray-200/50 pb-2 mb-2 last:border-0 last:mb-0 last:pb-0; }
+        
+        /* Tooltips (Solo Hover) */
+        .tooltip-container { position: relative; display: inline-flex; align-items: center; cursor: help; }
+        .tooltip-text { 
+            visibility: hidden; width: 200px; background-color: #1e293b; color: #fff; text-align: left; 
+            border-radius: 6px; padding: 10px; position: absolute; z-index: 50; 
+            bottom: 100%; left: 0; margin-bottom: 5px; opacity: 0; transition: opacity 0.2s; 
+            font-size: 10px; line-height: 1.3; box-shadow: 0 4px 6px rgba(0,0,0,0.3); pointer-events: none; 
+        }
+        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+        /* Feedback Status */
+        .feedback-done { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-style: italic; display: inline-block; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col text-slate-700 relative">
+
+    <div id="viewLogin" class="absolute inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center p-6">
+        <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 max-w-md w-full text-center">
+            <div class="mb-6 bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-indigo-600 text-3xl shadow-inner"><i class="fas fa-user-tie"></i></div>
+            <h1 class="text-2xl font-black text-slate-700 mb-2">Acceso Supervisor</h1>
+            <p class="text-sm text-slate-400 mb-8">Gestión de Calidad 2026</p>
+            <div class="relative mb-6">
+                <i class="fas fa-user absolute left-4 top-4 text-slate-300"></i>
+                <select id="loginSupSelect" class="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-xl text-slate-600 font-bold outline-none focus:border-indigo-500 transition appearance-none bg-white"><option value="" disabled selected>Selecciona tu nombre...</option></select>
+                <i class="fas fa-chevron-down absolute right-4 top-4 text-slate-300 pointer-events-none"></i>
+            </div>
+            <button onclick="loginSupervisor()" id="btnLogin" disabled class="w-full bg-slate-300 text-white font-bold py-4 rounded-xl transition shadow-lg transform active:scale-[0.98]">CARGANDO DATOS...</button>
+            <p id="loginStatus" class="text-xs text-blue-500 mt-4 h-4 font-bold animate-pulse">Conectando...</p>
+        </div>
+    </div>
+
+    <div id="viewApp" class="hidden h-full flex flex-col relative">
+        <nav class="bg-indigo-900 text-white px-6 py-2 flex justify-between items-center shadow-lg shrink-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/20 w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-inner"><i class="fas fa-chart-network text-xl"></i></div>
+                <div><h1 class="font-bold text-lg leading-none" id="navSupName">Supervisor</h1><p class="text-[10px] opacity-70 uppercase tracking-widest mt-1">Portal de Liderazgo</p></div>
+            </div>
+            <div class="flex gap-2 text-xs bg-black/20 p-1 rounded-lg">
+                <button onclick="cambiarTab('tabDashboard')" id="btnTabDashboard" class="nav-btn active-tab px-4 py-2 rounded text-white"><i class="fas fa-chart-line mr-2"></i>Dashboard</button>
+                <button onclick="cambiarTab('tabIngreso')" id="btnTabIngreso" class="nav-btn px-4 py-2 rounded text-white"><i class="fas fa-edit mr-2"></i>Nueva Auditoría</button>
+            </div>
+            <div class="flex items-center gap-3"><button onclick="location.reload()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow"><i class="fas fa-sign-out-alt mr-2"></i>Salir</button></div>
+        </nav>
+
+        <div id="audioDock" class="dock-panel fixed left-8 top-24 w-72 bg-white/95 border border-slate-200 shadow-2xl rounded-xl z-[60] flex flex-col transform origin-top-left hidden">
+            <div class="bg-slate-800 text-white p-3 rounded-t-xl flex justify-between items-center"><span class="text-xs font-bold uppercase"><i class="fas fa-headphones mr-2"></i>Player</span><button onclick="toggleDock('audioDock','btnOpenAudio')" class="hover:text-slate-300"><i class="fas fa-minus"></i></button></div>
+            <div class="p-4 bg-slate-50 rounded-b-xl border-t border-slate-100">
+                <audio id="mainAudioPlayer" controls class="w-full h-8 mb-2"></audio>
+                <div class="grid grid-cols-3 gap-2"><button onclick="setSpeed(1)" class="bg-slate-200 text-slate-600 py-1 rounded text-xs font-bold hover:bg-indigo-100">1.0x</button><button onclick="setSpeed(1.5)" class="bg-slate-200 text-slate-600 py-1 rounded text-xs font-bold hover:bg-indigo-100">1.5x</button><button onclick="setSpeed(2)" class="bg-slate-200 text-slate-600 py-1 rounded text-xs font-bold hover:bg-indigo-100">2.0x</button></div>
+            </div>
+        </div>
+        <button id="btnOpenAudio" onclick="toggleDock('audioDock','btnOpenAudio')" class="fixed left-0 top-32 bg-indigo-900 text-white p-3 rounded-r-lg shadow-lg z-50 hover:bg-indigo-800 transition hidden"><i class="fas fa-chevron-right"></i></button>
+
+        <div id="auditTools" class="dock-panel fixed right-8 top-24 w-72 bg-white/95 border border-slate-200 shadow-2xl rounded-xl z-[60] flex flex-col hidden transform origin-top-right">
+            <div class="bg-slate-800 text-white p-3 rounded-t-xl flex justify-between items-center"><span class="text-xs font-bold uppercase"><i class="fas fa-tools mr-2"></i>Herramientas</span><button onclick="toggleDock('auditTools','btnOpenTools')" class="hover:text-slate-300"><i class="fas fa-minus"></i></button></div>
+            <div class="p-4 bg-slate-50 rounded-b-xl border-t border-slate-100 space-y-4 max-h-[80vh] overflow-y-auto">
+                <div class="bg-white p-2 rounded border text-center"><div class="text-2xl font-mono font-black mb-1" id="timerDisplay">00:00</div><div class="flex justify-center gap-1"><button onclick="startTimer()" class="bg-emerald-500 text-white w-6 h-6 rounded"><i class="fas fa-play text-[10px]"></i></button><button onclick="pauseTimer()" class="bg-amber-400 text-white w-6 h-6 rounded"><i class="fas fa-pause text-[10px]"></i></button><button onclick="resetTimer()" class="bg-slate-400 text-white w-6 h-6 rounded"><i class="fas fa-undo text-[10px]"></i></button></div></div>
+                <div class="bg-slate-50 p-2 rounded border border-slate-200">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2"><p class="text-[10px] font-bold uppercase">Muletillas</p><div class="flex items-center gap-2"><span class="font-black text-indigo-600 w-6 text-center text-sm" id="cntMuletillas">0</span><button onclick="countUp('cntMuletillas')" class="bg-indigo-100 text-indigo-600 w-5 h-5 rounded font-bold text-xs">+</button><button onclick="countReset('cntMuletillas')" class="text-slate-300 hover:text-red-400"><i class="fas fa-times text-xs"></i></button></div></div>
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2"><p class="text-[10px] font-bold uppercase">Personaliz.</p><div class="flex items-center gap-2"><span class="font-black text-emerald-600 w-6 text-center text-sm" id="cntPerso">0</span><button onclick="countUp('cntPerso')" class="bg-emerald-100 text-emerald-600 w-5 h-5 rounded font-bold text-xs">+</button><button onclick="countReset('cntPerso')" class="text-slate-300 hover:text-red-400"><i class="fas fa-times text-xs"></i></button></div></div>
+                    <div class="flex justify-between items-center"><p class="text-[10px] font-bold uppercase">Otros</p><div class="flex items-center gap-2"><span class="font-black text-slate-600 w-6 text-center text-sm" id="cntOtros">0</span><button onclick="countUp('cntOtros')" class="bg-slate-200 text-slate-600 w-5 h-5 rounded font-bold text-xs">+</button><button onclick="countReset('cntOtros')" class="text-slate-300 hover:text-red-400"><i class="fas fa-times text-xs"></i></button></div></div>
+                </div>
+                <textarea id="tempNotes" class="w-full h-24 text-xs p-2 border border-slate-300 rounded resize-none focus:outline-none focus:border-indigo-500" placeholder="Notas..."></textarea>
+            </div>
+        </div>
+        <button id="btnOpenTools" onclick="toggleDock('auditTools','btnOpenTools')" class="fixed right-0 top-32 bg-slate-800 text-white p-3 rounded-l-lg shadow-lg z-50 hover:bg-slate-700 transition hidden"><i class="fas fa-chevron-left"></i></button>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-100">
+            
+            <div id="tabDashboard" class="flex flex-col gap-6">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 sticky top-0 z-30">
+                    <div class="flex flex-wrap items-end gap-3">
+                        <div class="flex-1 min-w-[150px]"><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Periodo (Mes)</label><select id="fMes" class="w-full border border-slate-200 p-2.5 rounded-lg text-xs font-bold bg-slate-50 outline-none cursor-pointer" onchange="aplicarFiltros()"><option value="TODOS">📅 Histórico</option></select></div>
+                        <div class="flex-[2] min-w-[200px]"><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Buscar Ejecutivo</label><input type="text" id="fSearch" list="lista-filtro-dash" class="w-full pl-4 border border-slate-200 p-2.5 rounded-lg text-xs font-bold bg-slate-50 outline-none uppercase" placeholder="Escribe nombre..." oninput="aplicarFiltros()"><datalist id="lista-filtro-dash"></datalist></div>
+                        <div class="flex gap-2"><button onclick="resetFiltros()" class="px-4 py-2.5 bg-slate-100 text-slate-500 rounded-lg font-bold text-xs hover:bg-slate-200 border border-slate-200"><i class="fas fa-eraser"></i></button><button onclick="updateData()" class="px-4 py-2.5 bg-blue-100 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-200 border border-blue-200"><i class="fas fa-sync-alt mr-1"></i> Actualizar</button></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-slate-500"><p class="text-[10px] text-slate-400 font-bold uppercase">Auditorías</p><p class="text-3xl font-black text-slate-700" id="kpiTotal">-</p></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-indigo-600"><p class="text-[10px] text-indigo-600 font-bold uppercase">Promedio</p><p class="text-3xl font-black text-indigo-600" id="kpiNota">-</p></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-red-500"><p class="text-[10px] text-red-500 font-bold uppercase">Críticos</p><p class="text-3xl font-black text-red-500" id="kpiPec">-</p></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-orange-400"><p class="text-[10px] text-orange-500 font-bold uppercase">Leves</p><p class="text-3xl font-black text-orange-500" id="kpiPenc">-</p></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-purple-500"><p class="text-[10px] text-purple-500 font-bold uppercase">Feedback</p><p class="text-3xl font-black text-purple-500" id="kpiFeed">-</p></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[600px]">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center shrink-0"><h3 class="font-bold text-slate-700 text-sm"><i class="fas fa-users-cog mr-2 text-slate-400"></i>Gestión de Equipo</h3><span class="text-[10px] text-slate-400 uppercase font-bold bg-slate-100 px-3 py-1 rounded-full" id="lblPeriodo">Todos</span></div>
+                    <div class="overflow-auto flex-1"><table class="w-full text-xs text-left"><thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 sticky top-0 z-10"><tr><th class="p-4">Ejecutivo</th><th class="p-4">Fecha</th><th class="p-4 text-center">Nota</th><th class="p-4 text-center">Feedback</th><th class="p-4 text-center">Acción</th></tr></thead><tbody id="tableDetail" class="divide-y divide-slate-100"></tbody></table></div>
+                </div>
+            </div>
+
+            <div id="tabIngreso" class="hidden">
+                <div class="max-w-6xl mx-auto bg-white rounded-lg shadow border border-slate-200 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center"><h2 class="font-bold text-gray-700 text-sm"><i class="fas fa-file-contract mr-2"></i>Evaluación de Calidad</h2><span class="text-[10px] bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-500 uppercase font-bold">Líder</span></div>
+                    <form id="auditForm" class="p-4 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50/50 p-3 rounded border border-slate-100">
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Fecha Llamada</label><input type="date" id="fechaLlamada" name="fecha_llamada" class="w-full border border-slate-300 rounded p-1.5 text-xs font-bold outline-none" required onchange="calcSemana()"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Hora</label><input type="time" id="horaLlamada" name="hora_llamada" class="w-full border border-slate-300 rounded p-1.5 text-xs font-bold outline-none" required></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Semana</label><input type="text" id="inputSemana" name="semana" class="w-full bg-slate-100 border border-slate-300 rounded p-1.5 text-xs text-slate-500 cursor-not-allowed" readonly></div>
+                            <div><label class="block text-[10px] font-bold text-blue-500 uppercase mb-0.5">RUT Paciente</label><input type="text" name="rut_paciente" class="w-full border border-slate-300 rounded p-1.5 text-xs font-bold" placeholder="12.345.678-9"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="md:col-span-2 relative"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Ejecutivo</label><input type="text" id="inputNombre" name="nombre" list="lista-ejecutivos" class="w-full pl-2 border border-slate-300 rounded p-1.5 text-xs font-bold outline-none uppercase" placeholder="Buscar..." autocomplete="off"><datalist id="lista-ejecutivos"></datalist></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Audio URL</label><div class="flex gap-1"><input type="url" id="inputAudioUrl" name="audio_url" class="w-full border border-slate-300 rounded p-1.5 text-xs text-blue-600 font-mono" placeholder="https://..."><button type="button" onclick="loadAudioFromForm()" class="bg-indigo-600 text-white px-3 rounded hover:bg-indigo-700 transition"><i class="fas fa-play text-xs"></i></button></div></div>
+                        </div>
+                        <div class="flex gap-4 bg-slate-50 p-2 rounded border border-slate-100 text-[10px]">
+                            <div><span class="font-bold text-slate-400 uppercase mr-1">Cód:</span><input id="inputCodigo" name="codigo" class="bg-transparent font-bold w-16" readonly></div>
+                            <div><span class="font-bold text-slate-400 uppercase mr-1">Sup:</span><input id="inputSup" name="supervisor" class="bg-transparent font-bold w-32" readonly></div>
+                            <div><span class="font-bold text-slate-400 uppercase mr-1">Serv:</span><input id="inputServ" name="servicio" class="bg-transparent font-bold w-32" readonly></div>
+                        </div>
+                        <div class="hidden"><input type="date" id="fechaAuditoria" name="fecha_auditoria"><input type="text" id="inputAuditorReal" name="auditor_real" value=""><input type="text" name="rut" value="N/A"></div>
+                        <div class="border border-slate-200 rounded overflow-hidden">
+                            <table class="w-full text-[11px]">
+                                <thead class="bg-slate-800 text-white uppercase tracking-wider text-[10px]"><tr><th class="p-2 text-left">Indicador</th><th class="p-2 text-center w-20">Cumple</th><th class="p-2 text-center w-20">Estado</th><th class="p-2 text-left">Observación</th></tr></thead>
+                                <tbody id="tablaItems" class="divide-y divide-slate-100 bg-white"></tbody>
+                                <tfoot class="bg-slate-50 border-t border-slate-200"><tr><td colspan="2" class="p-3 text-right font-bold text-slate-500">NOTA FINAL:</td><td colspan="2" class="p-3 text-left"><div id="totalScore" class="font-black text-2xl text-slate-300 transition-all duration-300">0%</div></td></tr></tfoot>
+                            </table>
+                        </div>
+                        <input type="hidden" name="nota_final" id="notaFinalHidden" value="0%">
+                        <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Comentarios</label><textarea name="comentario" id="mainComments" class="w-full border border-slate-300 rounded p-2 text-xs focus:ring-1 focus:ring-blue-500 outline-none h-16 resize-none" placeholder="Observaciones generales..."></textarea></div>
+                        <button type="submit" id="btnGuardar" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded shadow transition flex justify-center items-center gap-2 text-xs tracking-widest uppercase"><i class="fas fa-save text-emerald-400"></i> Guardar Auditoría</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbzs8tLZVq1B-JIiRpgm6Ifam0SQrwDm9NMkMCpz-3n1LiqKDtjQ3cE4gceJjmvYywZajA/exec"; 
+
+        const SUPERVISORES = ["Luis Cataldo", "Angélica Ferrada", "Carla Cabrera", "Aracely Torres"];
+        const MESES = { "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril", "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto", "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre" };
+        const baseEjecutivos = [
+            {nombre:"Andreina Villalon Mejías", codigo:"CC1683", sup:"Luis Cataldo", serv:"Bloqueo"}, {nombre:"Oscar Hidalgo Luco", codigo:"CC9827", sup:"Luis Cataldo", serv:"Bloqueo"}, {nombre:"Lorena Rodriguez Salazar", codigo:"CC4346", sup:"Luis Cataldo", serv:"Bloqueo"}, {nombre:"Angelica Galleguillos Abarca", codigo:"CC5251", sup:"Luis Cataldo", serv:"Bloqueo"},
+            {nombre:"Miriam Bruges De Torres", codigo:"CC0928", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Cristobal Fernandez Azares", codigo:"CC0315", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Carla Garay Vidal", codigo:"CC5070", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Jorge Yanez Cortés", codigo:"CC2467", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Maria Paz Nuñez Baeza", codigo:"CC5178", sup:"Angélica Ferrada", serv:"Ingreso"},
+            {nombre:"Diego Cea Briceño", codigo:"CC7625", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Edith Ossandon Montoya", codigo:"CC2762", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Johanna Herrera Merida", codigo:"CC7119", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Lesli Agudelo Viveros", codigo:"CC3118", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Maria Cristina Barón Barón", codigo:"CC1815", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Yessenia Gonzalez González", codigo:"CC6869", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Paola Herrera Barriga", codigo:"CC3898", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Adrian Manzanilla Rangel", codigo:"CC0506", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"María Farías Quintero", codigo:"CC0851", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Saymar Paéz García", codigo:"CC1992", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Katya Cáceres González", codigo:"CC1225", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Belfred Belis Mijares", codigo:"CC8219", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Carla Cabrera Lara", codigo:"S5388", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Aracely Torres Faúndez", codigo:"S7637", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Luis Cataldo Galaz", codigo:"S2065", sup:"Aracely Torres", serv:"HLF"}, {nombre:"María Angélica Ferrada Cea", codigo:"S7705", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Marco Lara Vera", codigo:"S0226", sup:"Aracely Torres", serv:"HLF"}
+        ];
+        const pautaItems = [
+            {cat:"PEC", label:"Validación Identidad", name:"item_validacion", tip:"Solicita RUT y Nombre completo."}, {cat:"PEC", label:"Confidencialidad", name:"item_confidencialidad", tip:"Resguardo de datos sensibles."}, {cat:"PEC", label:"Normas de Conducta", name:"item_normas", tip:"No grita, no corta llamada."}, {cat:"PEC", label:"Abandono", name:"item_abandono", tip:"No deja en mudo excesivo."}, {cat:"PEC", label:"Registro", name:"item_registro", tip:"Deja nota o glosa."},
+            {cat:"PENC", label:"Script Inicio/Cierre (5%)", name:"item_script", w:5, tip:"Saludo institucional."}, {cat:"PENC", label:"Cortesía y Trato (5%)", name:"item_cortesia", w:5, tip:"Usa 'Usted', por favor."}, {cat:"PENC", label:"Sondeo (15%)", name:"item_sondeo", w:15, tip:"Preguntas correctas."}, {cat:"PENC", label:"Entrega Información (20%)", name:"item_info", w:20, tip:"Info correcta y completa."}, {cat:"PENC", label:"Manejo Tiempos (10%)", name:"item_tiempos", w:10, tip:"Retoma cada 45 segs."}, {cat:"PENC", label:"Aseguramiento (10%)", name:"item_aseguramiento", w:10, tip:"Valida entendimiento."}, {cat:"PENC", label:"Personalización (5%)", name:"item_personalizacion", w:5, tip:"Usa nombre paciente."}, {cat:"PENC", label:"Lenguaje (5%)", name:"item_lenguaje", w:5, tip:"Modulación clara."}, {cat:"PENC", label:"Empatía (10%)", name:"item_empatia", w:10, tip:"Conecta emocionalmente."}, {cat:"PENC", label:"Tipificación (15%)", name:"item_tipificacion", w:15, tip:"Motivo correcto CRM."}
+        ];
+        const PAUTA_DEFS = {}; pautaItems.forEach(i=>PAUTA_DEFS[i.label]=i.tip); 
+
+        let ALL_DATA = [], TEAM_DATA = [], CURRENT_SUP = "";
+        let timerInterval, seconds=0;
+
+        window.onload = () => {
+            const sel = document.getElementById('loginSupSelect');
+            SUPERVISORES.forEach(s => sel.add(new Option(s, s)));
+            renderFormTable(); initFormLogic();
+            loadData();
+        };
+
+        // --- CARGA ---
+        async function loadData() {
+            const status = document.getElementById('loginStatus'); const btn = document.getElementById('btnLogin');
+            try {
+                if(status) status.innerText = "Conectando con Google...";
+                const proxy = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(API_URL + "?t=" + Date.now());
+                const resp = await fetch(proxy);
+                if (!resp.ok) throw new Error('Error de red');
+                ALL_DATA = await resp.json();
+                if(Array.isArray(ALL_DATA)) {
+                    if(status) { status.innerText = "Datos cargados. Selecciona tu nombre."; status.className = "text-xs text-emerald-500 mt-4 h-4 font-bold"; }
+                    if(btn) { btn.disabled = false; btn.classList.replace('bg-slate-300','bg-indigo-600'); btn.classList.replace('text-white','text-white'); btn.innerText="INGRESAR AL PORTAL"; }
+                    if(!document.getElementById('viewApp').classList.contains('hidden')){ loginSupervisor(true); }
+                }
+            } catch (e) {
+                console.error(e);
+                if(status) { status.innerText = "Error de conexión. Intenta nuevamente."; status.className = "text-xs text-rose-500 mt-4 h-4 font-bold"; }
+            }
+        }
+
+        // --- LOGIN & TABS ---
+        function loginSupervisor(isRefresh = false) {
+            const sup = isRefresh ? CURRENT_SUP : document.getElementById('loginSupSelect').value;
+            if(!sup) return Swal.fire("Atención", "Debes seleccionar tu nombre.", "warning");
+            if(ALL_DATA.length === 0) return Swal.fire("Espera", "Aún cargando datos...", "info");
+
+            CURRENT_SUP = sup;
+            TEAM_DATA = ALL_DATA.filter(d => d.SUPERVISOR === sup);
+
+            if(!isRefresh) {
+                document.getElementById('viewLogin').classList.add('hidden');
+                document.getElementById('viewApp').classList.remove('hidden');
+                document.getElementById('navSupName').innerText = sup;
+                document.getElementById('inputAuditorReal').value = sup;
+                cambiarTab('tabDashboard'); // Default tab
+            }
+            initDashboard();
+        }
+
+        function cambiarTab(id) {
+            ['tabDashboard', 'tabIngreso'].forEach(t => document.getElementById(t).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            // Navbar styles
+            ['btnTabDashboard', 'btnTabIngreso'].forEach(b => { document.getElementById(b).classList.remove('active-tab'); document.getElementById(b).classList.add('opacity-60'); });
+            document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('active-tab');
+            document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.remove('opacity-60');
+
+            // Manage Docks
+            const showDocks = (id === 'tabIngreso');
+            if (showDocks) {
+                document.getElementById('audioDock').classList.remove('hidden');
+                document.getElementById('auditTools').classList.remove('hidden');
+                // Ensure buttons are visible/hidden based on dock state
+                toggleDock('audioDock','btnOpenAudio', true); 
+                toggleDock('auditTools','btnOpenTools', true);
+            } else {
+                document.getElementById('audioDock').classList.add('hidden');
+                document.getElementById('auditTools').classList.add('hidden');
+                document.getElementById('btnOpenAudio').classList.add('hidden');
+                document.getElementById('btnOpenTools').classList.add('hidden');
+            }
+        }
+
+        // --- DOCKS & TOOLS ---
+        function toggleDock(dockId, btnId, forceOpen) {
+            const d = document.getElementById(dockId);
+            const b = document.getElementById(btnId);
+            // Si forceOpen no está definido, alterna. Si está definido, fuerza estado.
+            if(forceOpen === true) { d.classList.remove('hidden'); b.classList.add('hidden'); return; }
+            
+            if (d.classList.contains('hidden')) { d.classList.remove('hidden'); b.classList.add('hidden'); }
+            else { d.classList.add('hidden'); b.classList.remove('hidden'); }
+        }
+        function startTimer() { if(!timerInterval) timerInterval=setInterval(()=>{seconds++; let d=new Date(seconds*1000).toISOString().substr(14,5); document.getElementById('timerDisplay').innerText=d;},1000); }
+        function pauseTimer() { clearInterval(timerInterval); timerInterval=null; }
+        function resetTimer() { pauseTimer(); seconds=0; document.getElementById('timerDisplay').innerText="00:00"; }
+        function countUp(id) { const el=document.getElementById(id); el.innerText=parseInt(el.innerText)+1; }
+        function countReset(id) { document.getElementById(id).innerText="0"; }
+        function setSpeed(s) { document.getElementById('mainAudioPlayer').playbackRate = s; }
+        function loadAudioFromForm() { const u=document.getElementById('inputAudioUrl').value; if(u){document.getElementById('mainAudioPlayer').src=u; document.getElementById('mainAudioPlayer').play();} }
+
+        // --- DASHBOARD LOGIC ---
+        function initDashboard() {
+            const sel = document.getElementById('fMes'); 
+            sel.innerHTML = '<option value="TODOS">📅 Histórico</option>';
+            const meses = new Set();
+            TEAM_DATA.forEach(d => { let f=d.FECHA_LLAMADA||d.FECHA; if(f&&f.length>=7)meses.add(f.substring(0,7)); });
+            Array.from(meses).sort().reverse().forEach(m => { const [y, mo] = m.split('-'); sel.add(new Option(`📅 ${MESES[mo]||mo} ${y}`, m)); });
+            
+            const dl = document.getElementById('lista-filtro-dash'); const execs = new Set(TEAM_DATA.map(d => d.NOMBRE));
+            dl.innerHTML=""; execs.forEach(e => { dl.appendChild(new Option(e, e)); });
+            aplicarFiltros();
+        }
+
+        function aplicarFiltros() {
+            const fMes = document.getElementById('fMes').value, fSearch = document.getElementById('fSearch').value.toLowerCase();
+            let filtered = TEAM_DATA;
+            if (fMes !== 'TODOS') { filtered = filtered.filter(d => (d.FECHA_LLAMADA||d.FECHA).startsWith(fMes)); const [y, m] = fMes.split('-'); document.getElementById('lblPeriodo').innerText = `Filtrado: ${MESES[m]} ${y}`; } else document.getElementById('lblPeriodo').innerText = "Todo el Historial";
+            if (fSearch) filtered = filtered.filter(d => d.NOMBRE.toLowerCase().includes(fSearch));
+            renderStats(filtered); renderTables(filtered);
+        }
+        function resetFiltros() { document.getElementById('fMes').value = 'TODOS'; document.getElementById('fSearch').value = ''; aplicarFiltros(); }
+        function updateData() { const b=document.querySelector('button[onclick="updateData()"]'); const o=b.innerHTML; b.innerHTML='<i class="fas fa-spin fa-sync-alt"></i>'; b.disabled=true; loadData().then(()=>{b.innerHTML=o; b.disabled=false; Swal.fire({toast:true,position:'top-end',icon:'success',title:'Actualizado',timer:1500,showConfirmButton:false});}); }
+
+        function renderStats(d) {
+            const ns = d.map(x => parseFloat(x.NOTA.replace('%',''))||0);
+            const tot=ns.length; const prom=tot?(ns.reduce((a,b)=>a+b,0)/tot).toFixed(0):0;
+            document.getElementById('kpiTotal').innerText = tot; document.getElementById('kpiNota').innerText = prom + "%";
+            document.getElementById('kpiPec').innerText = ns.filter(n=>n===0).length;
+            document.getElementById('kpiPenc').innerText = d.reduce((a,c)=>a+(c.DETALLE?Object.values(c.DETALLE).filter(v=>v==='NO').length:0),0); 
+            document.getElementById('kpiFeed').innerText = d.filter(x=>x.FEEDBACK_STATUS==="REALIZADO").length;
+        }
+
+        function renderTables(d) {
+            const tb = document.getElementById('tableDetail'); tb.innerHTML = "";
+            d.sort((a,b) => new Date(b.FECHA_LLAMADA||b.FECHA) - new Date(a.FECHA_LLAMADA||a.FECHA));
+            d.forEach(x => {
+                const n = parseFloat(x.NOTA.replace('%',''));
+                const nc = n>=85?"text-emerald-600 bg-emerald-50":(n===0?"text-rose-600 bg-rose-50":"text-amber-600 bg-amber-50");
+                let fb = `<button onclick="registrarFeedback('${x.CODIGO}','${x.FECHA}','${x.NOTA}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow transition"><i class="fas fa-bullhorn mr-1"></i> Registrar</button>`;
+                if(x.FEEDBACK_STATUS === 'REALIZADO' || (x.FEEDBACK_TXT && x.FEEDBACK_TXT.length > 2)) fb = `<div class="feedback-done" title="${x.FEEDBACK_TXT}"><i class="fas fa-check-circle mr-1"></i> ${x.FEEDBACK_TXT}</div>`;
+                tb.innerHTML += `<tr class="hover:bg-slate-50 transition border-b border-slate-100"><td class="p-4 font-bold text-slate-600">${x.NOMBRE}</td><td class="p-4 text-slate-500">${x.FECHA_LLAMADA||x.FECHA}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-lg border font-black text-xs ${nc}">${x.NOTA}</span></td><td class="p-4 text-center">${fb}</td><td class="p-4 text-center"><button onclick='verDetalleCompleto(${JSON.stringify(x).replace(/'/g,"&#39;")})' class="bg-slate-100 hover:bg-slate-200 text-slate-500 p-2 rounded-lg transition"><i class="fas fa-eye"></i></button></td></tr>`;
+            });
+        }
+
+        // --- WORKFLOW FEEDBACK ---
+        async function registrarFeedback(cod, fecha, nota) {
+            const { value: txt } = await Swal.fire({ title: 'Registrar Feedback', html: '<p class="text-xs text-slate-500 mb-4">Ingresa el compromiso:</p>', input: 'textarea', showCancelButton: true, confirmButtonText: 'Guardar', confirmButtonColor: '#6366f1', customClass: { popup: 'rounded-2xl' } });
+            if (txt) {
+                Swal.fire({ title: 'Guardando...', didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-2xl' } });
+                try {
+                    const payload = { action: "REGISTER_FEEDBACK", codigo: cod, fecha_auditoria: fecha, nota: nota, feedback_text: txt, supervisor: CURRENT_SUP };
+                    await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const idx = TEAM_DATA.findIndex(d => d.CODIGO === cod && (d.FECHA_LLAMADA === fecha || d.FECHA === fecha));
+                    if(idx !== -1) { TEAM_DATA[idx].FEEDBACK_STATUS = "REALIZADO"; TEAM_DATA[idx].FEEDBACK_TXT = txt; }
+                    aplicarFiltros();
+                    Swal.fire({ icon: 'success', title: 'Registrado', timer: 2000, showConfirmButton: false, customClass: { popup: 'rounded-2xl' } });
+                } catch (e) { Swal.fire("Error", "Fallo conexión", "error"); }
+            }
+        }
+
+        function verDetalleCompleto(d) {
+            let quiebresHtml = "", ok = true;
+            if(d.DETALLE) {
+                for(let [k,v] of Object.entries(d.DETALLE)) {
+                    if(v === 'NO') {
+                        ok = false;
+                        const isPec = ["Validación","Confidencialidad","Normas","Abandono","Registro"].some(pk=>k.includes(pk));
+                        const badge = isPec ? '<span class="bg-rose-100 text-rose-600 text-[9px] px-1 rounded font-bold">PEC</span>' : '<span class="bg-orange-100 text-orange-600 text-[9px] px-1 rounded font-bold">PENC</span>';
+                        quiebresHtml += `<li class="mb-2 pb-2 border-b border-slate-50"><div class="flex items-center gap-2 mb-1">${badge} <span class="font-bold text-xs text-slate-700">${k}</span></div></li>`;
+                    }
+                }
+            }
+            if(ok) quiebresHtml = "<div class='text-center py-4 text-emerald-500 italic text-xs'>Sin errores.</div>";
+            const audioBtn = d.AUDIO ? `<a href="${d.AUDIO}" target="_blank" class="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center font-bold py-2 rounded-lg text-xs mb-3 shadow-md">Escuchar Audio</a>` : `<div class="text-center text-slate-300 text-xs py-2 bg-slate-50 rounded mb-3 italic">Audio no disponible</div>`;
+            Swal.fire({ html: `<div class="text-left"><div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3"><div><span class="text-[9px] font-bold text-slate-400 uppercase">Detalle Auditoría</span><h3 class="text-lg font-black text-slate-700">${d.NOMBRE}</h3><div class="flex gap-2 mt-1"><span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold">Sem: ${d.SEMANA}</span><span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold">${d.FECHA_LLAMADA||d.FECHA}</span></div></div><div class="text-right"><span class="block text-4xl font-black ${parseFloat(d.NOTA)>=85?'text-emerald-500':(parseFloat(d.NOTA)===0?'text-rose-500':'text-amber-500')}">${d.NOTA}</span></div></div>${audioBtn}<div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-3"><h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Observación</h4><p class="text-xs text-slate-600 italic">"${d.OBS}"</p></div><div class="bg-white border border-slate-200 rounded-xl p-3"><h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2 border-b border-slate-100 pb-1">Quiebres</h4><ul class="max-h-40 overflow-y-auto pr-1 custom-scrollbar">${quiebresHtml}</ul></div></div>`, showConfirmButton: false, showCloseButton: true, width: '500px', customClass: { popup: 'rounded-2xl' } });
+        }
+
+        // --- FORMULARIO NUEVA AUDITORÍA ---
+        function initFormLogic() {
+            const dl = document.getElementById('lista-ejecutivos'); dl.innerHTML = "";
+            baseEjecutivos.forEach(e => { let o=document.createElement('option'); o.value=e.nombre; dl.appendChild(o); });
+            document.getElementById('inputNombre').addEventListener('input', function() {
+                const f = baseEjecutivos.find(e => e.nombre === this.value);
+                if(f) { document.getElementById('inputCodigo').value=f.codigo; document.getElementById('inputSup').value=f.sup; document.getElementById('inputServ').value=f.serv; }
+            });
+        }
+        function renderFormTable() {
+            const tb=document.getElementById('tablaItems'); tb.innerHTML=""; let lc="";
+            pautaItems.forEach(i => { if(i.cat!==lc){tb.innerHTML+=`<tr><td colspan="4" class="p-2 font-bold text-center ${i.cat==='PEC'?'text-red-600 bg-red-50':'text-blue-600 bg-blue-50'} border-y text-[10px] uppercase">${i.cat}</td></tr>`; lc=i.cat;} tb.innerHTML+=`<tr class="hover:bg-slate-50 border-b border-slate-100"><td class="p-2 relative"><div class="tooltip-container"><span class="font-bold text-slate-700 text-[10px] border-b border-dotted border-slate-400 cursor-help">${i.label}</span><span class="tooltip-text">${i.tip}</span></div></td><td class="p-2 text-center"><select name="${i.name}" class="w-full border rounded p-1 text-[10px] font-bold ${i.cat==='PEC'?'critical':'weighted'}" data-w="${i.w||0}" onchange="updateRow(this)"><option value="">-</option><option value="SI">SI</option><option value="NO">NO</option></select></td><td class="p-2 text-center status-cell">-</td><td class="p-2"><input class="desc-input hidden w-full border border-red-300 rounded p-1 text-[10px]" placeholder="Detalle..."></td></tr>`; });
+        }
+        function updateRow(s) { const r=s.closest('tr'), sc=r.querySelector('.status-cell'), i=r.querySelector('.desc-input'); i.classList.add('hidden'); if(s.value==='SI') sc.innerHTML='<span class="text-emerald-600 font-bold bg-emerald-50 px-1 rounded text-[9px]">OK</span>'; else if(s.value==='NO') { sc.innerHTML='<span class="text-red-600 font-bold bg-red-50 px-1 rounded text-[9px]">NO</span>'; i.classList.remove('hidden'); i.focus(); } else sc.innerHTML='-'; calcScore(); }
+        function calcScore() { let t=0,m=0,c=false; document.querySelectorAll('.critical').forEach(s=>{if(s.value==='NO')c=true}); document.querySelectorAll('.weighted').forEach(s=>{const w=parseFloat(s.dataset.w);if(s.value==='SI'){t+=w;m+=w}else if(s.value==='NO')m+=w}); const f=(!c && m>0)?Math.round((t/m)*100):(c?0:0); document.getElementById('totalScore').innerText=f+"%"; document.getElementById('notaFinalHidden').value=f+"%"; }
+        function calcSemana() { const f=document.getElementById('fechaLlamada').value; if(f) document.getElementById('inputSemana').value="Semana "+Math.ceil(new Date(f).getDate()/7); }
+
+        document.getElementById('auditForm').addEventListener('submit',function(e){
+            e.preventDefault(); const b=document.getElementById('btnGuardar'), ot=b.innerHTML;
+            if(!document.getElementById('inputCodigo').value) return Swal.fire("Error","Selecciona ejecutivo","warning");
+            b.innerHTML='GUARDANDO...'; b.disabled=true;
+            document.getElementById('fechaAuditoria').value=new Date().toISOString().split('T')[0];
+            let obs=document.querySelector('[name="comentario"]').value, errs="";
+            document.querySelectorAll('.desc-input').forEach(i=>{if(i.value)errs+=`\n• ${i.closest('tr').cells[0].innerText}: ${i.value}`});
+            if(errs) document.querySelector('[name="comentario"]').value=obs+"\n--- DETALLE ---"+errs;
+            const fd=new FormData(this);
+            fetch(API_URL,{method:'POST',body:JSON.stringify(Object.fromEntries(fd)),headers:{'Content-Type':'text/plain'}})
+            .then(()=>{Swal.fire("Listo","Guardado","success");this.reset();document.getElementById('totalScore').innerText="0%";resetTimer();b.innerHTML=ot;b.disabled=false;updateData();})
+            .catch(()=>{Swal.fire("Error","Fallo conexión","error");b.innerHTML=ot;b.disabled=false;});
+        });
+    </script>
+</body>
+</html>
