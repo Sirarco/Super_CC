@@ -212,7 +212,7 @@
         async function loadData() {
             const status = document.getElementById('loginStatus'); const btn = document.getElementById('btnLogin');
             try {
-                if(status) status.innerText = "Conectando con Google...";
+                if(status) status.innerText = "Conectando con...";
                 const proxy = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(API_URL + "?t=" + Date.now());
                 const resp = await fetch(proxy);
                 if (!resp.ok) throw new Error('Error de red');
@@ -466,3 +466,4 @@
     </script>
 </body>
 </html>
+
