@@ -2,624 +2,551 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Supervisor QA</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👔</text></svg>">
-    
+    <title>Supervisor QA - SiperQA</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/es.min.js"></script>
-
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; overflow: hidden; }
-        
-        .btn-press { transition: transform 0.1s ease-in-out, background-color 0.2s; }
-        .btn-press:active { transform: scale(0.95); }
-
-        .nav-btn { opacity: 0.7; transition: all 0.3s; border-bottom: 3px solid transparent; }
-        .nav-btn:hover { opacity: 1; background-color: rgba(255,255,255,0.1); }
-        .active-tab { opacity: 1 !important; font-weight: 800; border-bottom: 3px solid #34d399; background-color: rgba(255,255,255,0.15); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-
-        .dock-panel { transition: all 0.3s ease; backdrop-filter: blur(10px); }
-        .dock-panel:hover { transform: scale(1.02); }
-
-        .tooltip-container { position: relative; display: inline-block; cursor: help; }
+        .active-tab { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: bold; background-color: #eff6ff; }
+        .header-blue { background-color: #3b82f6; color: white; font-weight: bold; }
+        #loginOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .tooltip-container { position: relative; cursor: help; }
         .tooltip-text { 
-            visibility: hidden; width: 260px; background-color: #0f172a; color: #ffffff; text-align: left; 
-            border-radius: 8px; padding: 14px; position: absolute; z-index: 9999 !important; 
-            bottom: 130%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; 
-            font-size: 11px; line-height: 1.5; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); pointer-events: none; border: 1px solid #334155;
+            visibility: hidden; width: 280px; background-color: #1e293b; color: #fff; 
+            text-align: left; border-radius: 8px; padding: 12px; position: fixed; 
+            z-index: 10000; opacity: 0; transition: opacity 0.3s; font-size: 11px; 
+            font-weight: normal; line-height: 1.4; border: 1px solid #3b82f6;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); pointer-events: none;
         }
-        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-5px); }
-        .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 6px; border-style: solid; border-color: #0f172a transparent transparent transparent; }
-
-        .feedback-done { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-style: italic; display: inline-block; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+        .critical-row { background-color: #fff1f2; }
+        .btn-press:active { transform: scale(0.96); transition: 0.1s; }
         
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        .creator-link { font-weight: bold; color: #64748b; transition: color 0.3s; text-decoration: none; }
-        .creator-link:hover { color: #4f46e5; text-decoration: underline; }
+        /* Spinner sencillo */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Estilos tabla ordenable */
+        th.sortable { cursor: pointer; position: relative; }
+        th.sortable:hover { background-color: #f1f5f9; }
     </style>
 </head>
-<body class="h-screen flex flex-col text-slate-700 relative">
+<body class="bg-slate-50 font-sans h-screen flex flex-col overflow-hidden">
 
-    <div id="viewLogin" class="absolute inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center p-6">
-        <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 max-w-md w-full text-center relative overflow-hidden">
-            <div id="loadingOverlay" class="absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center transition-opacity duration-500">
-                <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-                <h2 class="text-xl font-black text-indigo-900 animate-pulse">CARGANDO BASE DE DATOS</h2>
-                <p class="text-xs text-slate-400 mt-2">Sincronizando auditorías y parámetros...</p>
-            </div>
-            <div class="mb-6 bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-indigo-600 text-3xl shadow-inner"><i class="fas fa-user-tie"></i></div>
-            <h1 class="text-2xl font-black text-slate-700 mb-2">Acceso Supervisor</h1>
-            <p class="text-sm text-slate-400 mb-8">Gestión de Calidad 2026</p>
-            <div class="relative mb-6">
-                <i class="fas fa-user absolute left-4 top-4 text-slate-300"></i>
-                <select id="loginSupSelect" class="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-xl text-slate-600 font-bold outline-none focus:border-indigo-500 bg-white appearance-none"><option value="" disabled selected>Selecciona tu nombre...</option></select>
-            </div>
-            <button onclick="loginSupervisor()" id="btnLogin" disabled class="w-full bg-slate-300 text-white font-bold py-4 rounded-xl transition shadow-lg transform active:scale-[0.98] btn-press">INGRESAR AL PORTAL</button>
-            <p id="loginStatus" class="text-xs text-blue-500 mt-4 h-4 font-bold">Iniciando conexión...</p>
+    <div id="loginOverlay">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border-t-4 border-blue-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Acceso Supervisor</h2>
+            <select id="loginSelect" class="w-full p-3 border-2 border-gray-200 rounded-xl mb-6 font-bold text-gray-700 outline-none focus:border-blue-500 bg-gray-50">
+                <option value="">-- Selecciona tu Nombre --</option>
+            </select>
+            <button onclick="iniciarSesion()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg btn-press">
+                INGRESAR
+            </button>
         </div>
     </div>
 
-    <div id="viewApp" class="hidden h-full flex flex-col relative">
-        <nav class="bg-indigo-900 text-white px-6 py-2 flex justify-between items-center shadow-lg shrink-0 z-50">
-            <div class="flex items-center gap-3">
-                <img id="navAvatar" src="" class="w-10 h-10 rounded-lg shadow-inner bg-white" alt="Avatar">
-                <div><h1 class="font-bold text-lg leading-none" id="navSupName">Supervisor</h1><p class="text-[10px] opacity-70 uppercase tracking-widest mt-1">Portal de Liderazgo</p></div>
-            </div>
-            <div class="flex gap-2 text-xs bg-black/20 p-1 rounded-lg">
-                <button onclick="cambiarTab('tabDashboard')" id="btnTabDashboard" class="nav-btn active-tab px-4 py-2 rounded text-white btn-press"><i class="fas fa-chart-line mr-2"></i>Dashboard</button>
-                <button onclick="cambiarTab('tabIngreso')" id="btnTabIngreso" class="nav-btn px-4 py-2 rounded text-white btn-press"><i class="fas fa-edit mr-2"></i>Nueva Auditoría</button>
-            </div>
-            <div class="flex items-center gap-3"><button onclick="location.reload()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow btn-press"><i class="fas fa-sign-out-alt mr-2"></i>Salir</button></div>
-        </nav>
-
-        <div id="audioDock" class="hidden fixed left-8 top-24 w-72 bg-white/95 border border-slate-200 shadow-2xl rounded-xl z-[60] flex flex-col transition-all duration-300 backdrop-blur-md">
-            <div class="bg-slate-800 text-white p-3 rounded-t-xl flex justify-between items-center"><span class="text-xs font-bold uppercase"><i class="fas fa-headphones mr-2"></i>Reproductor</span><button onclick="toggleDock('audioDock','btnOpenAudio')" class="hover:text-slate-300"><i class="fas fa-minus"></i></button></div>
-            <div class="p-4 bg-slate-50 rounded-b-xl border-t border-slate-100">
-                <audio id="mainAudioPlayer" controls class="w-full h-8 mb-2"></audio>
-                <div class="grid grid-cols-3 gap-2"><button onclick="setSpeed(1)" class="bg-slate-200 text-slate-600 py-1 rounded text-xs font-bold hover:bg-indigo-100 btn-press">1.0x</button><button onclick="setSpeed(1.5)" class="bg-slate-200 text-slate-600 py-1 rounded text-xs font-bold hover:bg-indigo-100 btn-press">1.5x</button><button onclick="setSpeed(2)" class="bg-slate-200 text-slate-600 py-1 rounded text-xs font-bold hover:bg-indigo-100 btn-press">2.0x</button></div>
+    <nav class="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm z-40">
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center font-bold">S</div>
+            <div>
+                <span class="font-bold text-gray-700 block leading-tight">Consola Supervisor</span>
+                <span id="labelSupervisor" class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">Sin identificar</span>
             </div>
         </div>
-        <button id="btnOpenAudio" onclick="toggleDock('audioDock','btnOpenAudio')" class="hidden fixed left-0 top-32 bg-indigo-900 text-white p-3 rounded-r-lg shadow-lg z-50 hover:bg-indigo-800 transition btn-press"><i class="fas fa-chevron-right"></i></button>
-
-        <div id="auditTools" class="hidden fixed right-8 top-24 w-72 bg-white/95 border border-slate-200 shadow-2xl rounded-xl z-[60] flex flex-col transition-all duration-300 backdrop-blur-md">
-            <div class="bg-slate-800 text-white p-3 rounded-t-xl flex justify-between items-center"><span class="text-xs font-bold uppercase"><i class="fas fa-tools mr-2"></i>Herramientas</span><button onclick="toggleDock('auditTools','btnOpenTools')" class="hover:text-slate-300"><i class="fas fa-minus"></i></button></div>
-            <div class="p-4 bg-slate-50 rounded-b-xl border-t border-slate-100 space-y-4 max-h-[80vh] overflow-y-auto">
-                <div class="bg-white p-2 rounded border text-center"><div class="text-2xl font-mono font-black mb-1" id="timerDisplay">00:00</div><div class="flex justify-center gap-1"><button onclick="startTimer()" class="bg-emerald-500 text-white w-6 h-6 rounded btn-press"><i class="fas fa-play text-[10px]"></i></button><button onclick="pauseTimer()" class="bg-amber-400 text-white w-6 h-6 rounded btn-press"><i class="fas fa-pause text-[10px]"></i></button><button onclick="resetTimer()" class="bg-slate-400 text-white w-6 h-6 rounded btn-press"><i class="fas fa-undo text-[10px]"></i></button></div></div>
-                <div class="bg-slate-50 p-2 rounded border border-slate-200">
-                    <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2"><p class="text-[10px] font-bold uppercase">Muletillas</p><div class="flex items-center gap-2"><span class="font-black text-indigo-600 w-6 text-center text-sm" id="cntMuletillas">0</span><button onclick="countUp('cntMuletillas')" class="bg-indigo-100 text-indigo-600 w-5 h-5 rounded font-bold text-xs btn-press">+</button><button onclick="countReset('cntMuletillas')" class="text-slate-300 hover:text-red-400"><i class="fas fa-times text-xs"></i></button></div></div>
-                    <div class="flex justify-between items-center"><p class="text-[10px] font-bold uppercase">Otros</p><div class="flex items-center gap-2"><span class="font-black text-slate-600 w-6 text-center text-sm" id="cntOtros">0</span><button onclick="countUp('cntOtros')" class="bg-slate-200 text-slate-600 w-5 h-5 rounded font-bold text-xs btn-press">+</button><button onclick="countReset('cntOtros')" class="text-slate-300 hover:text-red-400"><i class="fas fa-times text-xs"></i></button></div></div>
-                </div>
-                <textarea id="tempNotes" class="w-full h-24 text-xs p-2 border border-slate-300 rounded resize-none focus:outline-none focus:border-indigo-500" placeholder="Notas temporales..."></textarea>
-            </div>
+        <div class="flex gap-2 text-sm bg-gray-100 p-1 rounded-lg">
+            <button onclick="cambiarTab('tabIngreso')" id="btnTabIngreso" class="tab-btn active-tab px-4 py-2 rounded-md transition btn-press">📝 Auditar</button>
+            <button onclick="cambiarTab('tabDashboard')" id="btnTabDashboard" class="tab-btn px-4 py-2 rounded-md transition text-gray-500 hover:text-gray-800 btn-press">📊 Mi Equipo</button>
         </div>
-        <button id="btnOpenTools" onclick="toggleDock('auditTools','btnOpenTools')" class="hidden fixed right-0 top-32 bg-slate-800 text-white p-3 rounded-l-lg shadow-lg z-50 hover:bg-slate-700 transition btn-press"><i class="fas fa-chevron-left"></i></button>
+    </nav>
 
-        <div class="flex-1 overflow-y-auto p-6 bg-slate-100 mb-8">
-            <div id="tabDashboard" class="flex flex-col gap-6">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 sticky top-0 z-30">
-                    <div class="flex flex-wrap items-end gap-3">
-                        <div class="flex-1 min-w-[160px]">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Periodo (Mes)</label>
-                            <select id="fMes" class="w-full border border-slate-200 p-2.5 rounded-lg text-xs font-bold bg-slate-50 cursor-pointer outline-none focus:border-indigo-400 transition" onchange="aplicarFiltros()"><option value="TODOS">📅 Histórico (Todos)</option></select>
-                        </div>
-                        <div class="flex-1 min-w-[140px]">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Periodo (Semana)</label>
-                            <select id="fSemana" class="w-full border border-slate-200 p-2.5 rounded-lg text-xs font-bold bg-slate-50 cursor-pointer outline-none focus:border-indigo-400 transition" onchange="aplicarFiltros()">
-                                <option value="TODAS">Todas las semanas</option>
-                                <option value="Semana 1">Semana 1</option><option value="Semana 2">Semana 2</option><option value="Semana 3">Semana 3</option><option value="Semana 4">Semana 4</option><option value="Semana 5">Semana 5</option>
-                            </select>
-                        </div>
-                        <div class="flex-[2] min-w-[200px]"><label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Buscar Ejecutivo</label><input type="text" id="fSearch" list="lista-filtro-dash" class="w-full pl-4 border border-slate-200 p-2.5 rounded-lg text-xs font-bold bg-slate-50 uppercase outline-none focus:border-indigo-400 transition" placeholder="Escribe nombre..." oninput="aplicarFiltros()"><datalist id="lista-filtro-dash"></datalist></div>
-                        <div class="flex gap-2">
-                            <button onclick="resetFiltros()" class="px-4 py-2.5 bg-slate-100 text-slate-500 rounded-lg font-bold text-xs hover:bg-slate-200 border border-slate-200 btn-press"><i class="fas fa-eraser"></i></button>
-                            <button onclick="updateData()" class="px-4 py-2.5 bg-blue-100 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-200 border border-blue-200 btn-press"><i class="fas fa-sync-alt mr-1"></i> Actualizar</button>
-                        </div>
+    <div id="tabIngreso" class="tab-content p-4 overflow-y-auto flex-1">
+        <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow border border-gray-200">
+            <form id="auditForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-gray-200">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Ejecutivo</label>
+                        <select id="selectEjecutivo" name="nombre" class="w-full border rounded p-2 font-bold text-sm bg-white" required onchange="autocompletarDatos()">
+                            <option value="">-- Seleccionar --</option>
+                        </select>
                     </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Código</label>
+                        <input type="text" id="inputCodigo" name="codigo" class="w-full bg-gray-100 border rounded p-2 text-sm font-mono" readonly>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Supervisor</label>
+                        <input type="text" id="inputSup" name="supervisor" class="w-full bg-gray-100 border rounded p-2 text-sm" readonly>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Servicio</label>
+                        <input type="text" id="inputServ" name="servicio" class="w-full bg-gray-100 border rounded p-2 text-sm" readonly>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Fecha Llamada</label>
+                        <input type="date" id="fechaLlamada" name="fecha_llamada" class="w-full border rounded p-2 text-sm" required onchange="calcularSemana()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Hora Llamada</label>
+                        <input type="time" name="hora_llamada" class="w-full border rounded p-2 text-sm" required>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-blue-600 uppercase">RUT Paciente</label>
+                        <input type="text" name="rut_paciente" class="w-full border-2 border-blue-100 rounded p-2 text-sm" required placeholder="12.345.678-9">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">URL Audio (Opcional)</label>
+                        <input type="url" name="audio_url" class="w-full border rounded p-2 text-sm" placeholder="https://...">
+                    </div>
+                </div>
+
+                <input type="hidden" id="inputSemana" name="semana">
+                <input type="hidden" id="fechaAuditoria" name="fecha_auditoria">
+                <input type="hidden" id="inputAuditorReal" name="auditor_real">
+                <input type="hidden" id="notaFinalHidden" name="nota_final" value="0%">
+
+                <div class="overflow-x-auto rounded border border-gray-300">
+                    <table class="w-full text-[11px]">
+                        <thead>
+                            <tr class="header-blue text-center uppercase">
+                                <th class="p-2 w-24">Categoría</th>
+                                <th class="p-2 text-left">Indicador</th>
+                                <th class="p-2 w-16">Tipo</th>
+                                <th class="p-2 w-24">Cumple</th>
+                                <th class="p-2 w-48 bg-slate-700 text-white">Observación de Quiebre</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pautaBody" class="divide-y divide-gray-200"></tbody>
+                        <tfoot>
+                            <tr class="bg-gray-800 text-white">
+                                <td colspan="4" class="p-3 text-right font-bold text-sm uppercase">Nota Final:</td>
+                                <td class="p-3 text-center font-black text-2xl" id="totalScore">100%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase">Comentario General y Feedback</label>
+                    <textarea id="comentarioFinal" name="comentario" class="w-full border p-3 rounded h-32 text-sm bg-white" placeholder="Escribe aquí tu análisis general de la llamada..."></textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-slate-500"><p class="text-[10px] text-slate-400 font-bold uppercase">Auditorías</p><p class="text-3xl font-black text-slate-700" id="kpiTotal">-</p></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-indigo-600"><p class="text-[10px] text-indigo-600 font-bold uppercase">Promedio</p><p class="text-3xl font-black text-indigo-600" id="kpiNota">-</p></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-red-500"><p class="text-[10px] text-red-500 font-bold uppercase">Críticos</p><p class="text-3xl font-black text-red-500" id="kpiPec">-</p></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-purple-500"><p class="text-[10px] text-purple-500 font-bold uppercase">Feedback / Total</p><p class="text-3xl font-black text-purple-500" id="kpiFeedRatio">-</p></div>
+                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 btn-press">
+                    <i class="fas fa-save mr-2"></i> GUARDAR AUDITORÍA
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="tabDashboard" class="tab-content hidden p-4 overflow-y-auto flex-1 bg-slate-100">
+        <div class="max-w-6xl mx-auto space-y-4">
+            
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase">Mes / Ciclo</label>
+                    <select id="filtroCiclo" class="w-full border rounded p-2 text-sm bg-gray-50" onchange="cargarDashboardEquipo()">
+                        <option value="">Cargando Ciclos...</option>
+                    </select>
                 </div>
-
-                <div id="executiveStats" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[600px]">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center shrink-0"><h3 class="font-bold text-slate-700 text-sm"><i class="fas fa-users-cog mr-2 text-slate-400"></i>Gestión de Equipo</h3><span class="text-[10px] text-slate-400 uppercase font-bold bg-slate-100 px-3 py-1 rounded-full" id="lblPeriodo">Todos</span></div>
-                    <div class="overflow-auto flex-1 custom-scrollbar">
-                        <table class="w-full text-xs text-left">
-                            <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200 sticky top-0 z-10">
-                                <tr>
-                                    <th class="p-4 cursor-pointer hover:bg-slate-100 transition" onclick="sortTable('NOMBRE')">Ejecutivo ↕</th>
-                                    <th class="p-4 cursor-pointer hover:bg-slate-100 transition" onclick="sortTable('FECHA')">Fecha ↕</th>
-                                    <th class="p-4 text-center cursor-pointer hover:bg-slate-100 transition" onclick="sortTable('NOTA')">Nota ↕</th>
-                                    <th class="p-4 text-center">Feedback</th>
-                                    <th class="p-4 text-center">Detalle</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableDetail" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase">Ejecutivo</label>
+                    <input type="text" id="filtroEjecutivo" list="listaEjecutivosFiltro" class="w-full border rounded p-2 text-sm bg-gray-50" placeholder="Buscar nombre...">
+                    <datalist id="listaEjecutivosFiltro"></datalist>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="cargarDashboardEquipo()" class="flex-1 bg-blue-600 text-white p-2 rounded-lg btn-press text-xs font-bold flex items-center justify-center gap-2">
+                        <span id="loadSpinner" class="hidden"><div class="loader" style="width:12px; height:12px; border-width:2px;"></div></span>
+                        <i class="fas fa-sync-alt"></i> ACTUALIZAR
+                    </button>
+                    <button onclick="borrarFiltros()" class="flex-1 bg-gray-500 text-white p-2 rounded-lg btn-press text-xs font-bold">
+                        <i class="fas fa-eraser"></i> BORRAR
+                    </button>
                 </div>
             </div>
 
-            <div id="tabIngreso" class="hidden">
-                <div class="max-w-6xl mx-auto bg-white rounded-lg shadow border border-slate-200">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center"><h2 class="font-bold text-gray-700 text-sm"><i class="fas fa-file-contract mr-2"></i>Nueva Auditoría</h2><span class="text-[10px] bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-500 uppercase font-bold">Evaluación</span></div>
-                    <form id="auditForm" class="p-4 space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50/50 p-3 rounded border border-slate-100">
-                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Fecha Llamada</label><input type="date" id="fechaLlamada" name="fecha_llamada" class="w-full border border-slate-300 rounded p-1.5 text-xs font-bold outline-none focus:border-indigo-400 transition" required onchange="calcSemana()"></div>
-                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Hora</label><input type="time" id="horaLlamada" name="hora_llamada" class="w-full border border-slate-300 rounded p-1.5 text-xs font-bold outline-none focus:border-indigo-400 transition" required></div>
-                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Semana</label><input type="text" id="inputSemana" name="semana" class="w-full bg-slate-100 border border-slate-300 rounded p-1.5 text-xs text-slate-500" readonly></div>
-                            <div><label class="block text-[10px] font-bold text-blue-500 uppercase mb-0.5">RUT Paciente</label><input type="text" name="rut_paciente" class="w-full border border-slate-300 rounded p-1.5 text-xs font-bold outline-none focus:border-indigo-400 transition" placeholder="12.345.678-9"></div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div class="md:col-span-2 relative"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Ejecutivo (Tu Equipo)</label><input type="text" id="inputNombre" name="nombre" list="lista-ejecutivos-propio" class="w-full pl-2 border border-slate-300 rounded p-1.5 text-xs font-bold uppercase outline-none focus:border-indigo-400 transition" placeholder="Seleccionar..." autocomplete="off"><datalist id="lista-ejecutivos-propio"></datalist></div>
-                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Audio URL</label><div class="flex gap-1"><input type="url" id="inputAudioUrl" name="audio_url" class="w-full border border-slate-300 rounded p-1.5 text-xs text-blue-600 font-mono outline-none focus:border-indigo-400 transition" placeholder="https://..."><button type="button" onclick="loadAudioFromForm()" class="bg-indigo-600 text-white px-3 rounded hover:bg-indigo-700 transition btn-press"><i class="fas fa-play text-xs"></i></button></div></div>
-                        </div>
-                        <div class="flex gap-4 bg-slate-50 p-2 rounded border border-slate-100 text-[10px]">
-                            <div><span class="font-bold text-slate-400 uppercase mr-1">Cód:</span><input id="inputCodigo" name="codigo" class="bg-transparent font-bold w-16 text-slate-600" readonly></div>
-                            <div><span class="font-bold text-slate-400 uppercase mr-1">Sup:</span><input id="inputSup" name="supervisor" class="bg-transparent font-bold w-32 text-slate-600" readonly></div>
-                            <div><span class="font-bold text-slate-400 uppercase mr-1">Serv:</span><input id="inputServ" name="servicio" class="bg-transparent font-bold w-32 text-slate-600" readonly></div>
-                        </div>
-                        <div class="hidden"><input type="date" id="fechaAuditoria" name="fecha_auditoria"><input type="text" id="inputAuditorReal" name="auditor_real"></div>
-                        
-                        <div class="border border-slate-200 rounded overflow-visible">
-                            <table class="w-full text-[11px]">
-                                <thead class="bg-slate-800 text-white uppercase text-[10px]"><tr><th class="p-2 text-left">Indicador</th><th class="p-2 text-center w-20">Cumple</th><th class="p-2 text-center w-20">Estado</th><th class="p-2 text-left">Observación</th></tr></thead>
-                                <tbody id="tablaItems" class="divide-y divide-slate-100 bg-white"></tbody>
-                                <tfoot class="bg-slate-50 border-t border-slate-200"><tr><td colspan="2" class="p-3 text-right font-bold text-slate-500">NOTA FINAL:</td><td colspan="2" class="p-3 text-left"><div id="totalScore" class="font-black text-2xl text-slate-300">0%</div></td></tr></tfoot>
-                            </table>
-                        </div>
-                        <input type="hidden" name="nota_final" id="notaFinalHidden" value="0%">
-                        <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Comentarios</label><textarea name="comentario" id="mainComments" class="w-full border border-slate-300 rounded p-2 text-xs h-16 resize-none outline-none focus:border-indigo-400 transition" placeholder="Observaciones generales..."></textarea></div>
-                        <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded shadow transition flex justify-center items-center gap-2 text-xs tracking-widest uppercase btn-press">Guardar Auditoría</button>
-                    </form>
+            <div id="containerTarjetas" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Promedio Equipo</p>
+                    <p class="text-3xl font-black text-slate-700" id="dashProm">0%</p>
                 </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Ciclos Feedback</p>
+                    <p class="text-3xl font-black text-slate-700" id="kpiFeedbackCount">0/0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Casos PEC</p>
+                    <p class="text-3xl font-black text-red-600" id="dashPec">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <table class="w-full text-xs" id="tableMain">
+                    <thead class="bg-slate-100 text-gray-500 uppercase">
+                        <tr>
+                            <th class="p-3 text-left sortable" onclick="sortTable(0)">Ejecutivo <i class="fas fa-sort"></i></th>
+                            <th class="p-3 text-center sortable" onclick="sortTable(1)">Fecha <i class="fas fa-sort"></i></th>
+                            <th class="p-3 text-center sortable" onclick="sortTable(2)">Nota <i class="fas fa-sort"></i></th>
+                            <th class="p-3 text-center sortable" onclick="sortTable(3)">Feedback <i class="fas fa-sort"></i></th>
+                            <th class="p-3 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaEquipo" class="divide-y divide-gray-100"></tbody>
+                </table>
             </div>
         </div>
-
-        <footer class="bg-white border-t border-slate-200 py-3 text-center text-[10px] text-slate-400 uppercase tracking-wider fixed bottom-0 w-full z-40">
-            Sitio desarrollado por <a href="mailto:marco.lara.vera@gmail.com" class="creator-link">Marco Lara</a> - Iniciativa de Calidad 2026
-        </footer>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzs8tLZVq1B-JIiRpgm6Ifam0SQrwDm9NMkMCpz-3n1LiqKDtjQ3cE4gceJjmvYywZajA/exec"; 
-        
-        moment.locale('es');
+        const API_URL = "https://script.google.com/macros/s/AKfycbygEAhS5jdllKf89ecmom2mmay3sCDU8qOyGsTl6Yixy3JpiRumYWvhMVtLtfdF2wZqUA/exec";
+        let CURRENT_USER = "";
+        let FULL_DATA = [];
 
-        const SUPERVISORES = ["Luis Cataldo", "Angélica Ferrada", "Carla Cabrera", "Aracely Torres"];
-        const MESES = { "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril", "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto", "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre" };
         const baseEjecutivos = [
-            {nombre:"Andreina Villalon Mejías", codigo:"CC1683", sup:"Luis Cataldo", serv:"Bloqueo"}, {nombre:"Oscar Hidalgo Luco", codigo:"CC9827", sup:"Luis Cataldo", serv:"Bloqueo"}, {nombre:"Lorena Rodriguez Salazar", codigo:"CC4346", sup:"Luis Cataldo", serv:"Bloqueo"}, {nombre:"Angelica Galleguillos Abarca", codigo:"CC5251", sup:"Luis Cataldo", serv:"Bloqueo"},
-            {nombre:"Miriam Bruges De Torres", codigo:"CC0928", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Cristobal Fernandez Azares", codigo:"CC0315", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Carla Garay Vidal", codigo:"CC5070", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Jorge Yanez Cortés", codigo:"CC2467", sup:"Angélica Ferrada", serv:"Ingreso"}, {nombre:"Maria Paz Nuñez Baeza", codigo:"CC5178", sup:"Angélica Ferrada", serv:"Ingreso"},
-            {nombre:"Diego Cea Briceño", codigo:"CC7625", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Edith Ossandon Montoya", codigo:"CC2762", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Johanna Herrera Merida", codigo:"CC7119", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Lesli Agudelo Viveros", codigo:"CC3118", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Maria Cristina Barón Barón", codigo:"CC1815", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Yessenia Gonzalez González", codigo:"CC6869", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Paola Herrera Barriga", codigo:"CC3898", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"Adrian Manzanilla Rangel", codigo:"CC0506", sup:"Carla Cabrera", serv:"Mesa Central"}, {nombre:"María Farías Quintero", codigo:"CC0851", sup:"Carla Cabrera", serv:"Mesa Central"},
-            {nombre:"Saymar Paéz García", codigo:"CC1992", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Katya Cáceres González", codigo:"CC1225", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Belfred Belis Mijares", codigo:"CC8219", sup:"Aracely Torres", serv:"FDS"}, {nombre:"Carla Cabrera Lara", codigo:"S5388", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Aracely Torres Faúndez", codigo:"S7637", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Luis Cataldo Galaz", codigo:"S2065", sup:"Aracely Torres", serv:"HLF"}, {nombre:"María Angélica Ferrada Cea", codigo:"S7705", sup:"Aracely Torres", serv:"HLF"}, {nombre:"Marco Lara Vera", codigo:"S0226", sup:"Aracely Torres", serv:"HLF"}
+            {nombre:"Andreina Villalon Mejías", codigo:"CC1683", sup:"Luis Cataldo", serv:"Bloqueo"},
+            {nombre:"Oscar Hidalgo Luco", codigo:"CC9827", sup:"Luis Cataldo", serv:"Bloqueo"},
+            {nombre:"Lorena Rodriguez Salazar", codigo:"CC4346", sup:"Luis Cataldo", serv:"Bloqueo"},
+            {nombre:"Angelica Galleguillos Abarca", codigo:"CC5251", sup:"Luis Cataldo", serv:"Bloqueo"},
+            {nombre:"Miriam Bruges De Torres", codigo:"CC0928", sup:"Angélica Ferrada", serv:"Ingreso"},
+            {nombre:"Cristobal Fernandez Azares", codigo:"CC0315", sup:"Angélica Ferrada", serv:"Ingreso"},
+            {nombre:"Carla Garay Vidal", codigo:"CC5070", sup:"Angélica Ferrada", serv:"Ingreso"},
+            {nombre:"Jorge Yanez Cortés", codigo:"CC2467", sup:"Angélica Ferrada", serv:"Ingreso"},
+            {nombre:"Maria Paz Nuñez Baeza", codigo:"CC5178", sup:"Angélica Ferrada", serv:"Ingreso"},
+            {nombre:"Diego Cea Briceño", codigo:"CC7625", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Edith Ossandon Montoya", codigo:"CC2762", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Johanna Herrera Merida", codigo:"CC7119", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Lesli Agudelo Viveros", codigo:"CC3118", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Maria Cristina Barón Barón", codigo:"CC1815", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Yessenia Gonzalez González", codigo:"CC6869", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Paola Herrera Barriga", codigo:"CC3898", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Adrian Manzanilla Rangel", codigo:"CC0506", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"María Farías Quintero", codigo:"CC0851", sup:"Carla Cabrera", serv:"Mesa Central"},
+            {nombre:"Saymar Paéz García", codigo:"CC1992", sup:"Aracely Torres", serv:"FDS"},
+            {nombre:"Katya Cáceres González", codigo:"CC1225", sup:"Aracely Torres", serv:"FDS"},
+            {nombre:"Belfred Belis Mijares", codigo:"CC8219", sup:"Aracely Torres", serv:"FDS"},
+            {nombre:"Carla Cabrera Lara", codigo:"S5388", sup:"Aracely Torres", serv:"HLF"},
+            {nombre:"Aracely Torres Faúndez", codigo:"S7637", sup:"Aracely Torres", serv:"HLF"},
+            {nombre:"Luis Cataldo Galaz", codigo:"S2065", sup:"Aracely Torres", serv:"HLF"},
+            {nombre:"María Angélica Ferrada Cea", codigo:"S7705", sup:"Aracely Torres", serv:"HLF"},
+            {nombre:"Marco Lara Vera", codigo:"S0226", sup:"Aracely Torres", serv:"HLF"}
         ];
-        
-        const INDICADORES_INFO = {
-            "SEG_VALIDACION": { nombre: "Validación Identidad", desc: "Debe solicitar RUT y Nombre completo." },
-            "SEG_CONFIDENCIALIDAD": { nombre: "Confidencialidad", desc: "Resguardo de datos sensibles." },
-            "COND_NORMAS": { nombre: "Normas de Conducta", desc: "Mantiene respeto y tono profesional." },
-            "OP_ABANDONO": { nombre: "Abandono", desc: "No deja al paciente en mudo excesivo." },
-            "SIST_REGISTRO": { nombre: "Registro en CRM", desc: "Deja glosa obligatoria de la gestión." },
-            "PROT_SCRIPT": { nombre: "Script Inicio/Cierre", desc: "Usa saludo y despedida protocolar." },
-            "PROT_CORTESIA": { nombre: "Cortesía y Trato", desc: "Utiliza 'Usted', por favor y gracias." },
-            "GEST_SONDEO": { nombre: "Sondeo", desc: "Preguntas para entender el motivo." },
-            "GEST_INFORMACION": { nombre: "Entrega Información", desc: "Info veraz, completa y correcta." },
-            "GEST_TIEMPOS": { nombre: "Manejo Tiempos", desc: "Retoma contacto cada 45 segundos." },
-            "GEST_ASEGURAMIENTO": { nombre: "Aseguramiento", desc: "Pregunta si quedan dudas." },
-            "HAB_PERSONALIZACION": { nombre: "Personalización", desc: "Usa nombre del paciente." },
-            "HAB_LENGUAJE": { nombre: "Lenguaje", desc: "Modulación clara, sin muletillas." },
-            "HAB_EMPATIA": { nombre: "Empatía", desc: "Conecta con la emoción del paciente." },
-            "SIST_TIPIFICACION": { nombre: "Tipificación", desc: "Selecciona motivo correcto en CRM." }
-        };
 
         const pautaItems = [
-            {cat:"PEC", label:"Validación Identidad", name:"item_validacion", tip: INDICADORES_INFO.SEG_VALIDACION.desc}, 
-            {cat:"PEC", label:"Confidencialidad", name:"item_confidencialidad", tip: INDICADORES_INFO.SEG_CONFIDENCIALIDAD.desc}, 
-            {cat:"PEC", label:"Normas de Conducta", name:"item_normas", tip: INDICADORES_INFO.COND_NORMAS.desc}, 
-            {cat:"PEC", label:"Abandono", name:"item_abandono", tip: INDICADORES_INFO.OP_ABANDONO.desc}, 
-            {cat:"PEC", label:"Registro", name:"item_registro", tip: INDICADORES_INFO.SIST_REGISTRO.desc},
-            {cat:"PENC", label:"Script Inicio/Cierre (5%)", name:"item_script", w:5, tip: INDICADORES_INFO.PROT_SCRIPT.desc}, 
-            {cat:"PENC", label:"Cortesía y Trato (5%)", name:"item_cortesia", w:5, tip: INDICADORES_INFO.PROT_CORTESIA.desc}, 
-            {cat:"PENC", label:"Sondeo (15%)", name:"item_sondeo", w:15, tip: INDICADORES_INFO.GEST_SONDEO.desc}, 
-            {cat:"PENC", label:"Entrega Información (20%)", name:"item_info", w:20, tip: INDICADORES_INFO.GEST_INFORMACION.desc}, 
-            {cat:"PENC", label:"Manejo Tiempos (10%)", name:"item_tiempos", w:10, tip: INDICADORES_INFO.GEST_TIEMPOS.desc}, 
-            {cat:"PENC", label:"Aseguramiento (10%)", name:"item_aseguramiento", w:10, tip: INDICADORES_INFO.GEST_ASEGURAMIENTO.desc}, 
-            {cat:"PENC", label:"Personalización (5%)", name:"item_personalizacion", w:5, tip: INDICADORES_INFO.HAB_PERSONALIZACION.desc}, 
-            {cat:"PENC", label:"Lenguaje (5%)", name:"item_lenguaje", w:5, tip: INDICADORES_INFO.HAB_LENGUAJE.desc}, 
-            {cat:"PENC", label:"Empatía (10%)", name:"item_empatia", w:10, tip: INDICADORES_INFO.HAB_EMPATIA.desc}, 
-            {cat:"PENC", label:"Tipificación (15%)", name:"item_tipificacion", w:15, tip: INDICADORES_INFO.SIST_TIPIFICACION.desc}
+            { cat: "SEGURIDAD", id: "item_validacion", label: "Validación Identidad", type: "PEC", tip: "Solicita RUT y Nombre. Si es tercero, datos de ambos." },
+            { cat: "SEGURIDAD", id: "item_confidencialidad", label: "Confidencialidad", type: "PEC", tip: "No informar diagnósticos sensibles sin validar titularidad." },
+            { cat: "CONDUCTA", id: "item_normas", label: "Normas Conducta", type: "PEC", tip: "Lenguaje formal, evita ruidos molestos o faltas de respeto." },
+            { cat: "OPERACIÓN", id: "item_abandono", label: "Abandono", type: "PEC", tip: "Cortar o dejar en espera infinita (Max 35 seg de silencio)." },
+            { cat: "SISTEMA", id: "item_registro", label: "Registro", type: "PEC", tip: "Deja registro de la gestión en CRM/HIS según protocolo." },
+            { cat: "PROTOCOLO", id: "item_script", label: "Script Inicio/Cierre", type: "PENC", weight: 5, tip: "Saludo y despedida institucional estándar." },
+            { cat: "PROTOCOLO", id: "item_cortesia", label: "Cortesía y Trato", type: "PENC", weight: 5, tip: "Cordialidad y amabilidad durante la llamada." },
+            { cat: "GESTIÓN", id: "item_sondeo", label: "Sondeo", type: "PENC", weight: 15, tip: "Preguntas clave para entender la necesidad del paciente." },
+            { cat: "GESTIÓN", id: "item_info", label: "Entrega Información", type: "PENC", weight: 20, tip: "Informa sobre horas, requisitos y ubicaciones correctamente." },
+            { cat: "GESTIÓN", id: "item_tiempos", label: "Manejo Tiempos", type: "PENC", weight: 10, tip: "Evita esperas innecesarias y gestiona con agilidad." },
+            { cat: "GESTIÓN", id: "item_aseguramiento", label: "Aseguramiento", type: "PENC", weight: 10, tip: "Confirma que el paciente entendió la información." },
+            { cat: "HABILIDADES", id: "item_personalizacion", label: "Personalización", type: "PENC", weight: 5, tip: "Usa el nombre del paciente durante la llamada." },
+            { cat: "HABILIDADES", id: "item_lenguaje", label: "Lenguaje/Dicción", type: "PENC", weight: 5, tip: "Modulación correcta, sin muletillas ni tecnicismos." },
+            { cat: "HABILIDADES", id: "item_empatia", label: "Empatía", type: "PENC", weight: 10, tip: "Valida la preocupación o urgencia del usuario." },
+            { cat: "SISTEMAS", id: "item_tipificacion", label: "Tipificación/Glosa", type: "PENC", weight: 15, tip: "Tipifica motivo y deja glosa explicativa clara." }
         ];
 
-        let ALL_DATA = [], TEAM_DATA = [], CURRENT_SUP = "";
-        let timerInterval, seconds=0;
-        let currentSortCol = 'FECHA', currentSortAsc = false;
+        const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
         window.onload = () => {
-            const sel = document.getElementById('loginSupSelect');
-            SUPERVISORES.forEach(s => sel.add(new Option(s, s)));
-            renderFormTable(); initFormLogic();
-            loadData();
+            const supervisores = [...new Set(baseEjecutivos.map(e => e.sup))].sort();
+            const select = document.getElementById('loginSelect');
+            supervisores.forEach(s => {
+                let opt = document.createElement('option'); opt.value = s; opt.innerText = s;
+                select.appendChild(opt);
+            });
+            renderPauta();
         };
 
-        // --- CARGA DE DATOS ---
-        async function loadData() {
-            const status = document.getElementById('loginStatus'); const btn = document.getElementById('btnLogin');
-            const overlay = document.getElementById('loadingOverlay');
-            try {
-                const proxy = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(API_URL + "?t=" + Date.now());
-                const resp = await fetch(proxy);
-                ALL_DATA = await resp.json();
-                if(Array.isArray(ALL_DATA)) {
-                    overlay.classList.add('opacity-0');
-                    setTimeout(() => overlay.classList.add('hidden'), 500);
-                    btn.disabled = false;
-                    btn.classList.replace('bg-slate-300','bg-indigo-600');
-                    status.innerText = "Base de datos conectada.";
-                }
-            } catch (e) {
-                status.innerText = "Error al conectar. Recarga.";
+        function iniciarSesion() {
+            const user = document.getElementById('loginSelect').value;
+            if(!user) return Swal.fire("Atención", "Selecciona tu nombre", "warning");
+            CURRENT_USER = user;
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('labelSupervisor').innerText = user;
+            const selectEjec = document.getElementById('selectEjecutivo');
+            selectEjec.innerHTML = '<option value="">-- Seleccionar --</option>';
+            baseEjecutivos.filter(e => e.sup === user).forEach(e => {
+                let opt = document.createElement('option'); opt.value = e.nombre; opt.innerText = e.nombre;
+                selectEjec.appendChild(opt);
+            });
+        }
+
+        function autocompletarDatos() {
+            const nombre = document.getElementById('selectEjecutivo').value;
+            const data = baseEjecutivos.find(e => e.nombre === nombre);
+            if(data) {
+                document.getElementById('inputCodigo').value = data.codigo;
+                document.getElementById('inputServ').value = data.serv;
+                document.getElementById('inputSup').value = data.sup;
+                document.getElementById('inputAuditorReal').value = CURRENT_USER;
             }
         }
 
-        function loginSupervisor(isRefresh = false) {
-            const sup = isRefresh ? CURRENT_SUP : document.getElementById('loginSupSelect').value;
-            if(!sup) return;
-            CURRENT_SUP = sup;
-            
-            if(!isRefresh) {
-                document.getElementById('viewLogin').classList.add('hidden');
-                document.getElementById('viewApp').classList.remove('hidden');
-                document.getElementById('navSupName').innerText = sup;
-                document.getElementById('inputAuditorReal').value = sup;
-                document.getElementById('navAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(sup)}&background=random&color=fff&bold=true`;
-                
-                const dl = document.getElementById('lista-ejecutivos-propio');
-                dl.innerHTML = "";
-                baseEjecutivos.filter(e => e.sup === sup).forEach(e => dl.appendChild(new Option(e.nombre, e.nombre)));
+        function renderPauta() {
+            const body = document.getElementById('pautaBody');
+            body.innerHTML = "";
+            pautaItems.forEach(item => {
+                const tr = document.createElement('tr');
+                if(item.type === "PEC") tr.className = "critical-row";
+                tr.innerHTML = `
+                    <td class="p-2 font-bold ${item.type === 'PEC' ? 'text-red-700' : 'text-slate-500'}">${item.cat}</td>
+                    <td class="p-2">
+                        <div class="tooltip-container">
+                            <span class="font-medium">${item.label}</span>
+                            <div class="tooltip-text">${item.tip}</div>
+                        </div>
+                    </td>
+                    <td class="p-2 text-center font-bold ${item.type === 'PEC' ? 'text-red-500' : 'text-blue-500'}">${item.type === 'PEC' ? 'PEC' : item.weight+'%'}</td>
+                    <td class="p-1"><select name="${item.id}" class="w-full border rounded p-1 calc-trigger" data-id="${item.id}" data-type="${item.type}" data-weight="${item.weight || 0}" onchange="toggleObs(this)"><option value="SI">SI</option><option value="NO">NO</option></select></td>
+                    <td class="p-1"><input type="text" id="obs_${item.id}" class="obs-input w-full border border-blue-200 rounded p-1 hidden text-[10px]" placeholder="¿Por qué no cumple?"></td>
+                `;
+                body.appendChild(tr);
+            });
+        }
 
-                cambiarTab('tabDashboard'); 
-            }
-            initDashboard(); // Forzar recalculado de meses
+        function toggleObs(select) {
+            const input = document.getElementById('obs_' + select.dataset.id);
+            if(select.value === 'NO') input.classList.remove('hidden');
+            else { input.classList.add('hidden'); input.value = ""; }
+            calculateScore();
+        }
+
+        function calculateScore() {
+            let total = 0, isPec = false;
+            document.querySelectorAll('.calc-trigger').forEach(sel => {
+                if(sel.dataset.type === "PEC" && sel.value === "NO") isPec = true;
+                if(sel.dataset.type === "PENC" && sel.value === "SI") total += parseInt(sel.dataset.weight);
+            });
+            const nota = isPec ? 0 : total;
+            document.getElementById('totalScore').innerText = nota + "%";
+            document.getElementById('notaFinalHidden').value = nota + "%";
+        }
+
+        function calcularSemana() {
+            const f = document.getElementById('fechaLlamada').value;
+            const d = new Date(f).getUTCDate();
+            const s = Math.ceil(d/7);
+            document.getElementById('inputSemana').value = "Semana " + (s > 4 ? 4 : s);
         }
 
         function cambiarTab(id) {
-            ['tabDashboard', 'tabIngreso'].forEach(t => document.getElementById(t).classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
             document.getElementById(id).classList.remove('hidden');
-            ['btnTabDashboard', 'btnTabIngreso'].forEach(b => document.getElementById(b).classList.remove('active-tab'));
-            document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('active-tab');
-
-            const isIngreso = (id === 'tabIngreso');
-            document.getElementById('audioDock').classList.toggle('hidden', !isIngreso);
-            document.getElementById('auditTools').classList.toggle('hidden', !isIngreso);
-            if(isIngreso) {
-                toggleDock('audioDock','btnOpenAudio', true);
-                toggleDock('auditTools','btnOpenTools', true);
-            } else {
-                 document.getElementById('btnOpenAudio').classList.add('hidden');
-                 document.getElementById('btnOpenTools').classList.add('hidden');
-            }
+            const btnId = id === 'tabIngreso' ? 'btnTabIngreso' : 'btnTabDashboard';
+            document.getElementById(btnId).classList.add('active-tab');
+            if(id === 'tabDashboard') cargarDashboardEquipo();
         }
 
-        function toggleDock(dockId, btnId, forceOpen) {
-            const d = document.getElementById(dockId), b = document.getElementById(btnId);
-            if(forceOpen === true) { d.classList.remove('hidden'); b.classList.add('hidden'); return; }
-            d.classList.toggle('hidden');
-            b.classList.toggle('hidden', !d.classList.contains('hidden'));
-        }
-        function startTimer() { if(!timerInterval) timerInterval=setInterval(()=>{seconds++; let d=new Date(seconds*1000).toISOString().substr(14,5); document.getElementById('timerDisplay').innerText=d;},1000); }
-        function pauseTimer() { clearInterval(timerInterval); timerInterval=null; }
-        function resetTimer() { pauseTimer(); seconds=0; document.getElementById('timerDisplay').innerText="00:00"; }
-        function countUp(id) { const el=document.getElementById(id); el.innerText=parseInt(el.innerText)+1; }
-        function countReset(id) { document.getElementById(id).innerText="0"; }
-        function setSpeed(s) { document.getElementById('mainAudioPlayer').playbackRate = s; }
-        function loadAudioFromForm() { const u=document.getElementById('inputAudioUrl').value; if(u){document.getElementById('mainAudioPlayer').src=u; document.getElementById('mainAudioPlayer').play();} }
-
-        // --- DASHBOARD LOGIC (CORREGIDO) ---
-        function sortTable(col) {
-            if(currentSortCol === col) currentSortAsc = !currentSortAsc;
-            else { currentSortCol = col; currentSortAsc = true; }
-            aplicarFiltros(); 
+        // --- DASHBOARD ---
+        function borrarFiltros() {
+            document.getElementById('filtroCiclo').value = "";
+            document.getElementById('filtroEjecutivo').value = "";
+            cargarDashboardEquipo();
         }
 
-        function initDashboard() {
-            const sel = document.getElementById('fMes'); 
-            sel.innerHTML = '<option value="TODOS">📅 Histórico (Todos)</option>';
-            const meses = new Set();
-            
-            // Usamos Moment para reconocer cualquier formato de fecha (D/M/YYYY, YYYY-MM-DD, etc)
-            ALL_DATA.filter(d => d.SUPERVISOR === CURRENT_SUP).forEach(d => { 
-                const fecha = d.FECHA_LLAMADA || d.FECHA;
-                if(fecha) {
-                    const m = moment(fecha, ["D/M/YYYY", "DD/MM/YYYY", "YYYY-MM-DD", "MM/DD/YYYY"]);
-                    if(m.isValid()) meses.add(m.format('YYYY-MM')); 
-                }
-            });
-            
-            const mesesSorted = Array.from(meses).sort().reverse();
-            mesesSorted.forEach(m => { 
-                // Convertir YYYY-MM a "Enero 2026"
-                const label = moment(m, "YYYY-MM").format("MMMM YYYY");
-                const labelCap = label.charAt(0).toUpperCase() + label.slice(1);
-                sel.add(new Option(labelCap, m)); 
-            });
-            
-            aplicarFiltros();
-        }
+        async function cargarDashboardEquipo() {
+            const spinner = document.getElementById('loadSpinner');
+            spinner.classList.remove('hidden');
+            try {
+                const r = await fetch(API_URL);
+                const data = await r.json();
+                FULL_DATA = data;
+                let filtrados = data.filter(d => d.SUPERVISOR === CURRENT_USER);
 
-        function showLoadingFeedback() {
-            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1000, timerProgressBar: true });
-            Toast.fire({ icon: 'info', title: 'Calculando métricas...' });
-        }
+                // Generar opciones de Ciclo (Mes - Semana) dinámicamente según lo que hay
+                const selectCiclo = document.getElementById('filtroCiclo');
+                const cicloSeleccionado = selectCiclo.value;
+                const ciclosDisponibles = [...new Set(filtrados.map(d => {
+                    const m = parseInt(d.FECHA_LLAMADA.split('-')[1]) - 1;
+                    return `${mesesNombres[m]} - ${d.SEMANA}`;
+                }))].sort();
 
-        function aplicarFiltros() {
-            showLoadingFeedback();
-            const fMes = document.getElementById('fMes').value; 
-            const fSemana = document.getElementById('fSemana').value;
-            const fSearch = document.getElementById('fSearch').value.toLowerCase();
-            
-            let filtered = ALL_DATA.filter(d => d.SUPERVISOR === CURRENT_SUP);
-            
-            // FILTRO MES CON MOMENT (Robustez máxima)
-            if (fMes !== 'TODOS') {
-                filtered = filtered.filter(d => {
-                    const fecha = d.FECHA_LLAMADA || d.FECHA;
-                    // Comparar formatos YYYY-MM
-                    const m = moment(fecha, ["D/M/YYYY", "DD/MM/YYYY", "YYYY-MM-DD", "MM/DD/YYYY"]);
-                    return m.isValid() && m.format('YYYY-MM') === fMes;
+                selectCiclo.innerHTML = '<option value="">Todos los Ciclos</option>';
+                ciclosDisponibles.forEach(c => {
+                    let opt = document.createElement('option'); opt.value = c; opt.innerText = c;
+                    selectCiclo.appendChild(opt);
                 });
-            }
-            
-            // FILTRO SEMANA
-            if (fSemana !== 'TODAS') filtered = filtered.filter(d => d.SEMANA === fSemana);
+                if(cicloSeleccionado) selectCiclo.value = cicloSeleccionado;
 
-            // FILTRO BÚSQUEDA
-            if (fSearch) filtered = filtered.filter(d => d.NOMBRE.toLowerCase().includes(fSearch));
-            
-            // ORDENAR
-            filtered.sort((a,b) => {
-                let valA, valB;
-                if(currentSortCol === 'NOTA') { valA = parseFloat(a.NOTA.replace('%','')) || 0; valB = parseFloat(b.NOTA.replace('%','')) || 0; }
-                else if(currentSortCol === 'FECHA') { 
-                    valA = moment(a.FECHA_LLAMADA||a.FECHA, ["D/M/YYYY", "YYYY-MM-DD"]).valueOf(); 
-                    valB = moment(b.FECHA_LLAMADA||b.FECHA, ["D/M/YYYY", "YYYY-MM-DD"]).valueOf(); 
+                // Aplicar Filtro de Ciclo
+                if(selectCiclo.value) {
+                    filtrados = filtrados.filter(d => {
+                        const m = parseInt(d.FECHA_LLAMADA.split('-')[1]) - 1;
+                        return `${mesesNombres[m]} - ${d.SEMANA}` === selectCiclo.value;
+                    });
                 }
-                else if(currentSortCol === 'NOMBRE') { valA = a.NOMBRE.toLowerCase(); valB = b.NOMBRE.toLowerCase(); }
-                if (valA < valB) return currentSortAsc ? -1 : 1;
-                if (valA > valB) return currentSortAsc ? 1 : -1;
-                return 0;
-            });
 
-            TEAM_DATA = filtered; 
-            renderStats(filtered); 
-            renderTables(filtered);
-            renderExecutiveCards(filtered); 
+                const ejec = document.getElementById('filtroEjecutivo').value.toLowerCase();
+                if(ejec) filtrados = filtrados.filter(d => d.NOMBRE.toLowerCase().includes(ejec));
+
+                // Datalist
+                const list = document.getElementById('listaEjecutivosFiltro');
+                const nombresUnicos = [...new Set(filtrados.map(d => d.NOMBRE))];
+                list.innerHTML = ""; nombresUnicos.forEach(n => { let opt = document.createElement('option'); opt.value = n; list.appendChild(opt); });
+
+                // Tarjetas
+                const containerTarjetas = document.getElementById('containerTarjetas');
+                containerTarjetas.innerHTML = "";
+                nombresUnicos.forEach(nombre => {
+                    const audsEjec = filtrados.filter(d => d.NOMBRE === nombre);
+                    const prom = (audsEjec.reduce((a, b) => a + (parseInt(b.NOTA_FINAL) || 0), 0) / audsEjec.length).toFixed(0);
+                    const count = audsEjec.length;
+                    containerTarjetas.innerHTML += `
+                        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 text-center btn-press cursor-pointer" onclick="document.getElementById('filtroEjecutivo').value='${nombre}'; cargarDashboardEquipo();">
+                            <p class="text-[9px] font-bold text-gray-400 uppercase truncate">${nombre}</p>
+                            <p class="text-xl font-black text-blue-600">${prom}%</p>
+                            <p class="text-2xl font-black ${count === 0 ? 'text-red-600 animate-pulse' : 'text-slate-700'}">${count}</p>
+                            <p class="text-[9px] text-gray-400 uppercase">Auditorías</p>
+                        </div>`;
+                });
+
+                const notas = filtrados.map(d => parseInt(d.NOTA_FINAL) || 0);
+                document.getElementById('dashProm').innerText = (notas.length ? (notas.reduce((a,b)=>a+b,0)/notas.length).toFixed(0) : 0) + "%";
+                document.getElementById('dashPec').innerText = notas.filter(n => n === 0).length;
+                document.getElementById('kpiFeedbackCount').innerText = `${filtrados.filter(d => d.FEEDBACK_STATUS === "REALIZADO").length}/${filtrados.length}`;
+
+                const tb = document.getElementById('tablaEquipo'); tb.innerHTML = "";
+                filtrados.forEach((d, idx) => {
+                    const isDone = d.FEEDBACK_STATUS === "REALIZADO";
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-blue-50 transition cursor-pointer";
+                    row.onclick = () => verDetalleAuditoria(d);
+                    row.innerHTML = `
+                        <td class="p-3 font-medium">${d.NOMBRE}</td>
+                        <td class="p-3 text-center">${d.FECHA_LLAMADA}</td>
+                        <td class="p-3 text-center font-bold ${parseInt(d.NOTA_FINAL) < 85 ? 'text-red-500':'text-green-600'}">${d.NOTA_FINAL}</td>
+                        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isDone ? 'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'}">${d.FEEDBACK_STATUS}</span></td>
+                        <td class="p-3 text-center" onclick="event.stopPropagation();">
+                            ${!isDone ? `<button onclick="abrirFeedback('${d.CODIGO}', '${d.FECHA_AUDITORIA}')" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 btn-press">Feedback</button>` : '✅'}
+                        </td>`;
+                    tb.appendChild(row);
+                });
+            } catch (e) { console.error(e); } finally { spinner.classList.add('hidden'); }
         }
 
-        function renderStats(d) {
-            const ns = d.map(x => parseFloat(x.NOTA.replace('%',''))||0);
-            document.getElementById('kpiTotal').innerText = ns.length; 
-            document.getElementById('kpiNota').innerText = ns.length ? (ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(0) + "%" : "0%";
-            document.getElementById('kpiPec').innerText = ns.filter(n=>n===0).length;
-            document.getElementById('kpiFeedRatio').innerText = `${d.filter(x=>x.FEEDBACK_STATUS==="REALIZADO").length} / ${ns.length}`;
-        }
-
-        function renderExecutiveCards(filteredAudits) {
-            const container = document.getElementById('executiveStats');
-            container.innerHTML = "";
-            const myTeam = baseEjecutivos.filter(e => e.sup === CURRENT_SUP);
-            const counts = {};
-            filteredAudits.forEach(x => counts[x.NOMBRE] = (counts[x.NOMBRE] || 0) + 1);
-
-            myTeam.sort((a,b) => {
-                const cA = counts[a.nombre] || 0;
-                const cB = counts[b.nombre] || 0;
-                return cB - cA || a.nombre.localeCompare(b.nombre);
-            });
-
-            myTeam.forEach(member => {
-                const count = counts[member.nombre] || 0;
-                const activeClass = count > 0 ? "border-indigo-200 ring-2 ring-indigo-50" : "border-slate-100 opacity-60";
-                const textClass = count > 0 ? "text-indigo-600" : "text-slate-300";
-                
-                container.innerHTML += `
-                <div class="bg-white p-3 rounded-xl border ${activeClass} shadow-sm text-center transition hover:shadow-md cursor-default">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">Auditorías</p>
-                    <p class="text-[10px] font-black text-slate-600 truncate px-1" title="${member.nombre}">${member.nombre}</p>
-                    <p class="text-xl font-black ${textClass}">${count}</p>
-                </div>`;
-            });
-        }
-
-        function resetFiltros() { 
-            document.getElementById('fMes').value = 'TODOS'; 
-            document.getElementById('fSemana').value = 'TODAS'; 
-            document.getElementById('fSearch').value = ''; 
-            aplicarFiltros(); 
-        }
-        
-        function updateData() { 
-            loadData().then(() => {
-                initDashboard(); // Recargar filtros también por si hay nuevas fechas
-                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-                Toast.fire({ icon: 'success', title: 'Datos actualizados' });
-            }); 
-        }
-
-        function renderTables(d) {
-            const tb = document.getElementById('tableDetail'); tb.innerHTML = "";
-            d.forEach(x => {
-                let fb = `<button onclick="registrarFeedback('${x.CODIGO}','${x.FECHA}','${x.NOTA}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow transition btn-press">Registrar</button>`;
-                if(x.FEEDBACK_STATUS === 'REALIZADO') fb = `<div class="feedback-done" title="${x.FEEDBACK_DETALLE}"><i class="fas fa-check-circle mr-1"></i> Realizado</div>`;
-                tb.innerHTML += `<tr class="hover:bg-slate-50 transition border-b border-slate-100"><td class="p-4 font-bold text-slate-600">${x.NOMBRE}</td><td class="p-4 text-slate-500">${x.FECHA_LLAMADA||x.FECHA}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-lg border font-black text-xs">${x.NOTA}</span></td><td class="p-4 text-center">${fb}</td><td class="p-4 text-center"><button onclick='verDetalleCompleto(${JSON.stringify(x).replace(/'/g,"&#39;")})' class="bg-slate-100 hover:bg-slate-200 text-indigo-600 p-2 rounded-lg transition btn-press"><i class="fas fa-eye"></i></button></td></tr>`;
-            });
-        }
-
-        function verDetalleCompleto(d) {
-            let quiebresHtml = "";
-            if (d.DETALLE) {
-                for (const [key, value] of Object.entries(d.DETALLE)) {
-                    if (value === "NO") {
-                        const info = INDICADORES_INFO[key] || { nombre: key };
-                        quiebresHtml += `<li class="flex items-start gap-2 mb-1"><i class="fas fa-times-circle text-red-500 mt-0.5"></i><span class="text-xs font-bold text-slate-700">${info.nombre}</span></li>`;
+        function verDetalleAuditoria(data) {
+            let pautaDetalle = "";
+            if(data.DETALLE) {
+                pautaDetalle = `<div class="mt-4 p-3 bg-red-50 rounded text-left text-xs border border-red-100"><p class="font-bold text-red-700 mb-2">INDICADORES NO CUMPLIDOS:</p>`;
+                let count = 0;
+                for (const [key, val] of Object.entries(data.DETALLE)) {
+                    if(val === "NO") {
+                        const item = pautaItems.find(p => p.id === key.toLowerCase() || p.id === "item_" + key.toLowerCase().split('_')[1]);
+                        pautaDetalle += `<p class="mb-1">❌ <b>${item ? item.label : key}:</b> Marcado como NO.</p>`;
+                        count++;
                     }
                 }
+                if(count === 0) pautaDetalle = `<div class="mt-4 p-3 bg-green-50 rounded text-left text-xs border border-green-100"><p class="font-bold text-green-700">Cumplimiento total de indicadores.</p>`;
+                pautaDetalle += `</div>`;
             }
-            if(!quiebresHtml) quiebresHtml = "<li class='text-xs text-emerald-600 italic'><i class='fas fa-check mr-1'></i> Sin quiebres detectados.</li>";
 
-            let audioHtml = "";
-            if (d.AUDIO_URL && d.AUDIO_URL.length > 5) {
-                audioHtml = `
-                    <div class="mt-3 p-2 bg-slate-50 rounded border border-slate-200">
-                        <p class="text-[9px] text-slate-400 font-bold uppercase mb-1"><i class="fas fa-headphones"></i> Reproductor de Audio</p>
-                        <audio controls src="${d.AUDIO_URL}" class="w-full h-8 mb-1"></audio>
-                        <p class="text-[9px] text-amber-600 italic text-center"><i class="fas fa-exclamation-triangle"></i> Debes estar logueado en ClickUp para reproducir.</p>
-                    </div>`;
-            } else {
-                audioHtml = `
-                    <div class="mt-3 p-4 bg-slate-50 rounded border border-slate-200 border-dashed text-center">
-                        <i class="fas fa-microphone-slash text-slate-300 text-2xl mb-2"></i>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase">Audio no disponible</p>
-                        <p class="text-[9px] text-slate-400 italic">Favor buscar manualmente en la plataforma de origen.</p>
-                    </div>`;
-            }
+            const audioHtml = data.AUDIO_URL && data.AUDIO_URL.trim() !== "" ? 
+                `<div class="mt-4 bg-slate-100 p-3 rounded border border-gray-200">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Escuchar Grabación:</p>
+                    <audio controls class="w-full h-8"><source src="${data.AUDIO_URL}" type="audio/mpeg">Tu navegador no soporta el audio.</audio>
+                </div>` : 
+                `<div class="mt-4 bg-amber-50 p-3 rounded border border-amber-200 text-amber-700 text-xs italic">La URL del audio no está disponible para esta auditoría.</div>`;
 
             Swal.fire({
-                title: `<div class="text-left"><p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Detalle Auditoría</p><p class="text-lg font-black text-slate-800 leading-none">${d.NOMBRE}</p></div>`,
+                title: `<span class="text-blue-600">${data.NOMBRE}</span>`,
                 html: `
-                    <div class="text-left mt-2">
-                        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3">
-                            <div><p class="text-[9px] font-bold text-slate-400 uppercase">Fecha / Hora</p><p class="text-xs font-bold text-slate-700">${d.FECHA_LLAMADA || d.FECHA} <span class="text-slate-400">|</span> ${d.HORA_LLAMADA || '--:--'}</p></div>
-                            <div class="text-right"><p class="text-[9px] font-bold text-slate-400 uppercase">Nota Final</p><p class="text-4xl font-black ${parseFloat(d.NOTA)>=85?'text-emerald-500':(parseFloat(d.NOTA)===0?'text-red-500':'text-amber-500')}">${d.NOTA}</p></div>
+                    <div class="text-sm border-t pt-4">
+                        <div class="grid grid-cols-2 gap-2 text-left mb-4">
+                            <div><p class="text-[9px] font-bold text-gray-400 uppercase">RUT Paciente</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold">${data.RUT_PACIENTE || 'N/A'}</span>
+                                    <button onclick="copyToClipboard('${data.RUT_PACIENTE}')" class="text-blue-500 text-xs"><i class="fas fa-copy"></i></button>
+                                </div>
+                            </div>
+                            <div><p class="text-[9px] font-bold text-gray-400 uppercase">Nota Final</p><p class="text-xl font-black text-blue-600">${data.NOTA_FINAL}</p></div>
+                            <div><p class="text-[9px] font-bold text-gray-400 uppercase">Fecha Llamada</p><p class="font-bold">${data.FECHA_LLAMADA}</p></div>
+                            <div><p class="text-[9px] font-bold text-gray-400 uppercase">Hora</p><p class="font-bold">${data.HORA_LLAMADA}</p></div>
                         </div>
-                        <div class="flex items-center gap-2 mb-3 bg-white border border-slate-200 p-2 rounded-lg shadow-sm">
-                            <div class="bg-blue-100 text-blue-600 w-8 h-8 rounded flex items-center justify-center font-bold text-xs">RUT</div>
-                            <div class="flex-1 font-mono text-sm font-bold text-slate-600 tracking-wider">${d.RUT_PACIENTE || 'S/I'}</div>
-                            <button onclick="navigator.clipboard.writeText('${d.RUT_PACIENTE}'); Swal.showValidationMessage('RUT Copiado!')" class="text-slate-400 hover:text-blue-500 p-2 btn-press"><i class="fas fa-copy"></i></button>
+                        <div class="bg-gray-50 p-3 rounded text-left text-xs border italic">
+                            <p class="font-bold text-gray-500 not-italic uppercase mb-1">Comentario General:</p>
+                            ${data.COMENTARIO || 'Sin comentarios.'}
                         </div>
+                        ${pautaDetalle}
                         ${audioHtml}
-                        <div class="mt-4 mb-2"><p class="text-[10px] font-bold text-red-400 uppercase border-b border-red-100 pb-1 mb-2">Quiebres Detectados (NO)</p>
-                            <ul class="bg-red-50 p-3 rounded-lg border border-red-100 max-h-32 overflow-y-auto custom-scrollbar">${quiebresHtml}</ul>
-                        </div>
-                        <div class="mt-4"><p class="text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100 pb-1 mb-2">Observación Completa</p>
-                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-600 italic h-32 overflow-y-auto custom-scrollbar whitespace-pre-line">${d.OBS || 'Sin comentarios registrados.'}</div>
-                        </div>
                     </div>
                 `,
-                width: '450px',
-                showConfirmButton: true,
+                showCloseButton: true,
                 confirmButtonText: 'Cerrar',
-                confirmButtonColor: '#334155',
-                customClass: { popup: 'rounded-2xl' }
+                width: '500px'
             });
         }
 
-        async function registrarFeedback(cod, fecha, nota) {
-            const { value: txt } = await Swal.fire({ title: 'Feedback', input: 'textarea', showCancelButton: true });
-            if (txt) {
-                Swal.fire({ title: 'Guardando...', didOpen: () => Swal.showLoading() });
-                const payload = { action: "REGISTER_FEEDBACK", codigo: cod, fecha_auditoria: fecha, nota: nota, feedback_detalle: txt, feedback_status: "REALIZADO", supervisor: CURRENT_SUP };
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                updateData(); // Refresh auto
-                Swal.fire({ icon: 'success', title: 'Registrado', timer: 1500 });
+        function copyToClipboard(txt) {
+            navigator.clipboard.writeText(txt);
+            Swal.showValidationMessage('¡Copiado!');
+        }
+
+        function sortTable(n) {
+            const table = document.getElementById("tableMain");
+            let switching = true, shouldSwitch, i, x, y, dir = "asc", switchcount = 0;
+            while (switching) {
+                switching = false;
+                const rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) { shouldSwitch = true; break; }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) { shouldSwitch = true; break; }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount ++;      
+                } else {
+                    if (switchcount == 0 && dir == "asc") { dir = "desc"; switching = true; }
+                }
             }
         }
 
-        // --- FORM LOGIC CONSTRUCTOR ---
-        function initFormLogic() {
-            document.getElementById('inputNombre').addEventListener('input', function() {
-                const val = this.value;
-                const f = baseEjecutivos.find(e => e.nombre === val);
-                if(f) { 
-                    document.getElementById('inputCodigo').value = f.codigo; 
-                    document.getElementById('inputSup').value = f.sup; 
-                    document.getElementById('inputServ').value = f.serv; 
+        async function abrirFeedback(cod, fecha) {
+            const { value: texto } = await Swal.fire({ title: 'Cerrar Ciclo', input: 'textarea', inputLabel: 'Compromisos...', showCancelButton: true });
+            if (texto) {
+                const payload = { action: "REGISTER_FEEDBACK", codigo: cod, fecha_auditoria: fecha, feedback_detalle: texto };
+                try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); Swal.fire("Éxito", "Feedback guardado", "success"); cargarDashboardEquipo(); } catch (e) { Swal.fire("Error", "No se pudo guardar", "error"); }
+            }
+        }
+
+        document.getElementById('auditForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            let textoFeedback = document.getElementById('comentarioFinal').value;
+            let quiebres = [];
+            pautaItems.forEach(item => {
+                const sel = document.querySelector(`select[name="${item.id}"]`);
+                const obs = document.getElementById('obs_' + item.id).value;
+                if(sel.value === 'NO') {
+                    let peso = item.type === "PEC" ? "PEC" : item.weight + "%";
+                    quiebres.push(`• ${item.label} (${peso}): ${obs || 'Sin observación'}`);
                 }
             });
-        }
-
-        function renderFormTable() {
-            const tb=document.getElementById('tablaItems'); tb.innerHTML=""; let lc="";
-            pautaItems.forEach(i => { 
-                if(i.cat!==lc){ tb.innerHTML+=`<tr><td colspan="4" class="p-2 font-bold text-center ${i.cat==='PEC'?'text-red-600 bg-red-50':'text-blue-600 bg-blue-50'} border-y text-[10px] uppercase">${i.cat}</td></tr>`; lc=i.cat; } 
-                tb.innerHTML+=`<tr class="hover:bg-slate-50 border-b border-slate-100">
-                    <td class="p-2 relative"><div class="tooltip-container"><span class="font-bold text-slate-700 text-[10px] border-b border-dotted border-slate-400">${i.label}</span><span class="tooltip-text">${i.tip}</span></div></td>
-                    <td class="p-2 text-center"><select name="${i.name}" class="w-full border rounded p-1 text-[10px] font-bold ${i.cat==='PEC'?'critical':'weighted'}" data-w="${i.w||0}" onchange="updateRow(this)"><option value="SI" selected>SI</option><option value="NO">NO</option></select></td>
-                    <td class="p-2 text-center status-cell"><span class="text-emerald-600 font-bold bg-emerald-50 px-1 rounded text-[9px]">OK</span></td>
-                    <td class="p-2"><input class="desc-input hidden w-full border border-red-300 rounded p-1 text-[10px]" placeholder="Detalle..."></td>
-                </tr>`; 
-            });
-            calcScore();
-        }
-
-        function updateRow(s) { const r=s.closest('tr'), sc=r.querySelector('.status-cell'), i=r.querySelector('.desc-input'); i.classList.add('hidden'); if(s.value==='SI') sc.innerHTML='<span class="text-emerald-600 font-bold bg-emerald-50 px-1 rounded text-[9px]">OK</span>'; else if(s.value==='NO') { sc.innerHTML='<span class="text-red-600 font-bold bg-red-50 px-1 rounded text-[9px]">NO</span>'; i.classList.remove('hidden'); i.focus(); } calcScore(); }
-        function calcScore() { let t=0,m=0,c=false; document.querySelectorAll('.critical').forEach(s=>{if(s.value==='NO')c=true}); document.querySelectorAll('.weighted').forEach(s=>{const w=parseFloat(s.dataset.w);if(s.value==='SI'){t+=w;m+=w}else if(s.value==='NO')m+=w}); const f=(!c && m>0)?Math.round((t/m)*100):(c?0:0); document.getElementById('totalScore').innerText=f+"%"; document.getElementById('notaFinalHidden').value=f+"%"; }
-        function calcSemana() { const f=document.getElementById('fechaLlamada').value; if(f) { const d = new Date(f); document.getElementById('inputSemana').value="Semana " + (Math.ceil(d.getDate() / 7)); } }
-
-        document.getElementById('auditForm').addEventListener('submit', function(e){
-            e.preventDefault(); 
-            const b = document.getElementById('btnGuardar');
-            
-            // VALIDACIÓN MANUAL DE DATOS CLAVE
-            const cod = document.getElementById('inputCodigo').value;
-            if(!cod) return Swal.fire("Atención", "Debes seleccionar un ejecutivo válido de la lista", "warning");
-
-            b.innerHTML = 'ENVIANDO...'; b.disabled = true;
-            
-            // CONSTRUCCIÓN MANUAL DE JSON (EVITA DATOS VACÍOS)
-            const payload = {
-                fecha_llamada: document.querySelector('[name="fecha_llamada"]').value,
-                hora_llamada: document.querySelector('[name="hora_llamada"]').value,
-                semana: document.querySelector('[name="semana"]').value,
-                rut_paciente: document.querySelector('[name="rut_paciente"]').value,
-                nombre: document.querySelector('[name="nombre"]').value,
-                audio_url: document.querySelector('[name="audio_url"]').value,
-                codigo: cod,
-                supervisor: document.getElementById('inputSup').value,
-                servicio: document.getElementById('inputServ').value,
-                auditor_real: document.getElementById('inputAuditorReal').value,
-                nota_final: document.getElementById('notaFinalHidden').value,
-                comentario: document.getElementById('mainComments').value,
-                fecha_auditoria: new Date().toISOString().split('T')[0]
-            };
-
-            pautaItems.forEach(i => { payload[i.name] = document.querySelector(`[name="${i.name}"]`).value; });
-            
-            let errs = "";
-            document.querySelectorAll('.desc-input').forEach(i => { if(!i.classList.contains('hidden') && i.value) errs += `\n- ${i.closest('tr').cells[0].innerText}: ${i.value}`; });
-            if(errs) payload.comentario += "\n--- QUIEBRES ---" + errs;
-
-            // ENVÍO COMO TEXTO PLANO
-            fetch(API_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify(payload),
-                headers: { "Content-Type": "text/plain" }
-            })
-            .then(() => {
-                Swal.fire("Éxito", "Auditoría registrada", "success");
-                this.reset();
-                renderFormTable();
-                b.innerHTML = 'Guardar Auditoría';
-                b.disabled = false;
-                updateData();
-            })
-            .catch(() => {
-                Swal.fire("Error", "Error de conexión", "error");
-                b.disabled = false;
-            });
+            if(quiebres.length > 0) textoFeedback += (textoFeedback ? "\n\n" : "") + "--- DETALLE ---\n" + quiebres.join('\n');
+            document.getElementById('comentarioFinal').value = textoFeedback;
+            const btn = document.getElementById('btnGuardar');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            document.getElementById('fechaAuditoria').value = new Date().toISOString().split('T')[0];
+            const data = Object.fromEntries(new FormData(this));
+            try {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+                Swal.fire("Éxito", "Guardado", "success"); this.reset(); renderPauta();
+                document.getElementById('totalScore').innerText = "100%";
+                document.getElementById('comentarioFinal').value = "";
+            } catch (err) { Swal.fire("Error", "Error", "error"); } finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save mr-2"></i> GUARDAR'; }
         });
     </script>
 </body>
