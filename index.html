@@ -10,25 +10,19 @@
         .active-tab { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: bold; background-color: #eff6ff; }
         .header-blue { background-color: #3b82f6; color: white; font-weight: bold; }
         #loginOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .tooltip-container { position: relative; cursor: help; }
-        .tooltip-text { 
-            visibility: hidden; width: 280px; background-color: #1e293b; color: #fff; 
-            text-align: left; border-radius: 8px; padding: 12px; position: fixed; 
-            z-index: 10000; opacity: 0; transition: opacity 0.3s; font-size: 11px; 
-            font-weight: normal; line-height: 1.4; border: 1px solid #3b82f6;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); pointer-events: none;
-        }
-        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
         .critical-row { background-color: #fff1f2; }
         .btn-press:active { transform: scale(0.96); transition: 0.1s; }
         
-        /* Spinner sencillo */
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Estilos tabla ordenable */
         th.sortable { cursor: pointer; position: relative; }
         th.sortable:hover { background-color: #f1f5f9; }
+
+        /* Nuevos estilos para los criterios de pauta */
+        .criterio-box { font-size: 10px; line-height: 1.3; margin-top: 4px; padding: 6px; border-radius: 6px; }
+        .criterio-cumple { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        .criterio-nocumple { background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans h-screen flex flex-col overflow-hidden">
@@ -112,7 +106,7 @@
                         <thead>
                             <tr class="header-blue text-center uppercase">
                                 <th class="p-2 w-24">Categoría</th>
-                                <th class="p-2 text-left">Indicador</th>
+                                <th class="p-2 text-left">Indicador / Criterios</th>
                                 <th class="p-2 w-16">Tipo</th>
                                 <th class="p-2 w-24">Cumple</th>
                                 <th class="p-2 w-48 bg-slate-700 text-white">Observación de Quiebre</th>
@@ -234,22 +228,83 @@
             {nombre:"Marco Lara Vera", codigo:"S0226", sup:"Aracely Torres", serv:"HLF"}
         ];
 
+        // Se han actualizado los items con los criterios de la Pauta V2 CSV para visualización inline
         const pautaItems = [
-            { cat: "SEGURIDAD", id: "item_validacion", label: "Validación Identidad", type: "PEC", tip: "Solicita RUT y Nombre. Si es tercero, datos de ambos." },
-            { cat: "SEGURIDAD", id: "item_confidencialidad", label: "Confidencialidad", type: "PEC", tip: "No informar diagnósticos sensibles sin validar titularidad." },
-            { cat: "CONDUCTA", id: "item_normas", label: "Normas Conducta", type: "PEC", tip: "Lenguaje formal, evita ruidos molestos o faltas de respeto." },
-            { cat: "OPERACIÓN", id: "item_abandono", label: "Abandono", type: "PEC", tip: "Cortar o dejar en espera infinita (Max 35 seg de silencio)." },
-            { cat: "SISTEMA", id: "item_registro", label: "Registro", type: "PEC", tip: "Deja registro de la gestión en CRM/HIS según protocolo." },
-            { cat: "PROTOCOLO", id: "item_script", label: "Script Inicio/Cierre", type: "PENC", weight: 5, tip: "Saludo y despedida institucional estándar." },
-            { cat: "PROTOCOLO", id: "item_cortesia", label: "Cortesía y Trato", type: "PENC", weight: 5, tip: "Cordialidad y amabilidad durante la llamada." },
-            { cat: "GESTIÓN", id: "item_sondeo", label: "Sondeo", type: "PENC", weight: 15, tip: "Preguntas clave para entender la necesidad del paciente." },
-            { cat: "GESTIÓN", id: "item_info", label: "Entrega Información", type: "PENC", weight: 20, tip: "Informa sobre horas, requisitos y ubicaciones correctamente." },
-            { cat: "GESTIÓN", id: "item_tiempos", label: "Manejo Tiempos", type: "PENC", weight: 10, tip: "Evita esperas innecesarias y gestiona con agilidad." },
-            { cat: "GESTIÓN", id: "item_aseguramiento", label: "Aseguramiento", type: "PENC", weight: 10, tip: "Confirma que el paciente entendió la información." },
-            { cat: "HABILIDADES", id: "item_personalizacion", label: "Personalización", type: "PENC", weight: 5, tip: "Usa el nombre del paciente durante la llamada." },
-            { cat: "HABILIDADES", id: "item_lenguaje", label: "Lenguaje/Dicción", type: "PENC", weight: 5, tip: "Modulación correcta, sin muletillas ni tecnicismos." },
-            { cat: "HABILIDADES", id: "item_empatia", label: "Empatía", type: "PENC", weight: 10, tip: "Valida la preocupación o urgencia del usuario." },
-            { cat: "SISTEMAS", id: "item_tipificacion", label: "Tipificación/Glosa", type: "PENC", weight: 15, tip: "Tipifica motivo y deja glosa explicativa clara." }
+            { 
+                cat: "SEGURIDAD", id: "item_validacion", label: "Validación Identidad", type: "PEC", 
+                ok: "Solicita RUT y Nombre completo. Si es tercero, valida ambos. Explica normativa si niegan RUT.",
+                fail: "Asume identidad por saludo. Valida solo nombre. Entrega datos a terceros sin validar."
+            },
+            { 
+                cat: "SEGURIDAD", id: "item_confidencialidad", label: "Confidencialidad", type: "PEC", 
+                ok: "Solo info administrativa. Valida titular para info sensible. Usa 'Sospecha diagnóstica'.",
+                fail: "Revela diagnósticos/recetas. Micrófono abierto con datos de fondo. Lee ficha sin permiso."
+            },
+            { 
+                cat: "CONDUCTA", id: "item_normas", label: "Normas Conducta", type: "PEC", 
+                ok: "Tono formal y respetuoso. Aplica protocolo cortes correctamente.",
+                fail: "Maltrato, sarcasmo, ruidos molestos (comer/chicle), tuteo sin permiso."
+            },
+            { 
+                cat: "OPERACIÓN", id: "item_abandono", label: "Abandono", type: "PEC", 
+                ok: "Cierre natural tras despedida. Intenta reconectar si se corta.",
+                fail: "Corte deliberado. Hold eterno para aburrir. Simula problemas de audio."
+            },
+            { 
+                cat: "SISTEMA", id: "item_registro", label: "Registro", type: "PEC", 
+                ok: "Crea ticket. Tipificación real. Glosa coherente y útil.",
+                fail: "Llamada fantasma (sin registro). Glosa basura ('asdf', '.'). Tipificación falsa."
+            },
+            { 
+                cat: "PROTOCOLO", id: "item_script", label: "Script Inicio/Cierre", type: "PENC", weight: 5, 
+                ok: "Saludo completo (Hospital + Nombre + Grabación). Despedida + Canales.",
+                fail: "'Aló' a secas. No se presenta. Omite advertencia grabación. Cierre informal."
+            },
+            { 
+                cat: "PROTOCOLO", id: "item_cortesia", label: "Cortesía y Trato", type: "PENC", weight: 5, 
+                ok: "Trata de 'Usted'. Usa 'Por favor', 'Gracias'. Pide amablemente.",
+                fail: "Tutea ('amigo', 'flaco'). Usa imperativos ('Deme el RUT'). Ignora saludos."
+            },
+            { 
+                cat: "GESTIÓN", id: "item_sondeo", label: "Sondeo", type: "PENC", weight: 15, 
+                ok: "Pregunta '¿En qué ayudo?'. Escucha sin interrumpir. Preguntas filtro.",
+                fail: "Interrumpe bruscamente. Asume motivo sin preguntar. Entrega hora que no sirve."
+            },
+            { 
+                cat: "GESTIÓN", id: "item_info", label: "Entrega Información", type: "PENC", weight: 20, 
+                ok: "Fecha, Hora, Médico, Ubicación. Indicaciones (ayuno/llegada). Lenguaje claro.",
+                fail: "Datos erróneos. Omite llegada anticipada. Inventa info ante duda."
+            },
+            { 
+                cat: "GESTIÓN", id: "item_tiempos", label: "Manejo Tiempos", type: "PENC", weight: 10, 
+                ok: "Avisa pausas. Retoma cada 45-60s. Agradece espera.",
+                fail: "Silencios muertos >30s. Música sin aviso. Retoma de golpe."
+            },
+            { 
+                cat: "GESTIÓN", id: "item_aseguramiento", label: "Aseguramiento", type: "PENC", weight: 10, 
+                ok: "Pregunta de cierre ('¿Quedó claro?'). Espera respuesta del paciente.",
+                fail: "Da por hecho entendimiento. Corta mientras paciente habla. Cierre abrupto."
+            },
+            { 
+                cat: "HABILIDADES", id: "item_personalizacion", label: "Personalización", type: "PENC", weight: 5, 
+                ok: "Menciona nombre (2 veces o según contexto). Trato individual.",
+                fail: "Trato genérico ('Caballero/Dama'). Confunde nombre o género."
+            },
+            { 
+                cat: "HABILIDADES", id: "item_lenguaje", label: "Lenguaje/Dicción", type: "PENC", weight: 5, 
+                ok: "Modula claro. Vocabulario formal. Velocidad adecuada.",
+                fail: "Muletillas ('Ehh', 'Cachái'). Robot o muy lento. Diminutivos ('Consultita')."
+            },
+            { 
+                cat: "HABILIDADES", id: "item_empatia", label: "Empatía", type: "PENC", weight: 10, 
+                ok: "Frases de contención. Tono calido. Valida estado emocional.",
+                fail: "Robótico/Monótono. Indiferencia ante problemas graves. Minimiza problema."
+            },
+            { 
+                cat: "SISTEMAS", id: "item_tipificacion", label: "Tipificación/Glosa", type: "PENC", weight: 15, 
+                ok: "Motivo exacto. Glosa útil y descriptiva. Actualiza teléfonos.",
+                fail: "Todo 'Varios'. Glosa vacía o basura. No actualiza contacto."
+            }
         ];
 
         const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -295,17 +350,28 @@
             pautaItems.forEach(item => {
                 const tr = document.createElement('tr');
                 if(item.type === "PEC") tr.className = "critical-row";
-                tr.innerHTML = `
-                    <td class="p-2 font-bold ${item.type === 'PEC' ? 'text-red-700' : 'text-slate-500'}">${item.cat}</td>
-                    <td class="p-2">
-                        <div class="tooltip-container">
-                            <span class="font-medium">${item.label}</span>
-                            <div class="tooltip-text">${item.tip}</div>
+                
+                // Generación de cajas visuales de Criterios (Sustituye a tooltips)
+                const criteriosHtml = `
+                    <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div class="criterio-box criterio-cumple">
+                            <i class="fas fa-check-circle mr-1"></i> <b>CUMPLE:</b> ${item.ok}
                         </div>
+                        <div class="criterio-box criterio-nocumple">
+                            <i class="fas fa-times-circle mr-1"></i> <b>NO CUMPLE:</b> ${item.fail}
+                        </div>
+                    </div>
+                `;
+
+                tr.innerHTML = `
+                    <td class="p-2 font-bold align-top ${item.type === 'PEC' ? 'text-red-700' : 'text-slate-500'}">${item.cat}</td>
+                    <td class="p-2 align-top">
+                        <span class="font-bold text-sm block">${item.label}</span>
+                        ${criteriosHtml}
                     </td>
-                    <td class="p-2 text-center font-bold ${item.type === 'PEC' ? 'text-red-500' : 'text-blue-500'}">${item.type === 'PEC' ? 'PEC' : item.weight+'%'}</td>
-                    <td class="p-1"><select name="${item.id}" class="w-full border rounded p-1 calc-trigger" data-id="${item.id}" data-type="${item.type}" data-weight="${item.weight || 0}" onchange="toggleObs(this)"><option value="SI">SI</option><option value="NO">NO</option></select></td>
-                    <td class="p-1"><input type="text" id="obs_${item.id}" class="obs-input w-full border border-blue-200 rounded p-1 hidden text-[10px]" placeholder="¿Por qué no cumple?"></td>
+                    <td class="p-2 text-center align-top font-bold ${item.type === 'PEC' ? 'text-red-500' : 'text-blue-500'}">${item.type === 'PEC' ? 'PEC' : item.weight+'%'}</td>
+                    <td class="p-1 align-top"><select name="${item.id}" class="w-full border rounded p-1 calc-trigger" data-id="${item.id}" data-type="${item.type}" data-weight="${item.weight || 0}" onchange="toggleObs(this)"><option value="SI">SI</option><option value="NO">NO</option></select></td>
+                    <td class="p-1 align-top"><input type="text" id="obs_${item.id}" class="obs-input w-full border border-blue-200 rounded p-1 hidden text-[10px]" placeholder="¿Por qué no cumple?"></td>
                 `;
                 body.appendChild(tr);
             });
