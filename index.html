@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Supervisor QA - SiperQA</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✅</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -13,13 +14,12 @@
         .critical-row { background-color: #fff1f2; }
         .btn-press:active { transform: scale(0.96); transition: 0.1s; }
         
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         th.sortable { cursor: pointer; position: relative; }
         th.sortable:hover { background-color: #f1f5f9; }
 
-        /* Nuevos estilos para los criterios de pauta */
         .criterio-box { font-size: 10px; line-height: 1.3; margin-top: 4px; padding: 6px; border-radius: 6px; }
         .criterio-cumple { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
         .criterio-nocumple { background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
@@ -28,14 +28,9 @@
 <body class="bg-slate-50 font-sans h-screen flex flex-col overflow-hidden">
 
     <div id="loginOverlay">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border-t-4 border-blue-500">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Acceso Supervisor</h2>
-            <select id="loginSelect" class="w-full p-3 border-2 border-gray-200 rounded-xl mb-6 font-bold text-gray-700 outline-none focus:border-blue-500 bg-gray-50">
-                <option value="">-- Selecciona tu Nombre --</option>
-            </select>
-            <button onclick="iniciarSesion()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg btn-press">
-                INGRESAR
-            </button>
+        <div class="text-white text-xl font-bold flex flex-col items-center">
+            <div class="loader mb-4"></div>
+            Sincronizando con Google Sheets...
         </div>
     </div>
 
@@ -62,6 +57,7 @@
                         <select id="selectEjecutivo" name="nombre" class="w-full border rounded p-2 font-bold text-sm bg-white" required onchange="autocompletarDatos()">
                             <option value="">-- Seleccionar --</option>
                         </select>
+                        <div id="comentarioEjecutivo" class="text-[11px] text-blue-600 italic mt-1 hidden font-semibold"></div>
                     </div>
                     <div>
                         <label class="text-[10px] font-bold text-gray-400 uppercase">Código</label>
@@ -92,7 +88,10 @@
                     </div>
                     <div>
                         <label class="text-[10px] font-bold text-gray-400 uppercase">URL Audio (Opcional)</label>
-                        <input type="url" name="audio_url" class="w-full border rounded p-2 text-sm" placeholder="https://...">
+                        <div class="flex gap-2">
+                            <input type="url" id="inputAudioUrl" name="audio_url" class="w-full border rounded p-2 text-sm" placeholder="https://...">
+                            <button type="button" onclick="cargarAudioFlotante()" class="bg-slate-800 text-white px-3 rounded hover:bg-slate-700 btn-press tooltip" title="Abrir Player">🎧</button>
+                        </div>
                     </div>
                 </div>
 
@@ -136,7 +135,6 @@
 
     <div id="tabDashboard" class="tab-content hidden p-4 overflow-y-auto flex-1 bg-slate-100">
         <div class="max-w-6xl mx-auto space-y-4">
-            
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase">Mes / Ciclo</label>
@@ -194,125 +192,79 @@
         </div>
     </div>
 
+    <div id="pipPlayer" class="hidden fixed bottom-4 right-4 w-80 bg-slate-900 rounded-xl shadow-2xl border border-slate-700 p-4 z-50 text-white">
+        <div class="flex justify-between items-center mb-2 drag-handle cursor-move">
+            <span class="text-xs font-bold text-slate-300"><i class="fas fa-grip-horizontal mr-1"></i> Player SiperQA</span>
+            <button type="button" onclick="cerrarAudioFlotante()" class="text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <audio id="audioFlotante" class="hidden"></audio>
+        <div class="flex items-center gap-2 mb-2">
+            <button type="button" onclick="togglePlay()" id="btnPlay" class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-500 transition"><i class="fas fa-play text-xs"></i></button>
+            <button type="button" onclick="stopAudio()" class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 transition"><i class="fas fa-stop text-xs"></i></button>
+            <select id="audioSpeed" onchange="changeSpeed(this.value)" class="text-xs bg-slate-800 border border-slate-600 rounded p-1 ml-auto text-white outline-none cursor-pointer">
+                <option value="1">1.0x</option><option value="1.5">1.5x</option><option value="2">2.0x</option>
+            </select>
+        </div>
+        <div class="flex items-center gap-2 text-[10px] text-slate-400">
+            <span id="timeCurrent" class="w-8">0:00</span>
+            <input type="range" id="seekSlider" value="0" step="1" class="w-full accent-blue-500 cursor-pointer">
+            <span id="timeTotal" class="w-8">0:00</span>
+        </div>
+    </div>
+
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbygEAhS5jdllKf89ecmom2mmay3sCDU8qOyGsTl6Yixy3JpiRumYWvhMVtLtfdF2wZqUA/exec";
+        // ¡REEMPLAZA AQUÍ TU URL DE GOOGLE APPS SCRIPT!
+        const API_URL = "https://script.google.com/macros/s/AKfycbzEnzOn8TVN8xAX7do3tk1N2g3bD0lKh9EF5eh6T_I2yHFiPdeKDrM4RTwjG8f2uIzDJQ/exec";
+        
         let CURRENT_USER = "";
         let FULL_DATA = [];
-
-        const baseEjecutivos = [
-            {nombre:"Andreina Villalon Mejías", codigo:"CC1683", sup:"Luis Cataldo", serv:"Bloqueo"},
-            {nombre:"Oscar Hidalgo Luco", codigo:"CC9827", sup:"Angélica Ferrada", serv:"Bloqueo"},
-            {nombre:"Lorena Rodriguez Salazar", codigo:"CC4346", sup:"Carla Cabrera", serv:"Bloqueo"},
-            {nombre:"Angelica Galleguillos Abarca", codigo:"CC5251", sup:"Luis Cataldo", serv:"Bloqueo"},
-            {nombre:"Miriam Bruges De Torres", codigo:"CC0928", sup:"Carla Cabrera", serv:"Ingreso"},
-            {nombre:"Cristobal Fernandez Azares", codigo:"CC0315", sup:"Luis Cataldo", serv:"Ingreso"},
-            {nombre:"Carla Garay Vidal", codigo:"CC5070", sup:"Angélica Ferrada", serv:"Ingreso"},
-            {nombre:"Jorge Yanez Cortés", codigo:"CC2467", sup:"Carla Cabrera", serv:"Ingreso"},
-            {nombre:"Maria Paz Nuñez Baeza", codigo:"CC5178", sup:"Aracely Torres", serv:"Ingreso"},
-            {nombre:"Diego Cea Briceño", codigo:"CC7625", sup:"Angélica Ferrada", serv:"Mesa Central"},
-            {nombre:"Edith Ossandon Montoya", codigo:"CC2762", sup:"Luis Cataldo", serv:"Mesa Central"},
-            {nombre:"Johanna Herrera Merida", codigo:"CC7119", sup:"Carla Cabrera", serv:"Mesa Central"},
-            {nombre:"Lesli Agudelo Viveros", codigo:"CC3118", sup:"Carla Cabrera", serv:"Mesa Central"},
-            {nombre:"Maria Cristina Barón Barón", codigo:"CC1815", sup:"Luis Cataldo", serv:"Mesa Central"},
-            {nombre:"Yessenia Gonzalez González", codigo:"CC6869", sup:"Angélica Ferrada", serv:"Mesa Central"},
-            {nombre:"Paola Herrera Barriga", codigo:"CC3898", sup:"Luis Cataldo", serv:"Mesa Central"},
-            {nombre:"Adrian Manzanilla Rangel", codigo:"CC0506", sup:"Angélica Ferrada", serv:"Mesa Central"},
-            {nombre:"Johanna Rojas Rejas", codigo:"CC2846", sup:"Angélica Ferrada", serv:"FDS"},
-            {nombre:"María Farías Quintero", codigo:"CC0851", sup:"Carla Cabrera", serv:"Mesa Central"},
-            {nombre:"Saymar Paéz García", codigo:"CC1992", sup:"Carla Cabrera", serv:"FDS"},
-            {nombre:"Belfred Belis Mijares", codigo:"CC8219", sup:"Aracely Torres", serv:"FDS"},
-        
-        ];
-
-        // Se han actualizado los items con los criterios de la Pauta V2 CSV para visualización inline
-        const pautaItems = [
-            { 
-                cat: "SEGURIDAD", id: "item_validacion", label: "Validación Identidad", type: "PEC", 
-                ok: "Solicita RUT y Nombre completo. Si es tercero, valida ambos. Explica normativa si niegan RUT.",
-                fail: "Asume identidad por saludo. Valida solo nombre. Entrega datos a terceros sin validar."
-            },
-            { 
-                cat: "SEGURIDAD", id: "item_confidencialidad", label: "Confidencialidad", type: "PEC", 
-                ok: "Solo info administrativa. Valida titular para info sensible. Usa 'Sospecha diagnóstica'.",
-                fail: "Revela diagnósticos/recetas. Micrófono abierto con datos de fondo. Lee ficha sin permiso."
-            },
-            { 
-                cat: "CONDUCTA", id: "item_normas", label: "Normas Conducta", type: "PEC", 
-                ok: "Tono formal y respetuoso. Aplica protocolo cortes correctamente.",
-                fail: "Maltrato, sarcasmo, ruidos molestos (comer/chicle), tuteo sin permiso."
-            },
-            { 
-                cat: "OPERACIÓN", id: "item_abandono", label: "Abandono", type: "PEC", 
-                ok: "Cierre natural tras despedida. Intenta reconectar si se corta.",
-                fail: "Corte deliberado. Hold eterno para aburrir. Simula problemas de audio."
-            },
-            { 
-                cat: "SISTEMA", id: "item_registro", label: "Registro", type: "PEC", 
-                ok: "Crea ticket. Tipificación real. Glosa coherente y útil.",
-                fail: "Llamada fantasma (sin registro). Glosa basura ('asdf', '.'). Tipificación falsa."
-            },
-            { 
-                cat: "PROTOCOLO", id: "item_script", label: "Script Inicio/Cierre", type: "PENC", weight: 5, 
-                ok: "Saludo completo (Hospital + Nombre + Grabación). Despedida + Canales.",
-                fail: "'Aló' a secas. No se presenta. Omite advertencia grabación. Cierre informal."
-            },
-            { 
-                cat: "PROTOCOLO", id: "item_cortesia", label: "Cortesía y Trato", type: "PENC", weight: 5, 
-                ok: "Trata de 'Usted'. Usa 'Por favor', 'Gracias'. Pide amablemente.",
-                fail: "Tutea ('amigo', 'flaco'). Usa imperativos ('Deme el RUT'). Ignora saludos."
-            },
-            { 
-                cat: "GESTIÓN", id: "item_sondeo", label: "Sondeo", type: "PENC", weight: 15, 
-                ok: "Pregunta '¿En qué ayudo?'. Escucha sin interrumpir. Preguntas filtro.",
-                fail: "Interrumpe bruscamente. Asume motivo sin preguntar. Entrega hora que no sirve."
-            },
-            { 
-                cat: "GESTIÓN", id: "item_info", label: "Entrega Información", type: "PENC", weight: 20, 
-                ok: "Fecha, Hora, Médico, Ubicación. Indicaciones (ayuno/llegada). Lenguaje claro.",
-                fail: "Datos erróneos. Omite llegada anticipada. Inventa info ante duda."
-            },
-            { 
-                cat: "GESTIÓN", id: "item_tiempos", label: "Manejo Tiempos", type: "PENC", weight: 10, 
-                ok: "Avisa pausas. Retoma cada 45-60s. Agradece espera.",
-                fail: "Silencios muertos >30s. Música sin aviso. Retoma de golpe."
-            },
-            { 
-                cat: "GESTIÓN", id: "item_aseguramiento", label: "Aseguramiento", type: "PENC", weight: 10, 
-                ok: "Pregunta de cierre ('¿Quedó claro?'). Espera respuesta del paciente.",
-                fail: "Da por hecho entendimiento. Corta mientras paciente habla. Cierre abrupto."
-            },
-            { 
-                cat: "HABILIDADES", id: "item_personalizacion", label: "Personalización", type: "PENC", weight: 5, 
-                ok: "Menciona nombre (2 veces o según contexto). Trato individual.",
-                fail: "Trato genérico ('Caballero/Dama'). Confunde nombre o género."
-            },
-            { 
-                cat: "HABILIDADES", id: "item_lenguaje", label: "Lenguaje/Dicción", type: "PENC", weight: 5, 
-                ok: "Modula claro. Vocabulario formal. Velocidad adecuada.",
-                fail: "Muletillas ('Ehh', 'Cachái'). Robot o muy lento. Diminutivos ('Consultita')."
-            },
-            { 
-                cat: "HABILIDADES", id: "item_empatia", label: "Empatía", type: "PENC", weight: 10, 
-                ok: "Frases de contención. Tono calido. Valida estado emocional.",
-                fail: "Robótico/Monótono. Indiferencia ante problemas graves. Minimiza problema."
-            },
-            { 
-                cat: "SISTEMAS", id: "item_tipificacion", label: "Tipificación/Glosa", type: "PENC", weight: 15, 
-                ok: "Motivo exacto. Glosa útil y descriptiva. Actualiza teléfonos.",
-                fail: "Todo 'Varios'. Glosa vacía o basura. No actualiza contacto."
-            }
-        ];
-
+        let baseEjecutivos = [];
+        let pautaItems = [];
         const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-        window.onload = () => {
-            const supervisores = [...new Set(baseEjecutivos.map(e => e.sup))].sort();
-            const select = document.getElementById('loginSelect');
-            supervisores.forEach(s => {
-                let opt = document.createElement('option'); opt.value = s; opt.innerText = s;
-                select.appendChild(opt);
-            });
-            renderPauta();
+        // Mapeo original para garantizar que si traes pauta dinámica desde Sheets, respete el formato que el Backend espera.
+        const ID_MAPEO_ORIGINAL = ["item_validacion", "item_confidencialidad", "item_normas", "item_abandono", "item_registro", "item_script", "item_cortesia", "item_sondeo", "item_info", "item_tiempos", "item_aseguramiento", "item_personalizacion", "item_lenguaje", "item_empatia", "item_tipificacion"];
+
+        window.onload = async () => {
+            const overlay = document.getElementById('loginOverlay');
+            const htmlOriginal = `
+                <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border-t-4 border-blue-500">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Acceso Supervisor</h2>
+                    <select id="loginSelect" class="w-full p-3 border-2 border-gray-200 rounded-xl mb-6 font-bold text-gray-700 outline-none focus:border-blue-500 bg-gray-50">
+                        <option value="">-- Selecciona tu Nombre --</option>
+                    </select>
+                    <button onclick="iniciarSesion()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg btn-press">INGRESAR</button>
+                </div>`;
+            
+            try {
+                const r = await fetch(API_URL);
+                const data = await r.json();
+                
+                FULL_DATA = data.auditorias || [];
+                baseEjecutivos = data.ejecutivos || [];
+                
+                // Cargar pauta desde la Hoja Config_Pauta respetando IDs
+                pautaItems = (data.pauta || []).map((p, index) => ({
+                    cat: p.Categoría,
+                    id: p.ID || ID_MAPEO_ORIGINAL[index] || "item_dinamico_" + index,
+                    label: p.Indicador,
+                    type: String(p.Peso).toUpperCase() === "PEC" ? "PEC" : "PENC",
+                    weight: String(p.Peso).toUpperCase() !== "PEC" ? parseInt(p.Peso) : 0,
+                    ok: p.Criterio_SI,
+                    fail: p.Criterio_NO
+                }));
+
+                overlay.innerHTML = htmlOriginal;
+                const supervisores = [...new Set(baseEjecutivos.map(e => e.Supervisor))].sort();
+                const select = document.getElementById('loginSelect');
+                supervisores.forEach(s => {
+                    if(s) { let opt = document.createElement('option'); opt.value = s; opt.innerText = s; select.appendChild(opt); }
+                });
+                renderPauta();
+            } catch (e) {
+                console.error(e);
+                Swal.fire("Error Fatal", "No se pudo conectar a la base de datos de Google Sheets.", "error");
+            }
         };
 
         function iniciarSesion() {
@@ -323,20 +275,32 @@
             document.getElementById('labelSupervisor').innerText = user;
             const selectEjec = document.getElementById('selectEjecutivo');
             selectEjec.innerHTML = '<option value="">-- Seleccionar --</option>';
-            baseEjecutivos.filter(e => e.sup === user).forEach(e => {
-                let opt = document.createElement('option'); opt.value = e.nombre; opt.innerText = e.nombre;
+            baseEjecutivos.filter(e => e.Supervisor === user).forEach(e => {
+                let opt = document.createElement('option'); opt.value = e.Nombre; opt.innerText = e.Nombre;
                 selectEjec.appendChild(opt);
             });
         }
 
         function autocompletarDatos() {
             const nombre = document.getElementById('selectEjecutivo').value;
-            const data = baseEjecutivos.find(e => e.nombre === nombre);
+            const data = baseEjecutivos.find(e => e.Nombre === nombre);
+            const divComentario = document.getElementById('comentarioEjecutivo');
+            
             if(data) {
-                document.getElementById('inputCodigo').value = data.codigo;
-                document.getElementById('inputServ').value = data.serv;
-                document.getElementById('inputSup').value = data.sup;
+                document.getElementById('inputCodigo').value = data.Código;
+                document.getElementById('inputServ').value = data.Servicio;
+                document.getElementById('inputSup').value = data.Supervisor;
                 document.getElementById('inputAuditorReal').value = CURRENT_USER;
+                
+                if(data.Comentario_Interno) {
+                    divComentario.innerText = "📌 " + data.Comentario_Interno;
+                    divComentario.classList.remove('hidden');
+                } else {
+                    divComentario.classList.add('hidden');
+                }
+                calculateScore(); // ¡SOLUCIÓN BUG 0%!
+            } else {
+                divComentario.classList.add('hidden');
             }
         }
 
@@ -346,31 +310,21 @@
             pautaItems.forEach(item => {
                 const tr = document.createElement('tr');
                 if(item.type === "PEC") tr.className = "critical-row";
-                
-                // Generación de cajas visuales de Criterios (Sustituye a tooltips)
                 const criteriosHtml = `
                     <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div class="criterio-box criterio-cumple">
-                            <i class="fas fa-check-circle mr-1"></i> <b>CUMPLE:</b> ${item.ok}
-                        </div>
-                        <div class="criterio-box criterio-nocumple">
-                            <i class="fas fa-times-circle mr-1"></i> <b>NO CUMPLE:</b> ${item.fail}
-                        </div>
-                    </div>
-                `;
-
+                        <div class="criterio-box criterio-cumple"><i class="fas fa-check-circle mr-1"></i> <b>CUMPLE:</b> ${item.ok}</div>
+                        <div class="criterio-box criterio-nocumple"><i class="fas fa-times-circle mr-1"></i> <b>NO CUMPLE:</b> ${item.fail}</div>
+                    </div>`;
                 tr.innerHTML = `
                     <td class="p-2 font-bold align-top ${item.type === 'PEC' ? 'text-red-700' : 'text-slate-500'}">${item.cat}</td>
-                    <td class="p-2 align-top">
-                        <span class="font-bold text-sm block">${item.label}</span>
-                        ${criteriosHtml}
-                    </td>
+                    <td class="p-2 align-top"><span class="font-bold text-sm block">${item.label}</span>${criteriosHtml}</td>
                     <td class="p-2 text-center align-top font-bold ${item.type === 'PEC' ? 'text-red-500' : 'text-blue-500'}">${item.type === 'PEC' ? 'PEC' : item.weight+'%'}</td>
                     <td class="p-1 align-top"><select name="${item.id}" class="w-full border rounded p-1 calc-trigger" data-id="${item.id}" data-type="${item.type}" data-weight="${item.weight || 0}" onchange="toggleObs(this)"><option value="SI">SI</option><option value="NO">NO</option></select></td>
                     <td class="p-1 align-top"><input type="text" id="obs_${item.id}" class="obs-input w-full border border-blue-200 rounded p-1 hidden text-[10px]" placeholder="¿Por qué no cumple?"></td>
                 `;
                 body.appendChild(tr);
             });
+            calculateScore();
         }
 
         function toggleObs(select) {
@@ -393,6 +347,7 @@
 
         function calcularSemana() {
             const f = document.getElementById('fechaLlamada').value;
+            if(!f) return;
             const d = new Date(f).getUTCDate();
             const s = Math.ceil(d/7);
             document.getElementById('inputSemana').value = "Semana " + (s > 4 ? 4 : s);
@@ -407,11 +362,70 @@
             if(id === 'tabDashboard') cargarDashboardEquipo();
         }
 
-        // --- DASHBOARD ---
+        // --- LÓGICA ENVÍO Y VALIDACIÓN CON PREVENCIÓN ---
+        document.getElementById('auditForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validar HTML5 Nativo antes de procesar
+            if(!this.checkValidity()) {
+                this.reportValidity();
+                return;
+            }
+
+            let textoFeedback = document.getElementById('comentarioFinal').value;
+            let quiebres = [];
+            pautaItems.forEach(item => {
+                const sel = document.querySelector(`select[name="${item.id}"]`);
+                const obs = document.getElementById('obs_' + item.id).value;
+                if(sel && sel.value === 'NO') {
+                    let peso = item.type === "PEC" ? "PEC" : item.weight + "%";
+                    quiebres.push(`• ${item.label} (${peso}): ${obs || 'Sin observación'}`);
+                }
+            });
+            if(quiebres.length > 0) textoFeedback += (textoFeedback ? "\n\n" : "") + "--- DETALLE ---\n" + quiebres.join('\n');
+            
+            const notaActual = document.getElementById('notaFinalHidden').value;
+
+            // Confirmación de seguridad
+            const confirm = await Swal.fire({
+                title: '¿Registrar Auditoría?',
+                html: `Se guardará la evaluación de <b>${document.getElementById('selectEjecutivo').value}</b> con nota final: <b class="text-xl text-blue-600">${notaActual}</b>.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6',
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Revisar'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            document.getElementById('comentarioFinal').value = textoFeedback;
+            const btn = document.getElementById('btnGuardar');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ENVIANDO...';
+            document.getElementById('fechaAuditoria').value = new Date().toISOString().split('T')[0];
+            const data = Object.fromEntries(new FormData(this));
+            
+            try {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+                Swal.fire("Éxito", "Auditoría registrada.", "success"); 
+                
+                // RESET UI
+                this.reset(); 
+                document.getElementById('comentarioFinal').value = "";
+                document.getElementById('comentarioEjecutivo').classList.add('hidden');
+                cerrarAudioFlotante();
+                renderPauta(); // Restaura la pauta al 100% SI
+                document.getElementById('totalScore').innerText = "100%";
+            } catch (err) { 
+                Swal.fire("Error", "Error de conexión.", "error"); 
+            } finally { 
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-save mr-2"></i> GUARDAR AUDITORÍA'; 
+            }
+        });
+
+        // --- DASHBOARD (INTACTO CON ADAPTACIÓN MÍNIMA) ---
         function borrarFiltros() {
-            document.getElementById('filtroCiclo').value = "";
-            document.getElementById('filtroEjecutivo').value = "";
-            cargarDashboardEquipo();
+            document.getElementById('filtroCiclo').value = ""; document.getElementById('filtroEjecutivo').value = ""; cargarDashboardEquipo();
         }
 
         async function cargarDashboardEquipo() {
@@ -420,41 +434,40 @@
             try {
                 const r = await fetch(API_URL);
                 const data = await r.json();
-                FULL_DATA = data;
-                let filtrados = data.filter(d => d.SUPERVISOR === CURRENT_USER);
+                FULL_DATA = data.auditorias || [];
+                let filtrados = FULL_DATA.filter(d => d.SUPERVISOR === CURRENT_USER);
 
-                // Generar opciones de Ciclo (Mes - Semana) dinámicamente según lo que hay
                 const selectCiclo = document.getElementById('filtroCiclo');
                 const cicloSeleccionado = selectCiclo.value;
                 const ciclosDisponibles = [...new Set(filtrados.map(d => {
-                    const m = parseInt(d.FECHA_LLAMADA.split('-')[1]) - 1;
+                    const parts = String(d.FECHA_LLAMADA).split('-');
+                    if(parts.length < 2) return null;
+                    const m = parseInt(parts[1]) - 1;
                     return `${mesesNombres[m]} - ${d.SEMANA}`;
-                }))].sort();
+                }).filter(Boolean))].sort();
 
                 selectCiclo.innerHTML = '<option value="">Todos los Ciclos</option>';
                 ciclosDisponibles.forEach(c => {
-                    let opt = document.createElement('option'); opt.value = c; opt.innerText = c;
-                    selectCiclo.appendChild(opt);
+                    let opt = document.createElement('option'); opt.value = c; opt.innerText = c; selectCiclo.appendChild(opt);
                 });
                 if(cicloSeleccionado) selectCiclo.value = cicloSeleccionado;
 
-                // Aplicar Filtro de Ciclo
                 if(selectCiclo.value) {
                     filtrados = filtrados.filter(d => {
-                        const m = parseInt(d.FECHA_LLAMADA.split('-')[1]) - 1;
+                        const parts = String(d.FECHA_LLAMADA).split('-');
+                        if(parts.length < 2) return false;
+                        const m = parseInt(parts[1]) - 1;
                         return `${mesesNombres[m]} - ${d.SEMANA}` === selectCiclo.value;
                     });
                 }
 
                 const ejec = document.getElementById('filtroEjecutivo').value.toLowerCase();
-                if(ejec) filtrados = filtrados.filter(d => d.NOMBRE.toLowerCase().includes(ejec));
+                if(ejec) filtrados = filtrados.filter(d => (d.NOMBRE||"").toLowerCase().includes(ejec));
 
-                // Datalist
                 const list = document.getElementById('listaEjecutivosFiltro');
                 const nombresUnicos = [...new Set(filtrados.map(d => d.NOMBRE))];
                 list.innerHTML = ""; nombresUnicos.forEach(n => { let opt = document.createElement('option'); opt.value = n; list.appendChild(opt); });
 
-                // Tarjetas
                 const containerTarjetas = document.getElementById('containerTarjetas');
                 containerTarjetas.innerHTML = "";
                 nombresUnicos.forEach(nombre => {
@@ -476,7 +489,7 @@
                 document.getElementById('kpiFeedbackCount').innerText = `${filtrados.filter(d => d.FEEDBACK_STATUS === "REALIZADO").length}/${filtrados.length}`;
 
                 const tb = document.getElementById('tablaEquipo'); tb.innerHTML = "";
-                filtrados.forEach((d, idx) => {
+                filtrados.forEach((d) => {
                     const isDone = d.FEEDBACK_STATUS === "REALIZADO";
                     const row = document.createElement('tr');
                     row.className = "hover:bg-blue-50 transition cursor-pointer";
@@ -523,57 +536,34 @@
                     <div class="text-sm border-t pt-4">
                         <div class="grid grid-cols-2 gap-2 text-left mb-4">
                             <div><p class="text-[9px] font-bold text-gray-400 uppercase">RUT Paciente</p>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold">${data.RUT_PACIENTE || 'N/A'}</span>
-                                    <button onclick="copyToClipboard('${data.RUT_PACIENTE}')" class="text-blue-500 text-xs"><i class="fas fa-copy"></i></button>
-                                </div>
+                                <div class="flex items-center gap-2"><span class="font-bold">${data.RUT_PACIENTE || 'N/A'}</span><button onclick="navigator.clipboard.writeText('${data.RUT_PACIENTE}')" class="text-blue-500 text-xs"><i class="fas fa-copy"></i></button></div>
                             </div>
                             <div><p class="text-[9px] font-bold text-gray-400 uppercase">Nota Final</p><p class="text-xl font-black text-blue-600">${data.NOTA_FINAL}</p></div>
                             <div><p class="text-[9px] font-bold text-gray-400 uppercase">Fecha Llamada</p><p class="font-bold">${data.FECHA_LLAMADA}</p></div>
                             <div><p class="text-[9px] font-bold text-gray-400 uppercase">Hora</p><p class="font-bold">${data.HORA_LLAMADA}</p></div>
                         </div>
-                        <div class="bg-gray-50 p-3 rounded text-left text-xs border italic">
-                            <p class="font-bold text-gray-500 not-italic uppercase mb-1">Comentario General:</p>
-                            ${data.COMENTARIO || 'Sin comentarios.'}
-                        </div>
+                        <div class="bg-gray-50 p-3 rounded text-left text-xs border italic"><p class="font-bold text-gray-500 not-italic uppercase mb-1">Comentario General:</p>${data.COMENTARIO || 'Sin comentarios.'}</div>
                         ${pautaDetalle}
                         ${audioHtml}
                     </div>
                 `,
-                showCloseButton: true,
-                confirmButtonText: 'Cerrar',
-                width: '500px'
+                showCloseButton: true, confirmButtonText: 'Cerrar', width: '500px'
             });
-        }
-
-        function copyToClipboard(txt) {
-            navigator.clipboard.writeText(txt);
-            Swal.showValidationMessage('¡Copiado!');
         }
 
         function sortTable(n) {
             const table = document.getElementById("tableMain");
             let switching = true, shouldSwitch, i, x, y, dir = "asc", switchcount = 0;
             while (switching) {
-                switching = false;
-                const rows = table.rows;
+                switching = false; const rows = table.rows;
                 for (i = 1; i < (rows.length - 1); i++) {
                     shouldSwitch = false;
-                    x = rows[i].getElementsByTagName("TD")[n];
-                    y = rows[i + 1].getElementsByTagName("TD")[n];
-                    if (dir == "asc") {
-                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) { shouldSwitch = true; break; }
-                    } else if (dir == "desc") {
-                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) { shouldSwitch = true; break; }
-                    }
+                    x = rows[i].getElementsByTagName("TD")[n]; y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") { if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) { shouldSwitch = true; break; } } 
+                    else if (dir == "desc") { if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) { shouldSwitch = true; break; } }
                 }
-                if (shouldSwitch) {
-                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-                    switchcount ++;      
-                } else {
-                    if (switchcount == 0 && dir == "asc") { dir = "desc"; switching = true; }
-                }
+                if (shouldSwitch) { rows[i].parentNode.insertBefore(rows[i + 1], rows[i]); switching = true; switchcount ++; } 
+                else { if (switchcount == 0 && dir == "asc") { dir = "desc"; switching = true; } }
             }
         }
 
@@ -585,34 +575,55 @@
             }
         }
 
-        document.getElementById('auditForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            let textoFeedback = document.getElementById('comentarioFinal').value;
-            let quiebres = [];
-            pautaItems.forEach(item => {
-                const sel = document.querySelector(`select[name="${item.id}"]`);
-                const obs = document.getElementById('obs_' + item.id).value;
-                if(sel.value === 'NO') {
-                    let peso = item.type === "PEC" ? "PEC" : item.weight + "%";
-                    quiebres.push(`• ${item.label} (${peso}): ${obs || 'Sin observación'}`);
-                }
-            });
-            if(quiebres.length > 0) textoFeedback += (textoFeedback ? "\n\n" : "") + "--- DETALLE ---\n" + quiebres.join('\n');
-            document.getElementById('comentarioFinal').value = textoFeedback;
-            const btn = document.getElementById('btnGuardar');
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            document.getElementById('fechaAuditoria').value = new Date().toISOString().split('T')[0];
-            const data = Object.fromEntries(new FormData(this));
-            try {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-                Swal.fire("Éxito", "Guardado", "success"); this.reset(); renderPauta();
-                document.getElementById('totalScore').innerText = "100%";
-                document.getElementById('comentarioFinal').value = "";
-            } catch (err) { Swal.fire("Error", "Error", "error"); } finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save mr-2"></i> GUARDAR'; }
+        // --- LÓGICA DEL REPRODUCTOR PIP FLOTANTE ---
+        const audioEl = document.getElementById('audioFlotante');
+        const pipPlayer = document.getElementById('pipPlayer');
+        const playBtn = document.getElementById('btnPlay');
+        const seekSlider = document.getElementById('seekSlider');
+        let isDragging = false, startX, startY, initialX, initialY;
+
+        function cargarAudioFlotante() {
+            const url = document.getElementById('inputAudioUrl').value;
+            if(!url) return Swal.fire('Aviso', 'Ingresa una URL de audio válida en el campo primero.', 'info');
+            audioEl.src = url;
+            pipPlayer.classList.remove('hidden');
+            audioEl.play().catch(e => console.log('Autoplay prevenido por navegador'));
+            playBtn.innerHTML = '<i class="fas fa-pause text-xs"></i>';
+        }
+        function cerrarAudioFlotante() { stopAudio(); pipPlayer.classList.add('hidden'); }
+        function togglePlay() {
+            if(audioEl.paused) { audioEl.play(); playBtn.innerHTML = '<i class="fas fa-pause text-xs"></i>'; }
+            else { audioEl.pause(); playBtn.innerHTML = '<i class="fas fa-play text-xs"></i>'; }
+        }
+        function stopAudio() { audioEl.pause(); audioEl.currentTime = 0; playBtn.innerHTML = '<i class="fas fa-play text-xs"></i>'; }
+        function changeSpeed(v) { audioEl.playbackRate = parseFloat(v); }
+
+        audioEl.addEventListener('timeupdate', () => {
+            seekSlider.value = Math.floor(audioEl.currentTime);
+            document.getElementById('timeCurrent').innerText = formatTime(audioEl.currentTime);
+            if(!isNaN(audioEl.duration)) {
+                seekSlider.max = Math.floor(audioEl.duration);
+                document.getElementById('timeTotal').innerText = formatTime(audioEl.duration);
+            }
         });
+        seekSlider.addEventListener('input', () => { audioEl.currentTime = seekSlider.value; });
+        function formatTime(sec) { const m = Math.floor(sec / 60); const s = Math.floor(sec % 60); return `${m}:${s < 10 ? '0':''}${s}`; }
+
+        // Sistema Drag & Drop nativo
+        const dragHandle = document.querySelector('.drag-handle');
+        dragHandle.addEventListener('mousedown', e => {
+            isDragging = true; startX = e.clientX; startY = e.clientY;
+            const rect = pipPlayer.getBoundingClientRect();
+            initialX = rect.left; initialY = rect.top;
+            pipPlayer.style.right = 'auto'; pipPlayer.style.bottom = 'auto'; // Reseteamos posicionamiento bottom/right
+        });
+        document.addEventListener('mousemove', e => {
+            if(!isDragging) return;
+            pipPlayer.style.left = (initialX + e.clientX - startX) + 'px';
+            pipPlayer.style.top = (initialY + e.clientY - startY) + 'px';
+        });
+        document.addEventListener('mouseup', () => isDragging = false);
+
     </script>
 </body>
 </html>
-
-
-
