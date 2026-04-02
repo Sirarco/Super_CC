@@ -16,18 +16,13 @@
         #loginOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .critical-row { background-color: #fff1f2; }
         .btn-press:active { transform: scale(0.96); transition: 0.1s; }
-        
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         th.sortable { cursor: pointer; position: relative; }
         th.sortable:hover { background-color: #f1f5f9; }
-
         .criterio-box { font-size: 10px; line-height: 1.3; margin-top: 4px; padding: 6px; border-radius: 6px; }
         .criterio-cumple { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
         .criterio-nocumple { background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
-        
-        /* --- ESTILOS MÓDULO CASOS Y FEEDBACK --- */
         .highlight-part { background-color: #fef08a; font-weight: bold; padding: 0 2px; border-radius: 2px; color: #854d0e; }
         .highlight-dialysis { background-color: #bfdbfe; font-weight: bold; padding: 0 2px; border-radius: 2px; color: #1e3a8a; }
         .highlight-search { background-color: #00FF00 !important; color: #FF0000 !important; font-weight: 900; padding: 0 2px; border: 1px solid #FF0000; }
@@ -76,81 +71,29 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-gray-200">
                     <div>
                         <label class="text-[10px] font-bold text-gray-400 uppercase">Ejecutivo</label>
-                        <select id="selectEjecutivo" name="nombre" class="w-full border rounded p-2 font-bold text-sm bg-white" required onchange="autocompletarDatos()">
-                            <option value="">-- Seleccionar --</option>
-                        </select>
+                        <select id="selectEjecutivo" name="nombre" class="w-full border rounded p-2 font-bold text-sm bg-white" required onchange="autocompletarDatos()"><option value="">-- Seleccionar --</option></select>
                         <div id="comentarioEjecutivo" class="text-[11px] text-blue-600 italic mt-1 hidden font-semibold"></div>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Código</label>
-                        <input type="text" id="inputCodigo" name="codigo" class="w-full bg-gray-100 border rounded p-2 text-sm font-mono" readonly>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Supervisor</label>
-                        <input type="text" id="inputSup" name="supervisor" class="w-full bg-gray-100 border rounded p-2 text-sm" readonly>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Servicio</label>
-                        <input type="text" id="inputServ" name="servicio" class="w-full bg-gray-100 border rounded p-2 text-sm" readonly>
-                    </div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase">Código</label><input type="text" id="inputCodigo" name="codigo" class="w-full bg-gray-100 border rounded p-2 text-sm font-mono" readonly></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase">Supervisor</label><input type="text" id="inputSup" name="supervisor" class="w-full bg-gray-100 border rounded p-2 text-sm" readonly></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase">Servicio</label><input type="text" id="inputServ" name="servicio" class="w-full bg-gray-100 border rounded p-2 text-sm" readonly></div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Fecha Llamada</label>
-                        <input type="date" id="fechaLlamada" name="fecha_llamada" class="w-full border rounded p-2 text-sm" required onchange="calcularSemana()">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Hora Llamada</label>
-                        <input type="time" name="hora_llamada" class="w-full border rounded p-2 text-sm" required>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-blue-600 uppercase">RUT Paciente</label>
-                        <input type="text" name="rut_paciente" class="w-full border-2 border-blue-100 rounded p-2 text-sm" required placeholder="12.345.678-9">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">URL Audio (Opcional)</label>
-                        <div class="flex gap-2">
-                            <input type="url" id="inputAudioUrl" name="audio_url" class="w-full border rounded p-2 text-sm" placeholder="https://...">
-                            <button type="button" onclick="cargarAudioFlotante()" class="bg-slate-800 text-white px-3 rounded hover:bg-slate-700 btn-press tooltip" title="Abrir Player">🎧</button>
-                        </div>
-                    </div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase">Fecha Llamada</label><input type="date" id="fechaLlamada" name="fecha_llamada" class="w-full border rounded p-2 text-sm" required onchange="calcularSemana()"></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase">Hora Llamada</label><input type="time" name="hora_llamada" class="w-full border rounded p-2 text-sm" required></div>
+                    <div><label class="text-[10px] font-bold text-blue-600 uppercase">RUT Paciente</label><input type="text" name="rut_paciente" class="w-full border-2 border-blue-100 rounded p-2 text-sm" required placeholder="12.345.678-9"></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase">URL Audio (Opcional)</label><div class="flex gap-2"><input type="url" id="inputAudioUrl" name="audio_url" class="w-full border rounded p-2 text-sm" placeholder="https://..."><button type="button" onclick="cargarAudioFlotante()" class="bg-slate-800 text-white px-3 rounded hover:bg-slate-700 btn-press tooltip" title="Abrir Player">🎧</button></div></div>
                 </div>
-
-                <input type="hidden" id="inputSemana" name="semana">
-                <input type="hidden" id="fechaAuditoria" name="fecha_auditoria">
-                <input type="hidden" id="inputAuditorReal" name="auditor_real">
-                <input type="hidden" id="notaFinalHidden" name="nota_final" value="0%">
-
+                <input type="hidden" id="inputSemana" name="semana"><input type="hidden" id="fechaAuditoria" name="fecha_auditoria"><input type="hidden" id="inputAuditorReal" name="auditor_real"><input type="hidden" id="notaFinalHidden" name="nota_final" value="0%">
                 <div class="overflow-x-auto rounded border border-gray-300">
                     <table class="w-full text-[11px]">
-                        <thead>
-                            <tr class="header-blue text-center uppercase">
-                                <th class="p-2 w-24">Categoría</th>
-                                <th class="p-2 text-left">Indicador / Criterios</th>
-                                <th class="p-2 w-16">Tipo</th>
-                                <th class="p-2 w-24">Cumple</th>
-                                <th class="p-2 w-48 bg-slate-700 text-white">Observación de Quiebre</th>
-                            </tr>
-                        </thead>
+                        <thead><tr class="header-blue text-center uppercase"><th class="p-2 w-24">Categoría</th><th class="p-2 text-left">Indicador / Criterios</th><th class="p-2 w-16">Tipo</th><th class="p-2 w-24">Cumple</th><th class="p-2 w-48 bg-slate-700 text-white">Observación de Quiebre</th></tr></thead>
                         <tbody id="pautaBody" class="divide-y divide-gray-200"></tbody>
-                        <tfoot>
-                            <tr class="bg-gray-800 text-white">
-                                <td colspan="4" class="p-3 text-right font-bold text-sm uppercase">Nota Final:</td>
-                                <td class="p-3 text-center font-black text-2xl" id="totalScore">100%</td>
-                            </tr>
-                        </tfoot>
+                        <tfoot><tr class="bg-gray-800 text-white"><td colspan="4" class="p-3 text-right font-bold text-sm uppercase">Nota Final:</td><td class="p-3 text-center font-black text-2xl" id="totalScore">100%</td></tr></tfoot>
                     </table>
                 </div>
-
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase">Comentario General y Feedback</label>
-                    <textarea id="comentarioFinal" name="comentario" class="w-full border p-3 rounded h-32 text-sm bg-white" placeholder="Escribe aquí tu análisis general de la llamada..."></textarea>
-                </div>
-                
-                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 btn-press">
-                    <i class="fas fa-save mr-2"></i> GUARDAR AUDITORÍA
-                </button>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase">Comentario General y Feedback</label><textarea id="comentarioFinal" name="comentario" class="w-full border p-3 rounded h-32 text-sm bg-white" placeholder="Escribe aquí tu análisis general de la llamada..."></textarea></div>
+                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 btn-press"><i class="fas fa-save mr-2"></i> GUARDAR AUDITORÍA</button>
             </form>
         </div>
     </div>
@@ -158,56 +101,22 @@
     <div id="tabDashboard" class="tab-content hidden p-4 overflow-y-auto flex-1 bg-slate-100">
         <div class="max-w-6xl mx-auto space-y-4">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase">Mes / Ciclo</label>
-                    <select id="filtroCiclo" class="w-full border rounded p-2 text-sm bg-gray-50" onchange="cargarDashboardEquipo()">
-                        <option value="">Cargando Ciclos...</option>
-                    </select>
-                </div>
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase">Ejecutivo (Visibilidad Abierta)</label>
-                    <input type="text" id="filtroEjecutivo" list="listaEjecutivosFiltro" class="w-full border rounded p-2 text-sm bg-gray-50" placeholder="Buscar nombre en plataforma...">
-                    <datalist id="listaEjecutivosFiltro"></datalist>
-                </div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase">Mes / Ciclo</label><select id="filtroCiclo" class="w-full border rounded p-2 text-sm bg-gray-50" onchange="cargarDashboardEquipo()"><option value="">Cargando Ciclos...</option></select></div>
+                <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase">Ejecutivo (Visibilidad Abierta)</label><input type="text" id="filtroEjecutivo" list="listaEjecutivosFiltro" class="w-full border rounded p-2 text-sm bg-gray-50" placeholder="Buscar nombre en plataforma..."><datalist id="listaEjecutivosFiltro"></datalist></div>
                 <div class="flex gap-2">
-                    <button onclick="actualizarDatosServidor()" class="flex-1 bg-blue-600 text-white p-2 rounded-lg btn-press text-xs font-bold flex items-center justify-center gap-2">
-                        <span id="loadSpinner" class="hidden"><div class="loader" style="width:12px; height:12px; border-width:2px;"></div></span>
-                        <i class="fas fa-sync-alt"></i> ACTUALIZAR DATOS
-                    </button>
-                    <button onclick="borrarFiltros()" class="flex-1 bg-gray-500 text-white p-2 rounded-lg btn-press text-xs font-bold">
-                        <i class="fas fa-eraser"></i> BORRAR
-                    </button>
+                    <button onclick="actualizarDatosServidor()" class="flex-1 bg-blue-600 text-white p-2 rounded-lg btn-press text-xs font-bold flex items-center justify-center gap-2"><span id="loadSpinner" class="hidden"><div class="loader" style="width:12px; height:12px; border-width:2px;"></div></span><i class="fas fa-sync-alt"></i> ACTUALIZAR DATOS</button>
+                    <button onclick="borrarFiltros()" class="flex-1 bg-gray-500 text-white p-2 rounded-lg btn-press text-xs font-bold"><i class="fas fa-eraser"></i> BORRAR</button>
                 </div>
             </div>
-
             <div id="containerTarjetas" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Promedio Global Plataforma</p>
-                    <p class="text-3xl font-black text-slate-700" id="dashProm">0%</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Ciclos Feedback</p>
-                    <p class="text-3xl font-black text-slate-700" id="kpiFeedbackCount">0/0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Casos PEC Totales</p>
-                    <p class="text-3xl font-black text-red-600" id="dashPec">0</p>
-                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 text-center"><p class="text-[10px] text-gray-400 font-bold uppercase">Promedio Global Plataforma</p><p class="text-3xl font-black text-slate-700" id="dashProm">0%</p></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 text-center"><p class="text-[10px] text-gray-400 font-bold uppercase">Ciclos Feedback</p><p class="text-3xl font-black text-slate-700" id="kpiFeedbackCount">0/0</p></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 text-center"><p class="text-[10px] text-gray-400 font-bold uppercase">Casos PEC Totales</p><p class="text-3xl font-black text-red-600" id="dashPec">0</p></div>
             </div>
-
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <table class="w-full text-xs" id="tableMain">
-                    <thead class="bg-slate-100 text-gray-500 uppercase">
-                        <tr>
-                            <th class="p-3 text-left sortable" onclick="sortTable(0)">Ejecutivo <i class="fas fa-sort"></i></th>
-                            <th class="p-3 text-center sortable" onclick="sortTable(1)">Fecha <i class="fas fa-sort"></i></th>
-                            <th class="p-3 text-center sortable" onclick="sortTable(2)">Nota <i class="fas fa-sort"></i></th>
-                            <th class="p-3 text-center sortable" onclick="sortTable(3)">Feedback <i class="fas fa-sort"></i></th>
-                            <th class="p-3 text-center">Acción</th>
-                        </tr>
-                    </thead>
+                    <thead class="bg-slate-100 text-gray-500 uppercase"><tr><th class="p-3 text-left sortable" onclick="sortTable(0)">Ejecutivo <i class="fas fa-sort"></i></th><th class="p-3 text-center sortable" onclick="sortTable(1)">Fecha <i class="fas fa-sort"></i></th><th class="p-3 text-center sortable" onclick="sortTable(2)">Nota <i class="fas fa-sort"></i></th><th class="p-3 text-center sortable" onclick="sortTable(3)">Feedback <i class="fas fa-sort"></i></th><th class="p-3 text-center">Acción</th></tr></thead>
                     <tbody id="tablaEquipo" class="divide-y divide-gray-100"></tbody>
                 </table>
             </div>
@@ -217,39 +126,25 @@
     <div id="tabCasos" class="tab-content hidden p-4 overflow-y-auto flex-1 bg-slate-100">
         <div class="max-w-[1900px] mx-auto space-y-4">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-800"><i class="fas fa-file-medical text-blue-600 mr-2"></i> Validador de Casos Masivos</h2>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">Procesa reportes de Excel en tiempo real</p>
-                </div>
-                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 flex items-center">
-                    <input type="file" id="fileInputCasos" accept=".xlsx" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer transition"/>
-                </div>
+                <div><h2 class="text-lg font-bold text-slate-800"><i class="fas fa-file-medical text-blue-600 mr-2"></i> Validador de Casos Masivos</h2><p class="text-[10px] text-slate-400 font-bold uppercase">Procesa reportes de Excel en tiempo real</p></div>
+                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 flex items-center"><input type="file" id="fileInputCasos" accept=".xlsx" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer transition"/></div>
             </div>
 
-            <div id="dashboardCasos" class="hidden grid grid-cols-1 md:grid-cols-6 gap-3">
-                <div id="card-rut" class="card-stat bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500" onclick="toggleAlertFilter('rut')">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">Alertas RUT Infantil</p>
-                    <p id="stat-rut" class="text-2xl font-black text-slate-800">0</p>
+            <div id="dashboardCasos" class="hidden flex flex-col gap-5">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-[11px] font-black text-slate-500 uppercase mb-3 flex items-center gap-2"><i class="fas fa-stethoscope text-blue-500"></i> Controles</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div id="card-rut" class="card-stat bg-slate-50 p-3 rounded-lg border-l-4 border-red-500" onclick="toggleAlertFilter('rut')"><p class="text-[9px] font-bold text-slate-400 uppercase">Alertas RUT Infantil</p><p id="stat-rut" class="text-xl font-black text-slate-800">0</p></div>
+                        <div id="card-trauma" class="card-stat bg-slate-50 p-3 rounded-lg border-l-4 border-amber-500" onclick="toggleAlertFilter('trauma')"><p class="text-[9px] font-bold text-slate-400 uppercase">Trauma Adulto</p><p id="stat-trauma-ratio" class="text-xl font-black text-slate-800">0/0</p></div>
+                        <div id="card-dialysis" class="card-stat bg-slate-50 p-3 rounded-lg border-l-4 border-blue-500" onclick="toggleAlertFilter('dialysis')"><p class="text-[9px] font-bold text-slate-400 uppercase">Auditoría Diálisis</p><p id="stat-dialysis-ratio" class="text-xl font-black text-slate-800">0/0</p></div>
+                        <div id="card-critical" class="card-stat bg-slate-50 p-3 rounded-lg border-l-4 border-purple-600" onclick="toggleAlertFilter('critical')"><p class="text-[9px] font-bold text-slate-400 uppercase">Esp. Críticas</p><p id="stat-critical" class="text-xl font-black text-slate-800">0</p></div>
+                        <div id="card-otras" class="card-stat bg-slate-50 p-3 rounded-lg border-l-4 border-pink-500" onclick="toggleAlertFilter('otras')"><p class="text-[9px] font-bold text-slate-400 uppercase">Otras Alertas</p><p id="stat-otras" class="text-xl font-black text-slate-800">0</p></div>
+                    </div>
                 </div>
-                <div id="card-trauma" class="card-stat bg-white p-4 rounded-xl shadow-sm border-l-4 border-amber-500" onclick="toggleAlertFilter('trauma')">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">Auditoría Trauma Adulto</p>
-                    <p id="stat-trauma-ratio" class="text-2xl font-black text-slate-800">0/0</p>
-                </div>
-                <div id="card-dialysis" class="card-stat bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500" onclick="toggleAlertFilter('dialysis')">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">Auditoría Diálisis</p>
-                    <p id="stat-dialysis-ratio" class="text-2xl font-black text-slate-800">0/0</p>
-                </div>
-                <div id="card-critical" class="card-stat bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-600" onclick="toggleAlertFilter('critical')">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">Especialidades Críticas</p>
-                    <p id="stat-critical" class="text-2xl font-black text-slate-800">0</p>
-                </div>
-                <div id="card-otras" class="card-stat bg-white p-4 rounded-xl shadow-sm border-l-4 border-pink-500" onclick="toggleAlertFilter('otras')">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">Otras Alertas</p>
-                    <p id="stat-otras" class="text-2xl font-black text-slate-800">0</p>
-                </div>
-                <div class="bg-slate-800 p-4 rounded-xl shadow-sm text-white border border-slate-700">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase">Vista Actual</p>
-                    <p id="stat-total" class="text-2xl font-black">0</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200"><h3 class="text-[11px] font-black text-slate-500 uppercase mb-3 flex items-center gap-2"><i class="fas fa-file-prescription text-rose-500"></i> Renovación de Receta</h3><div id="card-receta" class="card-stat bg-rose-50 p-3 rounded-lg border-l-4 border-rose-600" onclick="toggleAlertFilter('receta')"><p class="text-[9px] font-bold text-rose-400 uppercase">Alertas Recetas</p><p id="stat-receta" class="text-2xl font-black text-rose-600">0</p></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200"><h3 class="text-[11px] font-black text-slate-500 uppercase mb-3 flex items-center gap-2"><i class="fas fa-pills text-emerald-500"></i> Farmacia</h3><div id="card-farmacia" class="card-stat bg-emerald-50 p-3 rounded-lg border-l-4 border-emerald-500" onclick="toggleAlertFilter('farmacia')"><p class="text-[9px] font-bold text-emerald-500 uppercase">Filtro Farmacia</p><p id="stat-farmacia" class="text-2xl font-black text-emerald-600">0</p></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200"><h3 class="text-[11px] font-black text-slate-500 uppercase mb-3 flex items-center gap-2"><i class="fas fa-globe text-slate-500"></i> General</h3><div class="bg-slate-800 p-3 rounded-lg shadow-sm text-white"><p class="text-[9px] font-bold text-slate-400 uppercase">Vista Actual</p><p id="stat-total" class="text-2xl font-black">0</p></div></div>
                 </div>
             </div>
 
@@ -259,7 +154,6 @@
                 <div class="flex-1 min-w-[120px]"><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase">Creador</label><select id="filterCreator" class="w-full border-slate-200 border rounded-lg px-2 py-2 text-xs bg-slate-50 outline-none"></select></div>
                 <div class="w-32"><label class="block text-[10px] font-black text-slate-400 mb-1 uppercase">Fecha</label><input type="date" id="filterDate" class="w-full border-slate-200 border rounded-lg px-2 py-2 text-xs bg-slate-50 outline-none"></div>
                 <div class="flex-[1.5] min-w-[200px]"><label class="block text-[10px] font-black text-blue-600 mb-1 uppercase">Buscador (Fondo Verde)</label><input type="text" id="filterGlobal" placeholder="Escribe para resaltar..." class="w-full border-blue-200 border-2 rounded-lg px-2 py-2 text-xs bg-white outline-none"></div>
-                
                 <div class="flex items-center gap-2">
                     <button id="btnMagic" class="btn-magic text-white px-3 py-2 rounded-lg font-black shadow transition-all btn-press tooltip" title="D: Destacados">D</button>
                     <button id="btnError" class="btn-error px-3 py-2 rounded-lg font-black shadow transition-all btn-press tooltip" title="F: Solo Errores">F</button>
@@ -272,12 +166,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div id="loaderCasos" class="hidden p-10 text-center font-bold text-slate-400 text-xs uppercase tracking-widest"><i class="fas fa-spinner fa-spin mr-2"></i> Analizando archivo...</div>
                 <div class="casos-table-container">
-                    <table class="w-full text-left border-collapse">
-                        <thead id="tableHeaderCasos" class="bg-slate-50 sticky top-0 z-20 shadow-sm"></thead>
-                        <tbody id="tableBodyCasos" class="divide-y divide-slate-100 bg-white">
-                            <tr><td class="p-10 text-center text-slate-400 text-xs italic">Sube un archivo Excel (.xlsx) para comenzar la revisión cruzada.</td></tr>
-                        </tbody>
-                    </table>
+                    <table class="w-full text-left border-collapse"><thead id="tableHeaderCasos" class="bg-slate-50 sticky top-0 z-20 shadow-sm"></thead><tbody id="tableBodyCasos" class="divide-y divide-slate-100 bg-white"><tr><td class="p-10 text-center text-slate-400 text-xs italic">Sube un archivo Excel (.xlsx) para comenzar.</td></tr></tbody></table>
                 </div>
             </div>
         </div>
@@ -286,72 +175,33 @@
     <div id="tabFeedbackExtra" class="tab-content hidden p-4 overflow-y-auto flex-1 bg-slate-100">
         
         <div id="fb_dashboard_view" class="max-w-[1400px] mx-auto space-y-4">
-            
             <button onclick="abrirFormularioFeedback()" class="w-full bg-blue-600 text-white p-6 rounded-2xl shadow-lg border border-blue-700 hover:bg-blue-700 transition btn-press flex items-center justify-center gap-4">
                 <i class="fas fa-plus-circle text-4xl"></i>
                 <div class="text-left">
                     <h2 class="text-2xl font-black">INGRESAR NUEVO FEEDBACK</h2>
-                    <p class="text-xs text-blue-200 uppercase font-bold tracking-widest">Abre el tracker de audio y seguimiento</p>
+                    <p class="text-xs text-blue-200 uppercase font-bold tracking-widest">Abre el tracker de sesión (Máx 5 indicadores)</p>
                 </div>
             </button>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Feedbacks Registrados (Mes)</p>
-                    <p class="text-3xl font-black text-slate-700" id="fb_kpi_total">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Abiertos (Riesgo)</p>
-                    <p class="text-3xl font-black text-red-600" id="fb_kpi_abiertos">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-amber-500 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Pendiente / Vencido</p>
-                    <p class="text-3xl font-black text-amber-600" id="fb_kpi_vencidos">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Indicador + Frecuente</p>
-                    <p class="text-[11px] font-black text-slate-700 mt-2 truncate max-w-full px-2" id="fb_kpi_top" title="Top">N/A</p>
-                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 text-center"><p class="text-[10px] text-gray-400 font-bold uppercase">Feedbacks Registrados (Mes)</p><p class="text-3xl font-black text-slate-700" id="fb_kpi_total">0</p></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 text-center"><p class="text-[10px] text-gray-400 font-bold uppercase">Abiertos (Riesgo)</p><p class="text-3xl font-black text-red-600" id="fb_kpi_abiertos">0</p></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-amber-500 text-center"><p class="text-[10px] text-gray-400 font-bold uppercase">Pendiente / Vencido</p><p class="text-3xl font-black text-amber-600" id="fb_kpi_vencidos">0</p></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 text-center"><p class="text-[10px] text-gray-400 font-bold uppercase">Indicador + Frecuente</p><p class="text-[11px] font-black text-slate-700 mt-2 truncate max-w-full px-2" id="fb_kpi_top" title="Top">N/A</p></div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden lg:col-span-1 flex flex-col h-[500px]">
-                    <div class="bg-slate-800 text-white p-3 text-xs font-bold uppercase tracking-wider">
-                        <i class="fas fa-users mr-2"></i> Resumen Ejecutivos
-                    </div>
+                    <div class="bg-slate-800 text-white p-3 text-xs font-bold uppercase tracking-wider"><i class="fas fa-users mr-2"></i> Resumen Ejecutivos</div>
                     <div class="flex-1 overflow-y-auto">
-                        <table class="w-full text-[10px]">
-                            <thead class="bg-slate-100 text-gray-500 uppercase sticky top-0 shadow-sm z-10">
-                                <tr>
-                                    <th class="p-2 text-left w-1/2">Ejecutivo</th>
-                                    <th class="p-2 text-center w-1/6">N°</th>
-                                    <th class="p-2 text-left w-1/3">Indicadores</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fb_tabla_resumen" class="divide-y divide-gray-100"></tbody>
-                        </table>
+                        <table class="w-full text-[10px]"><thead class="bg-slate-100 text-gray-500 uppercase sticky top-0 shadow-sm z-10"><tr><th class="p-2 text-left w-1/2">Ejecutivo</th><th class="p-2 text-center w-1/6">N°</th><th class="p-2 text-left w-1/3">Indicadores</th></tr></thead><tbody id="fb_tabla_resumen" class="divide-y divide-gray-100"></tbody></table>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden lg:col-span-2 flex flex-col h-[500px]">
-                    <div class="bg-slate-800 text-white p-3 text-xs font-bold uppercase tracking-wider flex justify-between items-center">
-                        <span><i class="fas fa-list mr-2"></i> Historial General (Clic para Ver/PDF)</span>
-                        <button onclick="actualizarDatosServidor()" class="hover:text-blue-300"><i class="fas fa-sync-alt"></i></button>
-                    </div>
+                    <div class="bg-slate-800 text-white p-3 text-xs font-bold uppercase tracking-wider flex justify-between items-center"><span><i class="fas fa-list mr-2"></i> Historial General (Clic para Ver/PDF)</span><button onclick="actualizarDatosServidor()" class="hover:text-blue-300"><i class="fas fa-sync-alt"></i></button></div>
                     <div class="flex-1 overflow-y-auto">
-                        <table class="w-full text-[11px] table-fixed">
-                            <thead class="bg-slate-100 text-gray-500 uppercase sticky top-0 shadow-sm z-10">
-                                <tr>
-                                    <th class="p-3 text-left w-24">Fecha</th>
-                                    <th class="p-3 text-left w-1/4">Ejecutivo</th>
-                                    <th class="p-3 text-left w-1/4">Supervisor</th>
-                                    <th class="p-3 text-left w-1/3">Indicadores</th>
-                                    <th class="p-3 text-center w-28">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fb_tabla_historial" class="divide-y divide-gray-100"></tbody>
-                        </table>
+                        <table class="w-full text-[11px] table-fixed"><thead class="bg-slate-100 text-gray-500 uppercase sticky top-0 shadow-sm z-10"><tr><th class="p-3 text-left w-24">Fecha</th><th class="p-3 text-left w-1/4">Ejecutivo</th><th class="p-3 text-left w-1/4">Supervisor</th><th class="p-3 text-left w-1/3">Indicadores</th><th class="p-3 text-center w-28">Estado</th></tr></thead><tbody id="fb_tabla_historial" class="divide-y divide-gray-100"></tbody></table>
                     </div>
                 </div>
             </div>
@@ -364,73 +214,38 @@
             <form id="fb_auditForm" class="space-y-4">
                 <div class="bg-blue-600 text-white p-2 rounded-md font-bold text-xs uppercase shadow-sm">1. Origen y Referencia</div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-gray-200">
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Supervisor Responsable</label>
-                        <input type="text" id="fb_Nombre_Supervisor" class="w-full border rounded p-2 text-sm bg-gray-200 font-bold text-slate-600 cursor-not-allowed" readonly>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Ejecutivo</label>
-                        <select id="fb_Nombre_Ejecutivo" class="w-full border rounded p-2 text-sm bg-white" required onchange="fb_mostrarCodigoEjec()"><option value="">Seleccione...</option></select>
-                        <span id="fb_Codigo_Ejecutivo" class="text-[10px] text-blue-600 font-bold mt-1 block"></span>
-                    </div>
-                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Campaña</label><select id="fb_Campaña" class="w-full border rounded p-2 text-sm bg-white" required><option value="">Seleccione...</option><option value="Mesa Central">Mesa Central</option><option value="Ingreso">Ingreso</option><option value="Bloqueo">Bloqueo</option><option value="Inbound">Inbound General</option><option value="Outbound">Outbound</option><option value="Administrativo">Administrativo</option></select></div>
-                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">ID Llamada / Ticket</label><input type="text" id="fb_ID_Llamada_Ticket" class="w-full border rounded p-2 text-sm bg-white" required></div>
-                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fecha Llamada Original</label><input type="date" id="fb_Fecha_Llamada" class="w-full border rounded p-2 text-sm bg-white" required></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Supervisor</label><input type="text" id="fb_Nombre_Supervisor" class="w-full border rounded p-2 text-sm bg-gray-200 font-bold text-slate-600 cursor-not-allowed" readonly></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Ejecutivo</label><select id="fb_Nombre_Ejecutivo" class="w-full border rounded p-2 text-sm bg-white" required onchange="fb_mostrarCodigoEjec()"><option value="">Seleccione...</option></select><span id="fb_Codigo_Ejecutivo" class="text-[10px] text-blue-600 font-bold mt-1 block"></span></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Campaña</label><select id="fb_Campaña" class="w-full border rounded p-2 text-sm bg-white" required><option value="Mesa Central">Mesa Central</option><option value="Ingreso">Ingreso</option><option value="Bloqueo">Bloqueo</option><option value="Inbound">Inbound General</option><option value="Outbound">Outbound</option><option value="Administrativo">Administrativo</option></select></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">ID Ticket</label><input type="text" id="fb_ID_Llamada_Ticket" class="w-full border rounded p-2 text-sm bg-white" required></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fecha Llamada</label><input type="date" id="fb_Fecha_Llamada" class="w-full border rounded p-2 text-sm bg-white" required></div>
                     <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Hora Llamada</label><input type="time" id="fb_Hora_Llamada" class="w-full border rounded p-2 text-sm bg-white" required></div>
                     <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fecha Quiebre (Opcional)</label><input type="date" id="fb_Fecha_Quiebre" class="w-full border rounded p-2 text-sm bg-white"></div>
                 </div>
 
-                <div class="bg-blue-600 text-white p-2 rounded-md font-bold text-xs uppercase shadow-sm mt-6">2. Tipificación Inteligente (Max 3)</div>
+                <div class="bg-blue-600 text-white p-2 rounded-md font-bold text-xs uppercase shadow-sm mt-6">2. Tipificación Inteligente (Max 5)</div>
                 <datalist id="fb_lista_indicadores_datalist"></datalist>
                 <div id="fb_indicadores_wrapper" class="space-y-3 bg-slate-50 p-4 rounded-lg border border-gray-200">
-                    
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end">
-                        <div class="md:col-span-2">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">1. Seleccionar Indicador</label>
-                            <input type="text" id="fb_ind_1" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(1)" placeholder="Buscar indicador..." required>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Categoría Automática</label>
-                            <input type="text" id="fb_cat_1" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly required>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Gravedad</label>
-                            <select id="fb_grav_1" class="w-full border rounded p-2 text-sm bg-white" required><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="ACTITUD">ACTITUD</option></select>
-                        </div>
+                        <div class="md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Indicador</label><input type="text" id="fb_ind_1" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(1)" required></div>
+                        <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Categoría Automática</label><input type="text" id="fb_cat_1" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly required></div>
+                        <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Gravedad</label><select id="fb_grav_1" class="w-full border rounded p-2 text-sm bg-white" required><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="Aptitud">Aptitud</option><option value="Actitud">Actitud</option></select></div>
                     </div>
-
-                    <div id="fb_row_ind_2" class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end hidden">
-                        <div class="md:col-span-2"><input type="text" id="fb_ind_2" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(2)" placeholder="Buscar 2do indicador..."></div>
-                        <div><input type="text" id="fb_cat_2" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly></div>
-                        <div><select id="fb_grav_2" class="w-full border rounded p-2 text-sm bg-white"><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="ACTITUD">ACTITUD</option></select></div>
-                    </div>
-
-                    <div id="fb_row_ind_3" class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end hidden">
-                        <div class="md:col-span-2"><input type="text" id="fb_ind_3" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(3)" placeholder="Buscar 3er indicador..."></div>
-                        <div><input type="text" id="fb_cat_3" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly></div>
-                        <div><select id="fb_grav_3" class="w-full border rounded p-2 text-sm bg-white"><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="ACTITUD">ACTITUD</option></select></div>
-                    </div>
-
-                    <button type="button" onclick="fb_addIndicador()" class="mt-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition border border-blue-200">
-                        <i class="fas fa-plus mr-1"></i> Añadir Otro Indicador a Retroalimentar
-                    </button>
+                    <div id="fb_row_ind_2" class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end hidden"><div class="md:col-span-2"><input type="text" id="fb_ind_2" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(2)"></div><div><input type="text" id="fb_cat_2" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly></div><div><select id="fb_grav_2" class="w-full border rounded p-2 text-sm bg-white"><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="Aptitud">Aptitud</option><option value="Actitud">Actitud</option></select></div></div>
+                    <div id="fb_row_ind_3" class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end hidden"><div class="md:col-span-2"><input type="text" id="fb_ind_3" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(3)"></div><div><input type="text" id="fb_cat_3" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly></div><div><select id="fb_grav_3" class="w-full border rounded p-2 text-sm bg-white"><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="Aptitud">Aptitud</option><option value="Actitud">Actitud</option></select></div></div>
+                    <div id="fb_row_ind_4" class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end hidden"><div class="md:col-span-2"><input type="text" id="fb_ind_4" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(4)"></div><div><input type="text" id="fb_cat_4" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly></div><div><select id="fb_grav_4" class="w-full border rounded p-2 text-sm bg-white"><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="Aptitud">Aptitud</option><option value="Actitud">Actitud</option></select></div></div>
+                    <div id="fb_row_ind_5" class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end hidden"><div class="md:col-span-2"><input type="text" id="fb_ind_5" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(5)"></div><div><input type="text" id="fb_cat_5" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly></div><div><select id="fb_grav_5" class="w-full border rounded p-2 text-sm bg-white"><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="Aptitud">Aptitud</option><option value="Actitud">Actitud</option></select></div></div>
+                    
+                    <button type="button" onclick="fb_addIndicador()" class="mt-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition border border-blue-200"><i class="fas fa-plus mr-1"></i> Añadir Otro Indicador a Retroalimentar</button>
                 </div>
 
-                <div class="bg-blue-600 text-white p-2 rounded-md font-bold text-xs uppercase shadow-sm mt-6">3. Tiempo y Grabación de Audio (Nativo)</div>
+                <div class="bg-blue-600 text-white p-2 rounded-md font-bold text-xs uppercase shadow-sm mt-6">3. Tiempos de la Sesión</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Tipo Feedback</label>
-                        <select id="fb_Tipo_Feedback" class="w-full border rounded p-2 text-sm bg-white mb-4" required><option value="">Seleccione...</option><option value="Verbal">Verbal</option><option value="Acta de Reentrenamiento">Acta de Reentrenamiento</option><option value="Amonestación">Amonestación</option><option value="Compromiso">Compromiso</option></select>
-                        <div class="bg-amber-50 p-3 rounded border border-amber-200 text-xs text-amber-700 italic">
-                            <i class="fas fa-info-circle"></i> Al presionar "🔴 Grabar Sesión", el navegador pedirá permiso para usar el micrófono. Al detener, se descargará el archivo de audio localmente y se llenará el tiempo.
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-lg border border-gray-200 text-center relative flex flex-col items-center justify-center">
-                        <div class="text-3xl font-black text-blue-600 mb-2 tracking-widest" id="fb_displayTimer">00:00:00</div>
-                        <button type="button" id="fb_btnRecord" onclick="toggleAudioRecording()" class="bg-slate-800 text-white px-6 py-3 rounded-full shadow-lg font-black hover:bg-slate-700 transition btn-press mb-4 w-full md:w-auto">
-                            🔴 Grabar Sesión
-                        </button>
-                        <div class="w-full"><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block text-left">Duración Calculada o Manual (Minutos)</label><input type="number" id="fb_Duracion_Feedback" class="w-full border rounded p-2 text-sm font-bold bg-white text-blue-600 text-center" required></div>
+                    <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Tipo Feedback</label><select id="fb_Tipo_Feedback" class="w-full border rounded p-2 text-sm bg-white mb-4" required><option value="Verbal">Verbal</option><option value="Acta de Reentrenamiento">Acta de Reentrenamiento</option><option value="Amonestación">Amonestación</option><option value="Compromiso">Compromiso</option></select></div>
+                    <div class="grid grid-cols-3 gap-2 bg-slate-50 p-4 rounded-lg border border-gray-200 items-end">
+                        <div><label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Hora Inicio</label><input type="time" id="fb_Hora_Inicio" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_calcDuration()" required></div>
+                        <div><label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Hora Término</label><input type="time" id="fb_Hora_Termino" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_calcDuration()" required></div>
+                        <div><label class="text-[10px] font-bold text-blue-600 uppercase block mb-1">Duración (Min)</label><input type="number" id="fb_Duracion_Feedback" class="w-full border rounded p-2 text-sm font-black bg-gray-100 text-blue-600 text-center" readonly required></div>
                     </div>
                 </div>
 
@@ -447,15 +262,9 @@
                     <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Plazo Seguimiento</label><select id="fb_Plazo_Seguimiento" class="w-full border rounded p-2 text-sm bg-white" required><option value="">Seleccione...</option><option value="Inmediato">Inmediato</option><option value="24h">24h</option><option value="48h">48h</option><option value="1 semana">1 semana</option></select></div>
                     <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Fecha Prog. Revisión</label><input type="date" id="fb_Fecha_Programada_Revision" class="w-full border rounded p-2 text-sm bg-gray-100" readonly></div>
                     <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Estado Auditoría</label><select id="fb_Estado_Auditoria" class="w-full border rounded p-2 text-sm bg-white font-bold text-red-600" required><option value="Abierta">Abierta</option><option value="Pendiente de Seguimiento">Pendiente de Seguimiento</option><option value="Cerrada">Cerrada</option></select></div>
-                    <div>
-                        <label class="text-[10px] font-bold text-purple-600 uppercase mb-1 block">Actitud del Ejecutivo</label>
-                        <select id="fb_Actitud" class="w-full border-2 border-purple-200 rounded p-2 text-sm bg-white font-bold" required><option value="">Evalúe Actitud...</option><option value="Positivo/Receptivo">Positivo / Receptivo</option><option value="Pasivo/Indiferente">Pasivo / Indiferente</option><option value="Defensivo/Rechazo">Defensivo / Rechazo</option></select>
-                    </div>
+                    <div><label class="text-[10px] font-bold text-purple-600 uppercase mb-1 block">Actitud del Ejecutivo</label><select id="fb_Actitud" class="w-full border-2 border-purple-200 rounded p-2 text-sm bg-white font-bold" required><option value="">Evalúe Actitud...</option><option value="Positivo/Receptivo">Positivo / Receptivo</option><option value="Pasivo/Indiferente">Pasivo / Indiferente</option><option value="Defensivo/Rechazo">Defensivo / Rechazo</option></select></div>
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Bitácora del Supervisor (Impresiones extras, problemas de sistema, etc.)</label>
-                    <textarea id="fb_Observaciones_Finales" class="w-full border rounded p-2 text-sm bg-white h-16" placeholder="Ej: El ejecutivo entiende la mejora pero indica frustración por lentitud de PC..."></textarea>
-                </div>
+                <div><label class="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Bitácora del Supervisor (Impresiones extras, problemas de sistema, etc.)</label><textarea id="fb_Observaciones_Finales" class="w-full border rounded p-2 text-sm bg-white h-16" placeholder="Ej: El ejecutivo entiende la mejora pero indica frustración por lentitud de PC..."></textarea></div>
 
                 <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 btn-press mt-4 text-lg tracking-wider">
                     <i class="fas fa-paper-plane mr-2"></i> ENVIAR Y GUARDAR FEEDBACK
@@ -465,253 +274,114 @@
     </div>
 
     <div id="pipPlayer" class="hidden fixed bottom-4 right-4 w-80 bg-slate-900 rounded-xl shadow-2xl border border-slate-700 p-4 z-50 text-white">
-        <div class="flex justify-between items-center mb-2 drag-handle cursor-move">
-            <span class="text-xs font-bold text-slate-300"><i class="fas fa-grip-horizontal mr-1"></i> Player SiperQA</span>
-            <button type="button" onclick="cerrarAudioFlotante()" class="text-slate-400 hover:text-white">&times;</button>
-        </div>
+        <div class="flex justify-between items-center mb-2 drag-handle cursor-move"><span class="text-xs font-bold text-slate-300"><i class="fas fa-grip-horizontal mr-1"></i> Player SiperQA</span><button type="button" onclick="cerrarAudioFlotante()" class="text-slate-400 hover:text-white">&times;</button></div>
         <audio id="audioFlotante" class="hidden"></audio>
-        <div class="flex items-center gap-2 mb-2">
-            <button type="button" onclick="togglePlay()" id="btnPlay" class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-500 transition"><i class="fas fa-play text-xs"></i></button>
-            <button type="button" onclick="stopAudio()" class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 transition"><i class="fas fa-stop text-xs"></i></button>
-            <select id="audioSpeed" onchange="changeSpeed(this.value)" class="text-xs bg-slate-800 border border-slate-600 rounded p-1 ml-auto text-white outline-none cursor-pointer"><option value="1">1.0x</option><option value="1.5">1.5x</option><option value="2">2.0x</option></select>
-        </div>
+        <div class="flex items-center gap-2 mb-2"><button type="button" onclick="togglePlay()" id="btnPlay" class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-500 transition"><i class="fas fa-play text-xs"></i></button><button type="button" onclick="stopAudio()" class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 transition"><i class="fas fa-stop text-xs"></i></button><select id="audioSpeed" onchange="changeSpeed(this.value)" class="text-xs bg-slate-800 border border-slate-600 rounded p-1 ml-auto text-white outline-none cursor-pointer"><option value="1">1.0x</option><option value="1.5">1.5x</option><option value="2">2.0x</option></select></div>
         <div class="flex items-center gap-2 text-[10px] text-slate-400"><span id="timeCurrent" class="w-8">0:00</span><input type="range" id="seekSlider" value="0" step="1" class="w-full accent-blue-500 cursor-pointer"><span id="timeTotal" class="w-8">0:00</span></div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzEnzOn8TVN8xAX7do3tk1N2g3bD0lKh9EF5eh6T_I2yHFiPdeKDrM4RTwjG8f2uIzDJQ/exec";
         
-        let CURRENT_USER = "";
-        let FULL_DATA = [];
-        let FEEDBACK_DATA = [];
-        let baseEjecutivos = [];
-        let pautaItems = [];
-        let diccIndicadores = [];
+        let CURRENT_USER = ""; let FULL_DATA = []; let FEEDBACK_DATA = []; let baseEjecutivos = []; let pautaItems = []; let diccIndicadores = [];
         const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const ID_MAPEO_ORIGINAL = ["item_validacion", "item_confidencialidad", "item_normas", "item_abandono", "item_registro", "item_script", "item_cortesia", "item_sondeo", "item_info", "item_tiempos", "item_aseguramiento", "item_personalizacion", "item_lenguaje", "item_empatia", "item_tipificacion"];
 
-        // Helper Normalizador de Data (Previene Bugs de Case-Sensitivity de Google Sheets)
-        function getProp(obj, propName) {
-            if (!obj) return "";
-            const key = Object.keys(obj).find(k => k.toLowerCase() === propName.toLowerCase());
-            return key ? obj[key] : "";
-        }
-
-        const fallbackIndicadores = [
-            {cat: "Operación", ind: "Mala tipificación"}, {cat: "Operación", ind: "No actualiza datos"}, {cat: "Operación", ind: "Cuelgue de llamada"},
-            {cat: "Calidad", ind: "No saluda/despide"}, {cat: "Calidad", ind: "Información errónea"}, {cat: "Calidad", ind: "Uso de muletillas"},
-            {cat: "Gestión de Tiempos", ind: "TMO Excesivo"}, {cat: "Gestión de Tiempos", ind: "Hold injustificado"},
-            {cat: "Conducta", ind: "Falta de Empatía"}, {cat: "Conducta", ind: "Tono irónico o irrespetuoso"}
-        ];
+        function getProp(obj, propName) { if (!obj) return ""; const key = Object.keys(obj).find(k => k.toLowerCase() === propName.toLowerCase()); return key ? obj[key] : ""; }
 
         window.onload = async () => {
             const overlay = document.getElementById('loginOverlay');
             try {
-                const r = await fetch(API_URL);
-                const data = await r.json();
-                
-                FULL_DATA = data.auditorias || [];
-                FEEDBACK_DATA = data.otras_auditorias || data.registro_auditorias || []; 
-                baseEjecutivos = data.ejecutivos || [];
-                diccIndicadores = data.indicadores_fb || fallbackIndicadores;
+                const r = await fetch(API_URL); const data = await r.json();
+                FULL_DATA = data.auditorias || []; FEEDBACK_DATA = data.otras_auditorias || data.registro_auditorias || []; 
+                baseEjecutivos = data.ejecutivos || []; diccIndicadores = data.indicadores_fb || [];
                 
                 pautaItems = (data.pauta || []).map((p, index) => ({
                     cat: p.Categoría, id: p.ID || ID_MAPEO_ORIGINAL[index] || "item_dinamico_" + index,
                     label: p.Indicador, type: String(p.Peso).toUpperCase() === "PEC" ? "PEC" : "PENC",
-                    weight: String(p.Peso).toUpperCase() !== "PEC" ? parseInt(p.Peso) : 0,
-                    ok: p.Criterio_SI, fail: p.Criterio_NO
+                    weight: String(p.Peso).toUpperCase() !== "PEC" ? parseInt(p.Peso) : 0, ok: p.Criterio_SI, fail: p.Criterio_NO
                 }));
 
-                overlay.innerHTML = `<div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border-t-4 border-blue-500">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Acceso Supervisor</h2>
-                    <select id="loginSelect" class="w-full p-3 border-2 border-gray-200 rounded-xl mb-6 font-bold text-gray-700 outline-none focus:border-blue-500 bg-gray-50"><option value="">-- Selecciona tu Nombre --</option></select>
-                    <button onclick="iniciarSesion()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg btn-press">INGRESAR</button>
-                </div>`;
-                
+                overlay.innerHTML = `<div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border-t-4 border-blue-500"><h2 class="text-2xl font-bold text-gray-800 mb-6">Acceso Supervisor</h2><select id="loginSelect" class="w-full p-3 border-2 border-gray-200 rounded-xl mb-6 font-bold text-gray-700 outline-none focus:border-blue-500 bg-gray-50"><option value="">-- Selecciona tu Nombre --</option></select><button onclick="iniciarSesion()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg btn-press">INGRESAR</button></div>`;
                 const supervisores = [...new Set(baseEjecutivos.map(e => getProp(e, 'Supervisor')))].sort();
                 const select = document.getElementById('loginSelect');
                 supervisores.forEach(s => { if(s) { let opt = document.createElement('option'); opt.value = s; opt.innerText = s; select.appendChild(opt); } });
                 renderPauta();
-            } catch (e) {
-                console.error(e);
-                Swal.fire("Error Fatal", "No se pudo conectar a la base de datos.", "error");
-            }
+            } catch (e) { Swal.fire("Error Fatal", "No se pudo conectar a la base de datos.", "error"); }
         };
 
         function iniciarSesion() {
             const user = document.getElementById('loginSelect').value;
             if(!user) return Swal.fire("Atención", "Selecciona tu nombre", "warning");
-            CURRENT_USER = user;
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('labelSupervisor').innerText = user;
+            CURRENT_USER = user; document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('labelSupervisor').innerText = user;
             
-            const selEjecAud = document.getElementById('selectEjecutivo');
-            const selEjecFb = document.getElementById('fb_Nombre_Ejecutivo');
+            const selEjecAud = document.getElementById('selectEjecutivo'); const selEjecFb = document.getElementById('fb_Nombre_Ejecutivo');
+            baseEjecutivos.forEach(e => { const nom = getProp(e, 'Nombre'); if(nom) { selEjecAud.innerHTML += `<option value="${nom}">${nom}</option>`; selEjecFb.innerHTML += `<option value="${nom}">${nom}</option>`; } });
             
-            baseEjecutivos.forEach(e => {
-                const nom = getProp(e, 'Nombre');
-                if(nom) {
-                    selEjecAud.innerHTML += `<option value="${nom}">${nom}</option>`;
-                    selEjecFb.innerHTML += `<option value="${nom}">${nom}</option>`;
-                }
-            });
-
-            // Poblar Datalist Predictivo
             const dl = document.getElementById('fb_lista_indicadores_datalist');
             dl.innerHTML = diccIndicadores.map(i => `<option value="${i.Indicador || i.ind}">`).join('');
         }
 
-        // =========================================================================
-        // LÓGICA DE AUDITORÍA (PESTAÑA 1)
-        // =========================================================================
+        // ======================= PESTAÑA 1: AUDITAR =======================
         function autocompletarDatos() { const nombre = document.getElementById('selectEjecutivo').value; const data = baseEjecutivos.find(e => getProp(e, 'Nombre') === nombre); const divComentario = document.getElementById('comentarioEjecutivo'); if(data) { document.getElementById('inputCodigo').value = getProp(data, 'Código'); document.getElementById('inputServ').value = getProp(data, 'Servicio'); document.getElementById('inputSup').value = getProp(data, 'Supervisor'); document.getElementById('inputAuditorReal').value = CURRENT_USER; const com = getProp(data, 'Comentario_Interno'); if(com) { divComentario.innerText = "📌 " + com; divComentario.classList.remove('hidden'); } else { divComentario.classList.add('hidden'); } calculateScore(); } else { divComentario.classList.add('hidden'); } }
         function renderPauta() { const body = document.getElementById('pautaBody'); body.innerHTML = ""; pautaItems.forEach(item => { const tr = document.createElement('tr'); if(item.type === "PEC") tr.className = "critical-row"; const criteriosHtml = `<div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2"><div class="criterio-box criterio-cumple"><i class="fas fa-check-circle mr-1"></i> <b>CUMPLE:</b> ${item.ok}</div><div class="criterio-box criterio-nocumple"><i class="fas fa-times-circle mr-1"></i> <b>NO CUMPLE:</b> ${item.fail}</div></div>`; tr.innerHTML = `<td class="p-2 font-bold align-top ${item.type === 'PEC' ? 'text-red-700' : 'text-slate-500'}">${item.cat}</td><td class="p-2 align-top"><span class="font-bold text-sm block">${item.label}</span>${criteriosHtml}</td><td class="p-2 text-center align-top font-bold ${item.type === 'PEC' ? 'text-red-500' : 'text-blue-500'}">${item.type === 'PEC' ? 'PEC' : item.weight+'%'}</td><td class="p-1 align-top"><select name="${item.id}" class="w-full border rounded p-1 calc-trigger" data-id="${item.id}" data-type="${item.type}" data-weight="${item.weight || 0}" onchange="toggleObs(this)"><option value="SI">SI</option><option value="NO">NO</option></select></td><td class="p-1 align-top"><input type="text" id="obs_${item.id}" class="obs-input w-full border border-blue-200 rounded p-1 hidden text-[10px]" placeholder="¿Por qué no cumple?"></td>`; body.appendChild(tr); }); calculateScore(); }
         function toggleObs(select) { const input = document.getElementById('obs_' + select.dataset.id); if(select.value === 'NO') input.classList.remove('hidden'); else { input.classList.add('hidden'); input.value = ""; } calculateScore(); }
         function calculateScore() { let total = 0, isPec = false; document.querySelectorAll('.calc-trigger').forEach(sel => { if(sel.dataset.type === "PEC" && sel.value === "NO") isPec = true; if(sel.dataset.type === "PENC" && sel.value === "SI") total += parseInt(sel.dataset.weight); }); const nota = isPec ? 0 : total; document.getElementById('totalScore').innerText = nota + "%"; document.getElementById('notaFinalHidden').value = nota + "%"; }
         function calcularSemana() { const f = document.getElementById('fechaLlamada').value; if(!f) return; const d = new Date(f).getUTCDate(); const s = Math.ceil(d/7); document.getElementById('inputSemana').value = "Semana " + (s > 4 ? 4 : s); }
-        
-        document.getElementById('auditForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if(!this.checkValidity()) { this.reportValidity(); return; }
-            let textoFeedback = document.getElementById('comentarioFinal').value; let quiebres = [];
-            pautaItems.forEach(item => { const sel = document.querySelector(`select[name="${item.id}"]`); const obs = document.getElementById('obs_' + item.id).value; if(sel && sel.value === 'NO') { let peso = item.type === "PEC" ? "PEC" : item.weight + "%"; quiebres.push(`• ${item.label} (${peso}): ${obs || 'Sin observación'}`); } });
-            if(quiebres.length > 0) textoFeedback += (textoFeedback ? "\n\n" : "") + "--- DETALLE ---\n" + quiebres.join('\n');
-            const notaActual = document.getElementById('notaFinalHidden').value;
-            const confirm = await Swal.fire({ title: '¿Registrar Auditoría?', html: `Se guardará la evaluación con nota final: <b class="text-xl text-blue-600">${notaActual}</b>.`, icon: 'question', showCancelButton: true, confirmButtonColor: '#3b82f6', confirmButtonText: 'Sí, enviar', cancelButtonText: 'Revisar' });
-            if (!confirm.isConfirmed) return;
-            document.getElementById('comentarioFinal').value = textoFeedback; document.getElementById('fechaAuditoria').value = new Date().toISOString().split('T')[0];
-            const data = Object.fromEntries(new FormData(this));
-            Swal.fire({ title: 'Procesando...', allowOutsideClick: false, willOpen: () => { Swal.showLoading(); } });
-            try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) }); this.reset(); document.getElementById('comentarioFinal').value = ""; document.getElementById('comentarioEjecutivo').classList.add('hidden'); cerrarAudioFlotante(); renderPauta(); document.getElementById('totalScore').innerText = "100%"; Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'La auditoría ha sido registrada correctamente.', confirmButtonColor: '#3b82f6' }); } catch (err) { Swal.fire("Error", "Ocurrió un error de conexión al intentar guardar.", "error"); }
-        });
+        document.getElementById('auditForm').addEventListener('submit', async function(e) { e.preventDefault(); if(!this.checkValidity()) { this.reportValidity(); return; } let textoFeedback = document.getElementById('comentarioFinal').value; let quiebres = []; pautaItems.forEach(item => { const sel = document.querySelector(`select[name="${item.id}"]`); const obs = document.getElementById('obs_' + item.id).value; if(sel && sel.value === 'NO') { let peso = item.type === "PEC" ? "PEC" : item.weight + "%"; quiebres.push(`• ${item.label} (${peso}): ${obs || 'Sin observación'}`); } }); if(quiebres.length > 0) textoFeedback += (textoFeedback ? "\n\n" : "") + "--- DETALLE ---\n" + quiebres.join('\n'); const notaActual = document.getElementById('notaFinalHidden').value; const confirm = await Swal.fire({ title: '¿Registrar Auditoría?', html: `Se guardará la evaluación con nota final: <b class="text-xl text-blue-600">${notaActual}</b>.`, icon: 'question', showCancelButton: true, confirmButtonColor: '#3b82f6', confirmButtonText: 'Sí, enviar', cancelButtonText: 'Revisar' }); if (!confirm.isConfirmed) return; document.getElementById('comentarioFinal').value = textoFeedback; document.getElementById('fechaAuditoria').value = new Date().toISOString().split('T')[0]; const data = Object.fromEntries(new FormData(this)); Swal.fire({ title: 'Procesando...', allowOutsideClick: false, willOpen: () => { Swal.showLoading(); } }); try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) }); this.reset(); document.getElementById('comentarioFinal').value = ""; document.getElementById('comentarioEjecutivo').classList.add('hidden'); cerrarAudioFlotante(); renderPauta(); document.getElementById('totalScore').innerText = "100%"; Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'La auditoría ha sido registrada correctamente.', confirmButtonColor: '#3b82f6' }); } catch (err) { Swal.fire("Error", "Ocurrió un error de conexión al intentar guardar.", "error"); } });
 
-        // =========================================================================
-        // LÓGICA DE NAVEGACIÓN Y DASHBOARD (PESTAÑA 2)
-        // =========================================================================
-        function cambiarTab(id) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-gray-500'); });
-            document.getElementById(id).classList.remove('hidden');
-            let btnId = 'btnTabIngreso'; if(id === 'tabDashboard') btnId = 'btnTabDashboard'; if(id === 'tabCasos') btnId = 'btnTabCasos'; if(id === 'tabFeedbackExtra') btnId = 'btnTabFeedback';
-            const acBtn = document.getElementById(btnId); acBtn.classList.add('active-tab'); acBtn.classList.remove('text-gray-500');
-            if(id === 'tabDashboard') cargarDashboardEquipo();
-            if(id === 'tabFeedbackExtra') renderFeedbackDashboard();
-        }
-
-        async function actualizarDatosServidor() {
-            const spinner = document.getElementById('loadSpinner'); if(spinner) spinner.classList.remove('hidden');
-            try { const r = await fetch(API_URL); const data = await r.json(); FULL_DATA = data.auditorias || []; FEEDBACK_DATA = data.otras_auditorias || data.registro_auditorias || []; cargarDashboardEquipo(); if(!document.getElementById('tabFeedbackExtra').classList.contains('hidden')) renderFeedbackDashboard(); } catch (e) { Swal.fire("Error", "No se pudo actualizar.", "error"); } finally { if(spinner) spinner.classList.add('hidden'); }
-        }
-
+        // ======================= PESTAÑA 2: DASHBOARD =======================
+        function cambiarTab(id) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-gray-500'); }); document.getElementById(id).classList.remove('hidden'); let btnId = 'btnTabIngreso'; if(id === 'tabDashboard') btnId = 'btnTabDashboard'; if(id === 'tabCasos') btnId = 'btnTabCasos'; if(id === 'tabFeedbackExtra') btnId = 'btnTabFeedback'; const acBtn = document.getElementById(btnId); acBtn.classList.add('active-tab'); acBtn.classList.remove('text-gray-500'); if(id === 'tabDashboard') cargarDashboardEquipo(); if(id === 'tabFeedbackExtra') renderFeedbackDashboard(); }
+        async function actualizarDatosServidor() { const spinner = document.getElementById('loadSpinner'); if(spinner) spinner.classList.remove('hidden'); try { const r = await fetch(API_URL); const data = await r.json(); FULL_DATA = data.auditorias || []; FEEDBACK_DATA = data.otras_auditorias || data.registro_auditorias || []; cargarDashboardEquipo(); if(!document.getElementById('tabFeedbackExtra').classList.contains('hidden')) renderFeedbackDashboard(); } catch (e) { Swal.fire("Error", "No se pudo actualizar.", "error"); } finally { if(spinner) spinner.classList.add('hidden'); } }
         function borrarFiltros() { document.getElementById('filtroCiclo').value = ""; document.getElementById('filtroEjecutivo').value = ""; cargarDashboardEquipo(); }
+        function cargarDashboardEquipo() { try { let filtrados = FULL_DATA; const selectCiclo = document.getElementById('filtroCiclo'); const cicloSeleccionado = selectCiclo.value; const ciclosDisponibles = [...new Set(filtrados.map(d => { const parts = String(getProp(d, 'FECHA_LLAMADA')).split(/[-/]/); if(parts.length < 2) return null; const m = parseInt(parts[1]) - 1; return `${mesesNombres[m]} - ${getProp(d, 'SEMANA')}`; }).filter(Boolean))].sort(); selectCiclo.innerHTML = '<option value="">Todos los Ciclos</option>'; ciclosDisponibles.forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; selectCiclo.appendChild(opt); }); if(cicloSeleccionado) selectCiclo.value = cicloSeleccionado; if(selectCiclo.value) { filtrados = filtrados.filter(d => { const parts = String(getProp(d, 'FECHA_LLAMADA')).split(/[-/]/); if(parts.length < 2) return false; const m = parseInt(parts[1]) - 1; return `${mesesNombres[m]} - ${getProp(d, 'SEMANA')}` === selectCiclo.value; }); } const ejec = document.getElementById('filtroEjecutivo').value.toLowerCase(); if(ejec) filtrados = filtrados.filter(d => String(getProp(d, 'NOMBRE')).toLowerCase().includes(ejec)); const list = document.getElementById('listaEjecutivosFiltro'); const nombresUnicos = [...new Set(filtrados.map(d => getProp(d, 'NOMBRE')))]; list.innerHTML = ""; nombresUnicos.forEach(n => { let opt = document.createElement('option'); opt.value = n; list.appendChild(opt); }); const containerTarjetas = document.getElementById('containerTarjetas'); containerTarjetas.innerHTML = ""; nombresUnicos.forEach(nombre => { const audsEjec = filtrados.filter(d => getProp(d, 'NOMBRE') === nombre); const prom = (audsEjec.reduce((a, b) => a + (parseInt(getProp(b, 'NOTA_FINAL')) || 0), 0) / audsEjec.length).toFixed(0); const count = audsEjec.length; containerTarjetas.innerHTML += `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 text-center btn-press cursor-pointer" onclick="document.getElementById('filtroEjecutivo').value='${nombre}'; cargarDashboardEquipo();"><p class="text-[9px] font-bold text-gray-400 uppercase truncate">${nombre}</p><p class="text-xl font-black text-blue-600">${prom}%</p><p class="text-2xl font-black ${count === 0 ? 'text-red-600 animate-pulse' : 'text-slate-700'}">${count}</p><p class="text-[9px] text-gray-400 uppercase">Auditorías</p></div>`; }); const notas = filtrados.map(d => parseInt(getProp(d, 'NOTA_FINAL')) || 0); document.getElementById('dashProm').innerText = (notas.length ? (notas.reduce((a,b)=>a+b,0)/notas.length).toFixed(0) : 0) + "%"; document.getElementById('dashPec').innerText = notas.filter(n => n === 0).length; document.getElementById('kpiFeedbackCount').innerText = `${filtrados.filter(d => getProp(d, 'FEEDBACK_STATUS') === "REALIZADO").length}/${filtrados.length}`; const tb = document.getElementById('tablaEquipo'); tb.innerHTML = ""; filtrados.forEach((d) => { const isDone = getProp(d, 'FEEDBACK_STATUS') === "REALIZADO"; const isCrossAudit = getProp(d, 'AUDITOR_REAL') && getProp(d, 'AUDITOR_REAL') !== getProp(d, 'SUPERVISOR'); const badgeClass = isCrossAudit ? 'bg-orange-100 text-orange-700 font-bold' : 'bg-gray-100 text-gray-500'; const auditorName = getProp(d, 'AUDITOR_REAL') || 'Desconocido'; const row = document.createElement('tr'); row.className = "hover:bg-blue-50 transition cursor-pointer"; row.onclick = () => verDetalleAuditoria(d); row.innerHTML = `<td class="p-3 font-medium"><span class="block">${getProp(d, 'NOMBRE')}</span><span class="${badgeClass} text-[9px] px-1 rounded block w-max mt-1">Auditado por: ${auditorName}</span></td><td class="p-3 text-center align-middle">${getProp(d, 'FECHA_LLAMADA')}</td><td class="p-3 text-center align-middle font-bold ${parseInt(getProp(d, 'NOTA_FINAL')) < 85 ? 'text-red-500':'text-green-600'}">${getProp(d, 'NOTA_FINAL')}</td><td class="p-3 text-center align-middle"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isDone ? 'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'}">${getProp(d, 'FEEDBACK_STATUS')}</span></td><td class="p-3 text-center align-middle" onclick="event.stopPropagation();">${!isDone ? `<button onclick="abrirFeedbackAuditoria('${getProp(d, 'CODIGO')}', '${getProp(d, 'FECHA_AUDITORIA')}')" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 btn-press">Feedback</button>` : '✅'}</td>`; tb.appendChild(row); }); } catch (e) { console.error(e); } }
+        function sortTable(n) { const table = document.getElementById("tableMain"); let switching = true, shouldSwitch, i, x, y, dir = "asc", switchcount = 0; while (switching) { switching = false; const rows = table.rows; for (i = 1; i < (rows.length - 1); i++) { shouldSwitch = false; x = rows[i].getElementsByTagName("TD")[n]; y = rows[i + 1].getElementsByTagName("TD")[n]; if (dir == "asc") { if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) { shouldSwitch = true; break; } } else if (dir == "desc") { if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) { shouldSwitch = true; break; } } } if (shouldSwitch) { rows[i].parentNode.insertBefore(rows[i + 1], rows[i]); switching = true; switchcount ++; } else { if (switchcount == 0 && dir == "asc") { dir = "desc"; switching = true; } } } }
+        async function abrirFeedbackAuditoria(cod, fecha) { const { value: texto } = await Swal.fire({ title: 'Cerrar Ciclo', input: 'textarea', inputLabel: 'Compromisos...', showCancelButton: true }); if (texto) { const payload = { action: "REGISTER_FEEDBACK", codigo: cod, fecha_auditoria: fecha, feedback_detalle: texto }; try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); Swal.fire("Éxito", "Feedback guardado", "success"); actualizarDatosServidor(); } catch (e) { Swal.fire("Error", "No se pudo guardar", "error"); } } }
+        function verDetalleAuditoria(data) { let pautaDetalle = ""; const detalle = getProp(data, 'DETALLE'); if(detalle) { pautaDetalle = `<div class="mt-4 p-3 bg-red-50 rounded text-left text-xs border border-red-100"><p class="font-bold text-red-700 mb-2">INDICADORES NO CUMPLIDOS:</p>`; let count = 0; for (const [key, val] of Object.entries(detalle)) { if(val === "NO") { const item = pautaItems.find(p => p.id === key.toLowerCase() || p.id === "item_" + key.toLowerCase().split('_')[1]); pautaDetalle += `<p class="mb-1">❌ <b>${item ? item.label : key}:</b> Marcado como NO.</p>`; count++; } } if(count === 0) pautaDetalle = `<div class="mt-4 p-3 bg-green-50 rounded text-left text-xs border border-green-100"><p class="font-bold text-green-700">Cumplimiento total de indicadores.</p>`; pautaDetalle += `</div>`; } const audioUrl = getProp(data, 'AUDIO_URL'); const audioHtml = audioUrl && audioUrl.trim() !== "" ? `<div class="mt-4 bg-slate-100 p-3 rounded border border-gray-200"><p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Escuchar Grabación:</p><audio controls class="w-full h-8"><source src="${audioUrl}" type="audio/mpeg">Tu navegador no soporta el audio.</audio></div>` : `<div class="mt-4 bg-amber-50 p-3 rounded border border-amber-200 text-amber-700 text-xs italic">La URL del audio no está disponible para esta auditoría.</div>`; Swal.fire({ title: `<span class="text-blue-600">${getProp(data, 'NOMBRE')}</span>`, html: `<div class="text-sm border-t pt-4"><div class="grid grid-cols-2 gap-2 text-left mb-4"><div><p class="text-[9px] font-bold text-gray-400 uppercase">RUT Paciente</p><div class="flex items-center gap-2"><span class="font-bold">${getProp(data, 'RUT_PACIENTE') || 'N/A'}</span></div></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Nota Final</p><p class="text-xl font-black text-blue-600">${getProp(data, 'NOTA_FINAL')}</p></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Fecha Llamada</p><p class="font-bold">${getProp(data, 'FECHA_LLAMADA')}</p></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Hora</p><p class="font-bold">${getProp(data, 'HORA_LLAMADA')}</p></div></div><div class="bg-gray-50 p-3 rounded text-left text-xs border italic"><p class="font-bold text-gray-500 not-italic uppercase mb-1">Comentario General:</p>${getProp(data, 'COMENTARIO') || 'Sin comentarios.'}</div>${pautaDetalle}${audioHtml}</div>`, showCloseButton: true, confirmButtonText: 'Cerrar', width: '500px' }); }
 
-        function cargarDashboardEquipo() {
-            try {
-                // PRD 4.1: Visibilidad Abierta para todos.
-                let filtrados = FULL_DATA;
-                const selectCiclo = document.getElementById('filtroCiclo');
-                const cicloSeleccionado = selectCiclo.value;
-                
-                const ciclosDisponibles = [...new Set(filtrados.map(d => {
-                    const parts = String(getProp(d, 'FECHA_LLAMADA')).split(/[-/]/);
-                    if(parts.length < 2) return null;
-                    const m = parseInt(parts[1]) - 1;
-                    return `${mesesNombres[m]} - ${getProp(d, 'SEMANA')}`;
-                }).filter(Boolean))].sort();
+        // ======================= PESTAÑA 3: CASOS =======================
+        let casos_db = [], casos_viewData = [], casos_headers = [], showExtraCols = false; let currentSortCasos = { key: null, dir: 'asc' }, activeFilterCasos = null;
+        const BODY_PARTS = ['columna', 'pie', 'mano', 'hombro', 'muñeca', 'rodilla', 'cadera', 'codo', 'tobillo', 'dedo', 'pelvis', 'brazo', 'pierna', 'cuello', 'espalda', 'talon', 'planta', 'hueso', 'musculo', 'tendon', 'ligamento', 'escapula', 'vertebra', 'lumbar', 'sacro', 'cervical', 'pantorrilla', 'coxis', 'femur'];
+        const DIALYSIS_TERMS = ['no se dializa', 'se dializa', 'dializa', 'dializo', 'dialisis', 'hemodialisis', 'peritoneal', 'dializando', 'dialisa', 'fistula', 'fav', 'cateter', 'vascular', 'bypass'];
+        const DIALYSIS_SPECIALTIES = ['nefrologia infantil', 'nefrologia adulto', 'cirugia vascular periferica'];
+        const CRITICAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIATRIA ADULTO E INFANTIL (SALUD MENTAL)', 'NUTRICIONISTA INFANTIL', 'NUTRICIONISTA ADULTO', 'Salud Ocupacional', 'KINESIOLOGIA MFR', 'cuidados paliativos', 'HOSPITAL DE DÍA', 'ENDODONCIA', 'SERVICIO SOCIAL (ASISTENTE SOCIAL)', 'CRITERIOS CONTROL', 'HISTORICO', 'JUNTA MEDICA', 'HORMONOTERAPIA', 'ENFERMERA', 'UNIDAD PATOLOGICA CERVICAL', 'TERAPIA OCUPACIONAL', 'T TEMPOROMANDIBULAR Y DOLO ORO FACIAL', 'TACO', 'REHABBILITACION PROTESIS FIJAS Y REMOVIBLES', 'PERIODONCIA', 'ORTODONCIA', 'OPERATORIA', 'ODONTOPEDIATRIA', 'IMPLANTOLOGIA', 'FONOAUDIOLOGIA MFR', 'BRONCOPULMONAR INFANTIL'];
+        const EXTRA_COLS = ['Lista Espera', 'Resuelto', 'Informado'];
+        const REUMA_TERMS = ['lesli casanova']; const ADOLES_TERMS = ['correa', 'etchegaray']; const OFTALMO_TERMS = ['petour', 'leppe', 'bagolini', 'pereira', 'torrealba', 'nazar', 'muñoz', 'henriquez', 'perez', 'guevara', 'gajardo']; const OTORRINO_TERMS = ['silva', 'poblete'];
+        const RECETAS_PERMITIDAS = ['cirugia de mamas', 'med. fisica y rehab. adultos', 'taco']; // Regla normalizada
+        const normalizeTxt = (t) => t ? t.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+        const getRutBody = (s) => { let clean = s.toString().replace(/[^0-9kK]/g, ''); return clean.length > 1 ? parseInt(clean.slice(0, -1)) || 0 : 0; };
+        const formatDateCasos = (val) => { if (!val || isNaN(Date.parse(val))) return val; const d = new Date(val); return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getFullYear()).slice(-2)}`; };
 
-                selectCiclo.innerHTML = '<option value="">Todos los Ciclos</option>';
-                ciclosDisponibles.forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; selectCiclo.appendChild(opt); });
-                if(cicloSeleccionado) selectCiclo.value = cicloSeleccionado;
+        document.getElementById('fileInputCasos').addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; document.getElementById('loaderCasos').classList.remove('hidden'); const r = new FileReader(); r.onload = (e) => { const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true }); casos_db = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" }); if (casos_db.length > 0) { const orig = Object.keys(casos_db[0]); casos_headers = ['Caso', 'Especialidad', 'tag_description', 'Rut']; orig.forEach(h => { if(!casos_headers.includes(h)) casos_headers.push(h); }); populateUICasos(); processCasosData(); document.getElementById('dashboardCasos').classList.remove('hidden'); document.getElementById('filtersPanelCasos').classList.remove('hidden'); } document.getElementById('loaderCasos').classList.add('hidden'); }; r.readAsArrayBuffer(file); });
+        function populateUICasos() { const crs = [...new Set(casos_db.map(i => getProp(i, 'Creado Por')))].filter(Boolean).sort(); const sps = [...new Set(casos_db.map(i => getProp(i, 'Especialidad')))].filter(Boolean).sort(); const cats = [...new Set(casos_db.map(i => getProp(i, 'Categoria') || getProp(i, 'Categoría')))].filter(Boolean).sort(); document.getElementById('filterCreator').innerHTML = '<option value="">Todos</option>' + crs.map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('filterSpecialty').innerHTML = '<option value="">Todas</option>' + sps.map(s => `<option value="${s}">${s}</option>`).join(''); document.getElementById('filterCategory').innerHTML = '<option value="">Todas</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join(''); }
+        function toggleAlertFilter(type) { activeFilterCasos = (activeFilterCasos === type) ? null : type; document.querySelectorAll('.card-stat, #btnMagic, #btnError').forEach(c => c.classList.remove('card-active', 'ring-4', 'ring-blue-400')); if (activeFilterCasos) { const el = document.getElementById(type === 'magic' ? 'btnMagic' : (type === 'error' ? 'btnError' : `card-${type}`)); if(el) el.classList.add('ring-4', 'ring-blue-400'); } processCasosData(); }
+        function processCasosData() { const sV = document.getElementById('filterSpecialty').value, cV = document.getElementById('filterCreator').value, catV = document.getElementById('filterCategory').value, dV = document.getElementById('filterDate').value, gV = normalizeTxt(document.getElementById('filterGlobal').value); casos_viewData = casos_db.filter(row => { const esp = normalizeTxt(getProp(row, 'Especialidad')); const catNorm = normalizeTxt(getProp(row, 'Categoria') || getProp(row, 'Categoría')); const desc = normalizeTxt(getProp(row, 'tag_description')); const rut = getRutBody(getProp(row, 'Rut')); const isPed = esp.includes('infantil') || esp.includes('pediatri'), isTrau = esp.includes('traumatologia adulto'); const isDia = DIALYSIS_SPECIALTIES.includes(esp), isCri = CRITICAL_SPECS.map(s => normalizeTxt(s)).includes(esp); const hasPart = BODY_PARTS.some(p => desc.includes(normalizeTxt(p))), hasDia = DIALYSIS_TERMS.some(t => desc.includes(normalizeTxt(t))); const isRutAlrt = isPed && rut < 19000000 && rut > 0; const isTrauAlrt = isTrau && !hasPart; const isDiaAlrt = isDia && !hasDia; const isReumaAlrt = (esp === 'reumatologia') && !REUMA_TERMS.some(t => desc.includes(normalizeTxt(t))); const isAdolesAlrt = (esp === 'adolescencia') && !ADOLES_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOftalmoAlrt = (esp === 'oftalmologia') && !OFTALMO_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOtorrinoAlrt = (esp === 'otorrinolaringologia') && OTORRINO_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOtrasAlertas = isReumaAlrt || isAdolesAlrt || isOftalmoAlrt || isOtorrinoAlrt; const isReceta = catNorm === 'renovacion de receta'; const isRecetaAlrt = isReceta && !RECETAS_PERMITIDAS.some(permitida => esp.includes(permitida)); const isFarmacia = catNorm === 'farmacia'; const isFinalError = isRutAlrt || isTrauAlrt || isDiaAlrt || isCri || isOtrasAlertas || isRecetaAlrt; const fCrea = getProp(row, 'Fecha Creación'); const matchStd = (!sV || getProp(row, 'Especialidad') === sV) && (!cV || getProp(row, 'Creado Por') === cV) && (!catV || (getProp(row, 'Categoria') || getProp(row, 'Categoría')) === catV) && (!gV || desc.includes(gV)) && (!dV || (fCrea && new Date(fCrea).toISOString().split('T')[0] === dV)); if (!matchStd) return false; if (activeFilterCasos === 'rut') return isPed; if (activeFilterCasos === 'trauma') return isTrauAlrt; if (activeFilterCasos === 'dialysis') return isDiaAlrt; if (activeFilterCasos === 'critical') return isCri; if (activeFilterCasos === 'otras') return isOtrasAlertas; if (activeFilterCasos === 'receta') return isRecetaAlrt; if (activeFilterCasos === 'farmacia') return isFarmacia; if (activeFilterCasos === 'error') return isFinalError; if (activeFilterCasos === 'magic') return isFinalError || hasPart || hasDia; return true; }); renderCasos(); }
+        function highlightTxt(text, list, className) { if (!text) return ""; let html = text.toString(); [...list].sort((a,b) => b.length - a.length).forEach(term => { if(!term || term.length < 2) return; const pattern = term.replace(/[aá]/gi, '[aá]').replace(/[eé]/gi, '[eé]').replace(/[ií]/gi, '[ií]').replace(/[oó]/gi, '[oó]').replace(/[uú]/gi, '[uú]').replace(/[nñ]/gi, '[nñ]'); html = html.replace(new RegExp(`(${pattern})`, 'gi'), `<span class="${className}">$1</span>`); }); return html; }
+        function renderCasos() { const tbody = document.getElementById('tableBodyCasos'), gS = document.getElementById('filterGlobal').value; let s = { rut: 0, tNo: 0, tT: 0, dNo: 0, dT: 0, cr: 0, otras: 0, receta: 0, farmacia: 0 }; document.getElementById('tableHeaderCasos').innerHTML = `<tr>${casos_headers.map(h => `<th onclick="sortCasos('${h}')" class="px-4 py-3 text-left text-[10px] font-black uppercase text-slate-400 cursor-pointer hover:bg-slate-100 ${EXTRA_COLS.includes(h) && !showExtraCols ? 'column-hidden' : ''}">${h} ${currentSortCasos.key === h ? (currentSortCasos.dir === 'asc' ? '↑' : '↓') : ''}</th>`).join('')}</tr>`; tbody.innerHTML = casos_viewData.map(row => { const esp = normalizeTxt(getProp(row, 'Especialidad')); const catNorm = normalizeTxt(getProp(row, 'Categoria') || getProp(row, 'Categoría')); const desc = normalizeTxt(getProp(row, 'tag_description')); const rut = getRutBody(getProp(row, 'Rut')); let rC = "", rS = "", pD = getProp(row, 'tag_description') || ""; const isPed = esp.includes('infantil') || esp.includes('pediatri'), isTrau = esp.includes('traumatologia adulto'); const isDia = DIALYSIS_SPECIALTIES.includes(esp), isCri = CRITICAL_SPECS.map(x => normalizeTxt(x)).includes(esp); const hasPart = BODY_PARTS.some(p => desc.includes(normalizeTxt(p))), hasDia = DIALYSIS_TERMS.some(t => desc.includes(normalizeTxt(t))); const isReumaAlrt = (esp === 'reumatologia') && !REUMA_TERMS.some(t => desc.includes(normalizeTxt(t))); const isAdolesAlrt = (esp === 'adolescencia') && !ADOLES_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOftalmoAlrt = (esp === 'oftalmologia') && !OFTALMO_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOtorrinoAlrt = (esp === 'otorrinolaringologia') && OTORRINO_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOtrasAlertas = isReumaAlrt || isAdolesAlrt || isOftalmoAlrt || isOtorrinoAlrt; const isReceta = catNorm === 'renovacion de receta'; const isRecetaAlrt = isReceta && !RECETAS_PERMITIDAS.some(permitida => esp.includes(permitida)); const isFarmacia = catNorm === 'farmacia'; if (isPed) { if(rut < 19000000 && rut > 0) { rC = "alert-row"; rS = "alert-text"; s.rut++; } if(activeFilterCasos === 'rut') rS = "rut-focus-alert"; } if (isTrau) { s.tT++; if(!hasPart) { rC = "alert-row"; s.tNo++; } } if (esp.includes('trauma')) pD = highlightTxt(pD, BODY_PARTS, 'highlight-part'); if (isDia) { s.dT++; if(!hasDia) { rC = "alert-row"; s.dNo++; } } if (hasDia) pD = highlightTxt(pD, DIALYSIS_TERMS, 'highlight-dialysis'); if (isCri) { s.cr++; rC = "alert-row"; } if (isOtrasAlertas) { s.otras++; rC = "alert-row"; } if (isRecetaAlrt) { s.receta++; rC = "alert-row"; } if (isFarmacia) { s.farmacia++; } if (gS && gS.length >= 2) pD = highlightTxt(pD, [gS], 'highlight-search'); return `<tr class="${rC} hover:bg-slate-50 border-b border-slate-100">${casos_headers.map(h => { let v = getProp(row, h), c = EXTRA_COLS.includes(h) && !showExtraCols ? 'column-hidden' : ''; if (h.includes('Fecha')) v = formatDateCasos(v); if (h === 'tag_description') { v = pD; c += ' col-description'; } if (h === 'Especialidad') c += ' col-spec text-[10px] uppercase'; if (h === 'Rut') c += ` ${rS}`; if (h === 'Estado' && v) { const vNorm = normalizeTxt(v); if (vNorm === 'abierto') v = `<span class="text-green-500 font-black">${v}</span>`; else if (vNorm === 'cerrado') v = `<span class="text-red-500 font-black">${v}</span>`; } return `<td class="px-4 py-2 text-xs ${c}">${v}</td>`; }).join('')}</tr>`; }).join(''); document.getElementById('stat-rut').textContent = s.rut; document.getElementById('stat-trauma-ratio').textContent = `${s.tNo}/${s.tT}`; document.getElementById('stat-dialysis-ratio').textContent = `${s.dNo}/${s.dT}`; document.getElementById('stat-critical').textContent = s.cr; document.getElementById('stat-otras').textContent = s.otras; document.getElementById('stat-receta').textContent = s.receta; document.getElementById('stat-farmacia').textContent = s.farmacia; document.getElementById('stat-total').textContent = casos_viewData.length; }
+        function sortCasos(k) { currentSortCasos.dir = (currentSortCasos.key === k && currentSortCasos.dir === 'asc') ? 'desc' : 'asc'; currentSortCasos.key = k; casos_viewData.sort((a, b) => (getProp(a, k) > getProp(b, k) ? 1 : -1) * (currentSortCasos.dir === 'asc' ? 1 : -1)); renderCasos(); }
+        document.getElementById('btnResetCasos').addEventListener('click', () => { document.getElementById('filterCategory').value = ""; document.getElementById('filterSpecialty').value = ""; document.getElementById('filterCreator').value = ""; document.getElementById('filterDate').value = ""; document.getElementById('filterGlobal').value = ""; activeFilterCasos = null; document.querySelectorAll('.card-stat, #btnMagic, #btnError').forEach(c => c.classList.remove('card-active', 'ring-4', 'ring-blue-400')); processCasosData(); });
+        document.getElementById('btnMagic').addEventListener('click', () => toggleAlertFilter('magic')); document.getElementById('btnError').addEventListener('click', () => toggleAlertFilter('error')); document.getElementById('btnToggleCols').addEventListener('click', () => { showExtraCols = !showExtraCols; renderCasos(); });
+        document.getElementById('btnDownloadCasos').addEventListener('click', () => { if(casos_viewData.length === 0) return Swal.fire("Aviso", "No hay datos para descargar", "info"); const ws = XLSX.utils.json_to_sheet(casos_viewData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Casos_Validados"); XLSX.writeFile(wb, `Revision_Casos_${new Date().toISOString().split('T')[0]}.xlsx`); });
+        ['filterCategory', 'filterSpecialty', 'filterCreator', 'filterDate', 'filterGlobal'].forEach(id => document.getElementById(id).addEventListener('input', processCasosData));
 
-                if(selectCiclo.value) {
-                    filtrados = filtrados.filter(d => {
-                        const parts = String(getProp(d, 'FECHA_LLAMADA')).split(/[-/]/);
-                        if(parts.length < 2) return false;
-                        const m = parseInt(parts[1]) - 1;
-                        return `${mesesNombres[m]} - ${getProp(d, 'SEMANA')}` === selectCiclo.value;
-                    });
-                }
+        // ======================= PESTAÑA 4: FEEDBACK =======================
+        function abrirTabFeedback() { cambiarTab('tabFeedbackExtra'); }
+        function renderFeedbackDashboard() { const today = new Date(); const currMonth = today.toISOString().slice(0,7); let totales = 0, abiertos = 0, vencidos = 0; const indMap = {}; const execMap = {}; FEEDBACK_DATA.forEach(d => { const fechaAud = getProp(d, 'Fecha_Auditoria') || getProp(d, 'FECHA_AUDITORIA'); const estado = getProp(d, 'Estado_Auditoria') || getProp(d, 'ESTADO_AUDITORIA'); const fRev = getProp(d, 'Fecha_Programada_Revision') || getProp(d, 'FECHA_PROGRAMADA_REVISION'); const indEsp = getProp(d, 'Indicador_Especifico') || getProp(d, 'INDICADOR_ESPECIFICO'); const ejec = getProp(d, 'Nombre_Ejecutivo') || getProp(d, 'NOMBRE_EJECUTIVO'); if (String(fechaAud).startsWith(currMonth)) totales++; const stLower = String(estado).toLowerCase(); if (stLower.includes('abiert') || stLower.includes('pendiente') || stLower === '') abiertos++; if (stLower !== 'cerrada' && stLower !== 'cerrado' && fRev) { if (new Date(fRev) < today) vencidos++; } if (indEsp) indMap[indEsp] = (indMap[indEsp] || 0) + 1; if (ejec) { if (!execMap[ejec]) execMap[ejec] = { count: 0, inds: new Set() }; execMap[ejec].count++; if(indEsp) indEsp.split('|').forEach(i => execMap[ejec].inds.add(i.trim())); } }); const topInd = Object.keys(indMap).sort((a,b) => indMap[b] - indMap[a])[0] || 'N/A'; document.getElementById('fb_kpi_total').innerText = totales; document.getElementById('fb_kpi_abiertos').innerText = abiertos; document.getElementById('fb_kpi_vencidos').innerText = vencidos; document.getElementById('fb_kpi_top').innerText = topInd.split('|')[0]; const tbodyRes = document.getElementById('fb_tabla_resumen'); tbodyRes.innerHTML = ""; Object.keys(execMap).sort().forEach(ejec => { const tr = document.createElement('tr'); tr.className = "hover:bg-blue-50 border-b border-slate-100"; const indsArr = Array.from(execMap[ejec].inds).slice(0, 3).join(', ') + (execMap[ejec].inds.size > 3 ? '...' : ''); tr.innerHTML = `<td class="p-2 font-bold text-slate-700 truncate max-w-[150px]" title="${ejec}">${ejec}</td><td class="p-2 text-center font-black text-blue-600">${execMap[ejec].count}</td><td class="p-2 text-slate-500 truncate max-w-[200px]" title="${Array.from(execMap[ejec].inds).join(', ')}">${indsArr}</td>`; tbodyRes.appendChild(tr); }); const tbodyHist = document.getElementById('fb_tabla_historial'); tbodyHist.innerHTML = ""; [...FEEDBACK_DATA].reverse().forEach(d => { const idReg = getProp(d, 'ID_Registro') || getProp(d, 'ID_REGISTRO'); if(!idReg) return; const fechaAud = getProp(d, 'Fecha_Auditoria') || getProp(d, 'FECHA_AUDITORIA'); const ejec = getProp(d, 'Nombre_Ejecutivo') || getProp(d, 'NOMBRE_EJECUTIVO'); const sup = getProp(d, 'Nombre_Supervisor') || getProp(d, 'NOMBRE_SUPERVISOR'); const indEsp = getProp(d, 'Indicador_Especifico') || getProp(d, 'INDICADOR_ESPECIFICO'); const estado = getProp(d, 'Estado_Auditoria') || getProp(d, 'ESTADO_AUDITORIA') || "Abierta"; const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-100 cursor-pointer transition"; tr.onclick = () => verDetalleFeedback(idReg); const stLower = String(estado).toLowerCase(); let stClass = 'bg-amber-100 text-amber-700'; if(stLower.includes('cerrad')) stClass = 'bg-green-100 text-green-700'; else if(stLower.includes('abiert')) stClass = 'bg-red-100 text-red-700'; tr.innerHTML = `<td class="p-3">${fechaAud ? String(fechaAud).split('T')[0] : ''}</td><td class="p-3 font-bold text-slate-700 truncate">${ejec}</td><td class="p-3 text-slate-500 truncate">${sup}</td><td class="p-3 text-[10px] uppercase truncate" title="${indEsp}">${indEsp ? indEsp.split('|')[0] : ''}</td><td class="p-3 text-center"><span class="px-2 py-1 rounded font-bold text-[9px] block w-full text-center ${stClass}">${estado.toUpperCase()}</span></td>`; tbodyHist.appendChild(tr); }); }
+        function verDetalleFeedback(id) { const d = FEEDBACK_DATA.find(x => (getProp(x, 'ID_Registro') || getProp(x, 'ID_REGISTRO')) === id); if(!d) return; const ejec = getProp(d, 'Nombre_Ejecutivo') || getProp(d, 'NOMBRE_EJECUTIVO'); const sup = getProp(d, 'Nombre_Supervisor') || getProp(d, 'NOMBRE_SUPERVISOR'); const indEsp = getProp(d, 'Indicador_Especifico') || getProp(d, 'INDICADOR_ESPECIFICO'); const hallazgo = getProp(d, 'Detalle_Hallazgo') || getProp(d, 'DETALLE_HALLAZGO'); const compromiso = getProp(d, 'Compromiso_Ejecutivo') || getProp(d, 'COMPROMISO_EJECUTIVO'); const estado = getProp(d, 'Estado_Auditoria') || getProp(d, 'ESTADO_AUDITORIA') || 'Abierta'; Swal.fire({ title: `<div class="text-blue-600 font-black text-xl border-b pb-2">Feedback: ${ejec}</div>`, html: `<div class="text-left text-sm space-y-3 mt-4"><div class="grid grid-cols-2 gap-2 bg-slate-50 p-2 rounded border"><div><p class="text-[9px] font-bold text-gray-400 uppercase">Supervisor</p><p class="font-bold">${sup}</p></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Estado</p><p class="font-bold text-red-500">${estado}</p></div></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Indicadores Tratados</p><p class="text-xs bg-blue-50 p-1 rounded text-blue-800">${(indEsp||"").replace(/\|/g, '<br>')}</p></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Quiebre (Supervisor)</p><div class="text-xs p-2 bg-gray-50 border rounded italic">${hallazgo}</div></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Compromiso (Ejecutivo)</p><div class="text-xs p-2 bg-green-50 border border-green-200 rounded text-green-800 font-bold">${compromiso}</div></div>${!String(estado).toLowerCase().includes('cerrad') ? `<button onclick="fb_cerrarSeguimiento('${id}')" class="w-full bg-amber-500 text-white p-2 rounded font-bold shadow hover:bg-amber-600 mt-2">Cerrar Seguimiento</button>` : ''}<button onclick="descargarPDF('${id}')" class="w-full bg-slate-800 text-white p-2 rounded font-bold shadow hover:bg-slate-700 mt-2 flex justify-center items-center gap-2"><i class="fas fa-file-pdf text-red-400"></i> Descargar Acta PDF</button></div>`, showConfirmButton: false, showCloseButton: true, width: '600px' }); }
+        function descargarPDF(id) { const d = FEEDBACK_DATA.find(x => (getProp(x, 'ID_Registro') || getProp(x, 'ID_REGISTRO')) === id); if(!d) return; const element = document.createElement('div'); element.innerHTML = `<div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e293b; line-height: 1.5;"><div style="display: flex; justify-content: space-between; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 30px;"><h2 style="margin:0; color:#1e3a8a; font-size:26px; font-weight:900; letter-spacing: 1px;">ESPEX</h2><h2 style="margin:0; color:#64748b; font-size:26px; font-weight:900; letter-spacing: 1px;">HLF</h2></div><h3 style="text-align:center; text-transform:uppercase; font-size: 18px; margin-bottom: 30px; letter-spacing: 1px;">Acta Formal de Retroalimentación</h3><div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 20px;"><table style="width: 100%; font-size: 12px;"><tr><td style="padding: 5px; width: 50%;"><strong>Fecha de Sesión:</strong> ${getProp(d, 'Fecha_Auditoria') ? String(getProp(d, 'Fecha_Auditoria')).split('T')[0] : 'N/A'}</td><td style="padding: 5px; width: 50%;"><strong>Tipo Feedback:</strong> ${getProp(d, 'Tipo_Feedback') || 'N/A'}</td></tr><tr><td style="padding: 5px;"><strong>Supervisor Responsable:</strong> ${getProp(d, 'Nombre_Supervisor') || 'N/A'}</td><td style="padding: 5px;"><strong>Ejecutivo Evaluado:</strong> ${getProp(d, 'Nombre_Ejecutivo') || 'N/A'}</td></tr><tr><td style="padding: 5px;" colspan="2"><strong>ID Llamada / Referencia:</strong> ${getProp(d, 'ID_Llamada_Ticket') || 'N/A'}</td></tr></table></div><h4 style="margin-bottom: 5px; color:#1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">1. Indicadores Evaluados</h4><p style="font-size: 12px; margin-top: 0;">${(getProp(d, 'Indicador_Especifico') || 'N/A').replace(/\|/g, '<br>• ')}</p><h4 style="margin-bottom: 5px; color:#1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">2. Detalle del Hallazgo</h4><p style="font-size: 12px; margin-top: 0; background-color: #f1f5f9; padding: 10px; border-radius: 5px;">${getProp(d, 'Detalle_Hallazgo') || 'Sin detalles'}</p><h4 style="margin-bottom: 5px; color:#1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">3. Descargo / Réplica del Ejecutivo</h4><p style="font-size: 12px; margin-top: 0; background-color: #f1f5f9; padding: 10px; border-radius: 5px;">${getProp(d, 'Replica_Ejecutivo') || 'Sin réplica registrada'}</p><h4 style="margin-bottom: 5px; color:#16a34a; border-bottom: 1px solid #bbf7d0; padding-bottom: 3px;">4. Compromiso de Mejora</h4><p style="font-size: 12px; margin-top: 0; background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 5px; color: #166534;">${getProp(d, 'Compromiso_Ejecutivo') || 'Sin compromiso registrado'}</p><p style="font-size: 11px; text-align: right;"><strong>¿Reconoce Quiebre?</strong> ${getProp(d, 'Reconoce_Quiebre') || 'N/A'}</p><div style="margin-top: 80px; display: flex; justify-content: space-around; text-align: center;"><div style="width: 40%;"><div style="border-bottom: 1px solid #000; height: 40px; margin-bottom: 5px;"></div><p style="margin: 0; font-size: 11px; font-weight: bold;">Firma Supervisor</p><p style="margin: 0; font-size: 10px; color: #64748b;">${getProp(d, 'Nombre_Supervisor') || ''}</p></div><div style="width: 40%;"><div style="border-bottom: 1px solid #000; height: 40px; margin-bottom: 5px;"></div><p style="margin: 0; font-size: 11px; font-weight: bold;">Firma Ejecutivo</p><p style="margin: 0; font-size: 10px; color: #64748b;">${getProp(d, 'Nombre_Ejecutivo') || ''}</p></div></div></div>`; const opt = { margin: 10, filename: `Acta_${getProp(d, 'Nombre_Ejecutivo').replace(/\s+/g, '_')}_${String(getProp(d, 'Fecha_Auditoria')).split('T')[0]}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, foreignObjectRendering: false }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }; Swal.fire({ title: 'Generando PDF...', text: 'Por favor espera', allowOutsideClick: false, willOpen: () => Swal.showLoading() }); html2pdf().set(opt).from(element).save().then(() => Swal.close()).catch(err => { Swal.fire('Atención', 'Si estás abriendo el archivo directo desde tu PC, Chrome puede bloquear el PDF. Súbelo a un servidor web o GitHub Pages.', 'warning'); }); }
+        function abrirFormularioFeedback() { document.getElementById('fb_dashboard_view').classList.add('hidden'); document.getElementById('fb_form_view').classList.remove('hidden'); document.getElementById('fb_Nombre_Supervisor').value = CURRENT_USER; }
+        function cerrarFormularioFeedback() { document.getElementById('fb_form_view').classList.add('hidden'); document.getElementById('fb_dashboard_view').classList.remove('hidden'); }
+        function fb_mostrarCodigoEjec() { const nom = document.getElementById('fb_Nombre_Ejecutivo').value; const data = baseEjecutivos.find(e => getProp(e, 'Nombre') === nom); const span = document.getElementById('fb_Codigo_Ejecutivo'); span.innerText = data ? `Cód: ${getProp(data, 'Código') || 'N/A'}` : ""; }
+        
+        let fb_ind_count = 1;
+        function fb_autoFillCategory(num) { const val = document.getElementById(`fb_ind_${num}`).value; const obj = diccIndicadores.find(i => getProp(i, 'Indicador') === val); document.getElementById(`fb_cat_${num}`).value = obj ? getProp(obj, 'Categoría') : "Otra"; }
+        function fb_addIndicador() { if(fb_ind_count < 5) { fb_ind_count++; const row = document.getElementById(`fb_row_ind_${fb_ind_count}`); if(!row) { const wrapper = document.getElementById('fb_indicadores_wrapper'); const div = document.createElement('div'); div.id = `fb_row_ind_${fb_ind_count}`; div.className = "grid grid-cols-1 md:grid-cols-4 gap-2 items-end"; div.innerHTML = `<div class="md:col-span-2"><input type="text" id="fb_ind_${fb_ind_count}" list="fb_lista_indicadores_datalist" class="w-full border rounded p-2 text-sm bg-white" onchange="fb_autoFillCategory(${fb_ind_count})"></div><div><input type="text" id="fb_cat_${fb_ind_count}" class="w-full border rounded p-2 text-sm bg-gray-100 text-slate-500 font-bold" readonly></div><div><select id="fb_grav_${fb_ind_count}" class="w-full border rounded p-2 text-sm bg-white"><option value="PEC">PEC</option><option value="PENC">PENC</option><option value="Aptitud">Aptitud</option><option value="Actitud">Actitud</option></select></div>`; wrapper.insertBefore(div, wrapper.lastElementChild); } else { row.classList.remove('hidden'); } } else { Swal.fire("Aviso", "Máximo 5 indicadores por feedback", "info"); } }
+        function fb_calcDuration() { const hI = document.getElementById('fb_Hora_Inicio').value; const hF = document.getElementById('fb_Hora_Termino').value; if(hI && hF) { let diff = (new Date(`1970-01-01T${hF}:00Z`) - new Date(`1970-01-01T${hI}:00Z`)) / 60000; if(diff < 0) diff += 1440; document.getElementById('fb_Duracion_Feedback').value = Math.max(0, Math.round(diff)); } }
+        document.getElementById('fb_Plazo_Seguimiento').addEventListener('change', (e) => { const p = e.target.value; const f = document.getElementById('fb_Fecha_Programada_Revision'); if(!p){f.value="";return;} let d = new Date(); if(p==="24h") d.setDate(d.getDate()+1); else if(p==="48h") d.setDate(d.getDate()+2); else if(p==="1 semana") d.setDate(d.getDate()+7); f.value = d.toISOString().split('T')[0]; });
+        document.getElementById('fb_auditForm').addEventListener('submit', async (e) => { e.preventDefault(); const dur = document.getElementById('fb_Duracion_Feedback').value; if(!dur || dur <= 0) return Swal.fire("Aviso", "Asegúrate de calcular la duración.", "warning"); let c = document.getElementById('fb_cat_1').value, i = document.getElementById('fb_ind_1').value, g = document.getElementById('fb_grav_1').value; for(let x=2; x<=fb_ind_count; x++) { const indNode = document.getElementById('fb_ind_'+x); if(indNode && indNode.value && !document.getElementById('fb_row_ind_'+x).classList.contains('hidden')) { c += ` | ${document.getElementById('fb_cat_'+x).value}`; i += ` | ${indNode.value}`; g += ` | ${document.getElementById('fb_grav_'+x).value}`; } } Swal.fire({ title: 'Procesando...', allowOutsideClick: false, willOpen: () => Swal.showLoading() }); const payload = { ID_Registro: crypto.randomUUID(), Fecha_Auditoria: new Date().toISOString().split('T')[0], Nombre_Supervisor: document.getElementById('fb_Nombre_Supervisor').value, Nombre_Ejecutivo: document.getElementById('fb_Nombre_Ejecutivo').value, Campaña: document.getElementById('fb_Campaña').value, ID_Llamada_Ticket: document.getElementById('fb_ID_Llamada_Ticket').value, Fecha_Llamada: document.getElementById('fb_Fecha_Llamada').value, Hora_Llamada: document.getElementById('fb_Hora_Llamada').value, Fecha_Quiebre: document.getElementById('fb_Fecha_Quiebre').value || "", Categoria_Indicador: c, Indicador_Especifico: i, Gravedad: g, Tipo_Feedback: document.getElementById('fb_Tipo_Feedback').value, Hora_Inicio_Feedback: document.getElementById('fb_Hora_Inicio').value, Hora_Termino_Feedback: document.getElementById('fb_Hora_Termino').value, Duracion_Feedback: dur, Detalle_Hallazgo: document.getElementById('fb_Detalle_Hallazgo').value, Reconoce_Quiebre: document.getElementById('fb_Reconoce_Quiebre').value, Replica_Ejecutivo: document.getElementById('fb_Replica_Ejecutivo').value || "", Compromiso_Ejecutivo: document.getElementById('fb_Compromiso_Ejecutivo').value, Plazo_Seguimiento: document.getElementById('fb_Plazo_Seguimiento').value, Fecha_Programada_Revision: document.getElementById('fb_Fecha_Programada_Revision').value, Estado_Auditoria: document.getElementById('fb_Estado_Auditoria').value, Observaciones_Finales: `[Actitud: ${document.getElementById('fb_Actitud').value}] ${document.getElementById('fb_Observaciones_Finales').value}` }; try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); Swal.fire('¡Guardado!', `Feedback registrado.`, 'success'); document.getElementById('fb_auditForm').reset(); cerrarFormularioFeedback(); actualizarDatosServidor(); } catch (err) { Swal.fire("Error", "Fallo al enviar.", "error"); } });
+        async function fb_cerrarSeguimiento(id) { const { value: v } = await Swal.fire({ title: 'Cerrar Seguimiento', html: `<textarea id="s_not" class="swal2-textarea w-full text-sm" placeholder="Notas de cierre..."></textarea><select id="s_est" class="swal2-select w-full text-sm font-bold text-green-600"><option value="Cerrada">Cerrada</option></select>`, showCancelButton: true, confirmButtonText: 'Guardar', preConfirm: () => { return { n: document.getElementById('s_not').value, e: document.getElementById('s_est').value } } }); if (v) { Swal.fire({ title: 'Actualizando...', willOpen: () => Swal.showLoading() }); try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "UPDATE_FEEDBACK", ID_Registro: id, Notas_Cierre: v.n, Estado_Auditoria: v.e }) }); Swal.fire("Éxito", "Feedback cerrado correctamente", "success"); actualizarDatosServidor(); } catch (e) { Swal.fire("Error", "No se pudo actualizar", "error"); } } }
 
-                const ejec = document.getElementById('filtroEjecutivo').value.toLowerCase();
-                if(ejec) filtrados = filtrados.filter(d => String(getProp(d, 'NOMBRE')).toLowerCase().includes(ejec));
-
-                const list = document.getElementById('listaEjecutivosFiltro');
-                const nombresUnicos = [...new Set(filtrados.map(d => getProp(d, 'NOMBRE')))];
-                list.innerHTML = ""; nombresUnicos.forEach(n => { let opt = document.createElement('option'); opt.value = n; list.appendChild(opt); });
-
-                const containerTarjetas = document.getElementById('containerTarjetas'); containerTarjetas.innerHTML = "";
-                nombresUnicos.forEach(nombre => {
-                    const audsEjec = filtrados.filter(d => getProp(d, 'NOMBRE') === nombre);
-                    const prom = (audsEjec.reduce((a, b) => a + (parseInt(getProp(b, 'NOTA_FINAL')) || 0), 0) / audsEjec.length).toFixed(0);
-                    const count = audsEjec.length;
-                    containerTarjetas.innerHTML += `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 text-center btn-press cursor-pointer" onclick="document.getElementById('filtroEjecutivo').value='${nombre}'; cargarDashboardEquipo();"><p class="text-[9px] font-bold text-gray-400 uppercase truncate">${nombre}</p><p class="text-xl font-black text-blue-600">${prom}%</p><p class="text-2xl font-black ${count === 0 ? 'text-red-600 animate-pulse' : 'text-slate-700'}">${count}</p><p class="text-[9px] text-gray-400 uppercase">Auditorías</p></div>`;
-                });
-
-                const notas = filtrados.map(d => parseInt(getProp(d, 'NOTA_FINAL')) || 0);
-                document.getElementById('dashProm').innerText = (notas.length ? (notas.reduce((a,b)=>a+b,0)/notas.length).toFixed(0) : 0) + "%";
-                document.getElementById('dashPec').innerText = notas.filter(n => n === 0).length;
-                document.getElementById('kpiFeedbackCount').innerText = `${filtrados.filter(d => getProp(d, 'FEEDBACK_STATUS') === "REALIZADO").length}/${filtrados.length}`;
-
-                const tb = document.getElementById('tablaEquipo'); tb.innerHTML = "";
-                filtrados.forEach((d) => {
-                    const isDone = getProp(d, 'FEEDBACK_STATUS') === "REALIZADO";
-                    const isCrossAudit = getProp(d, 'AUDITOR_REAL') && getProp(d, 'AUDITOR_REAL') !== getProp(d, 'SUPERVISOR');
-                    const badgeClass = isCrossAudit ? 'bg-orange-100 text-orange-700 font-bold' : 'bg-gray-100 text-gray-500';
-                    const auditorName = getProp(d, 'AUDITOR_REAL') || 'Desconocido';
-                    const row = document.createElement('tr'); row.className = "hover:bg-blue-50 transition cursor-pointer"; row.onclick = () => verDetalleAuditoria(d);
-                    row.innerHTML = `<td class="p-3 font-medium"><span class="block">${getProp(d, 'NOMBRE')}</span><span class="${badgeClass} text-[9px] px-1 rounded block w-max mt-1">Auditado por: ${auditorName}</span></td><td class="p-3 text-center align-middle">${getProp(d, 'FECHA_LLAMADA')}</td><td class="p-3 text-center align-middle font-bold ${parseInt(getProp(d, 'NOTA_FINAL')) < 85 ? 'text-red-500':'text-green-600'}">${getProp(d, 'NOTA_FINAL')}</td><td class="p-3 text-center align-middle"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isDone ? 'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'}">${getProp(d, 'FEEDBACK_STATUS')}</span></td><td class="p-3 text-center align-middle" onclick="event.stopPropagation();">${!isDone ? `<button onclick="abrirFeedbackAuditoria('${getProp(d, 'CODIGO')}', '${getProp(d, 'FECHA_AUDITORIA')}')" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 btn-press">Feedback</button>` : '✅'}</td>`;
-                    tb.appendChild(row);
-                });
-            } catch (e) { console.error(e); }
-        }
-
-        function sortTable(n) {
-            const table = document.getElementById("tableMain"); let switching = true, shouldSwitch, i, x, y, dir = "asc", switchcount = 0;
-            while (switching) {
-                switching = false; const rows = table.rows;
-                for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSwitch = false; x = rows[i].getElementsByTagName("TD")[n]; y = rows[i + 1].getElementsByTagName("TD")[n];
-                    if (dir == "asc") { if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) { shouldSwitch = true; break; } } else if (dir == "desc") { if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) { shouldSwitch = true; break; } }
-                }
-                if (shouldSwitch) { rows[i].parentNode.insertBefore(rows[i + 1], rows[i]); switching = true; switchcount ++; } else { if (switchcount == 0 && dir == "asc") { dir = "desc"; switching = true; } }
-            }
-        }
-
-        async function abrirFeedbackAuditoria(cod, fecha) {
-            const { value: texto } = await Swal.fire({ title: 'Cerrar Ciclo', input: 'textarea', inputLabel: 'Compromisos...', showCancelButton: true });
-            if (texto) {
-                const payload = { action: "REGISTER_FEEDBACK", codigo: cod, fecha_auditoria: fecha, feedback_detalle: texto };
-                try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); Swal.fire("Éxito", "Feedback guardado", "success"); actualizarDatosServidor(); } catch (e) { Swal.fire("Error", "No se pudo guardar", "error"); }
-            }
-        }
-
-        function verDetalleAuditoria(data) {
-            let pautaDetalle = "";
-            const detalle = getProp(data, 'DETALLE');
-            if(detalle) {
-                pautaDetalle = `<div class="mt-4 p-3 bg-red-50 rounded text-left text-xs border border-red-100"><p class="font-bold text-red-700 mb-2">INDICADORES NO CUMPLIDOS:</p>`;
-                let count = 0;
-                for (const [key, val] of Object.entries(detalle)) {
-                    if(val === "NO") {
-                        const item = pautaItems.find(p => p.id === key.toLowerCase() || p.id === "item_" + key.toLowerCase().split('_')[1]);
-                        pautaDetalle += `<p class="mb-1">❌ <b>${item ? item.label : key}:</b> Marcado como NO.</p>`; count++;
-                    }
-                }
-                if(count === 0) pautaDetalle = `<div class="mt-4 p-3 bg-green-50 rounded text-left text-xs border border-green-100"><p class="font-bold text-green-700">Cumplimiento total de indicadores.</p>`;
-                pautaDetalle += `</div>`;
-            }
-            const audioUrl = getProp(data, 'AUDIO_URL');
-            const audioHtml = audioUrl && audioUrl.trim() !== "" ? `<div class="mt-4 bg-slate-100 p-3 rounded border border-gray-200"><p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Escuchar Grabación:</p><audio controls class="w-full h-8"><source src="${audioUrl}" type="audio/mpeg">Tu navegador no soporta el audio.</audio></div>` : `<div class="mt-4 bg-amber-50 p-3 rounded border border-amber-200 text-amber-700 text-xs italic">La URL del audio no está disponible para esta auditoría.</div>`;
-            Swal.fire({
-                title: `<span class="text-blue-600">${getProp(data, 'NOMBRE')}</span>`,
-                html: `<div class="text-sm border-t pt-4"><div class="grid grid-cols-2 gap-2 text-left mb-4"><div><p class="text-[9px] font-bold text-gray-400 uppercase">RUT Paciente</p><div class="flex items-center gap-2"><span class="font-bold">${getProp(data, 'RUT_PACIENTE') || 'N/A'}</span></div></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Nota Final</p><p class="text-xl font-black text-blue-600">${getProp(data, 'NOTA_FINAL')}</p></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Fecha Llamada</p><p class="font-bold">${getProp(data, 'FECHA_LLAMADA')}</p></div><div><p class="text-[9px] font-bold text-gray-400 uppercase">Hora</p><p class="font-bold">${getProp(data, 'HORA_LLAMADA')}</p></div></div><div class="bg-gray-50 p-3 rounded text-left text-xs border italic"><p class="font-bold text-gray-500 not-italic uppercase mb-1">Comentario General:</p>${getProp(data, 'COMENTARIO') || 'Sin comentarios.'}</div>${pautaDetalle}${audioHtml}</div>`,
-                showCloseButton: true, confirmButtonText: 'Cerrar', width: '500px'
-            });
-        }
-
-        // =========================================================================
-        // PIP PLAYER 
-        // =========================================================================
+        // ======================= REPRODUCTOR PIP =======================
         const audioEl = document.getElementById('audioFlotante'); const pipPlayer = document.getElementById('pipPlayer'); const playBtn = document.getElementById('btnPlay'); const seekSlider = document.getElementById('seekSlider');
         function cargarAudioFlotante() { const url = document.getElementById('inputAudioUrl').value; if(!url) return Swal.fire('Aviso', 'Ingresa una URL válida.', 'info'); audioEl.src = url; pipPlayer.classList.remove('hidden'); audioEl.play().catch(e=>console.log(e)); playBtn.innerHTML = '<i class="fas fa-pause text-xs"></i>'; }
         function cerrarAudioFlotante() { stopAudio(); pipPlayer.classList.add('hidden'); }
@@ -724,341 +394,6 @@
         let isDragging = false, startX, startY, initialX, initialY;
         document.querySelector('.drag-handle').addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; startY = e.clientY; const rect = pipPlayer.getBoundingClientRect(); initialX = rect.left; initialY = rect.top; pipPlayer.style.right = 'auto'; pipPlayer.style.bottom = 'auto'; });
         document.addEventListener('mousemove', e => { if(!isDragging) return; pipPlayer.style.left = (initialX + e.clientX - startX) + 'px'; pipPlayer.style.top = (initialY + e.clientY - startY) + 'px'; }); document.addEventListener('mouseup', () => isDragging = false);
-
-        // =========================================================================
-        // MÓDULO AISLADO: REVISIÓN DE CASOS (PESTAÑA 3)
-        // =========================================================================
-        let casos_db = [], casos_viewData = [], casos_headers = [], showExtraCols = false;
-        let currentSortCasos = { key: null, dir: 'asc' }, activeFilterCasos = null;
-        const BODY_PARTS = ['columna', 'pie', 'mano', 'hombro', 'muñeca', 'rodilla', 'cadera', 'codo', 'tobillo', 'dedo', 'pelvis', 'brazo', 'pierna', 'cuello', 'espalda', 'talon', 'planta', 'hueso', 'musculo', 'tendon', 'ligamento', 'escapula', 'vertebra', 'lumbar', 'sacro', 'cervical', 'pantorrilla', 'coxis', 'femur'];
-        const DIALYSIS_TERMS = ['no se dializa', 'se dializa', 'dializa', 'dializo', 'dialisis', 'hemodialisis', 'peritoneal', 'dializando', 'dialisa', 'fistula', 'fav', 'cateter', 'vascular', 'bypass'];
-        const DIALYSIS_SPECIALTIES = ['nefrologia infantil', 'nefrologia adulto', 'cirugia vascular periferica'];
-        const CRITICAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIATRIA ADULTO E INFANTIL (SALUD MENTAL)', 'NUTRICIONISTA INFANTIL', 'NUTRICIONISTA ADULTO', 'Salud Ocupacional', 'KINESIOLOGIA MFR', 'cuidados paliativos', 'HOSPITAL DE DÍA', 'ENDODONCIA', 'SERVICIO SOCIAL (ASISTENTE SOCIAL)', 'CRITERIOS CONTROL', 'HISTORICO', 'JUNTA MEDICA', 'HORMONOTERAPIA', 'ENFERMERA', 'UNIDAD PATOLOGICA CERVICAL', 'TERAPIA OCUPACIONAL', 'T TEMPOROMANDIBULAR Y DOLO ORO FACIAL', 'TACO', 'REHABBILITACION PROTESIS FIJAS Y REMOVIBLES', 'PERIODONCIA', 'ORTODONCIA', 'OPERATORIA', 'ODONTOPEDIATRIA', 'IMPLANTOLOGIA', 'FONOAUDIOLOGIA MFR', 'BRONCOPULMONAR INFANTIL'];
-        const EXTRA_COLS = ['Lista Espera', 'Resuelto', 'Informado'];
-        const normalizeTxt = (t) => t ? t.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
-        const getRutBody = (s) => { let clean = s.toString().replace(/[^0-9kK]/g, ''); return clean.length > 1 ? parseInt(clean.slice(0, -1)) || 0 : 0; };
-        const formatDateCasos = (val) => { if (!val || isNaN(Date.parse(val))) return val; const d = new Date(val); return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getFullYear()).slice(-2)}`; };
-
-        document.getElementById('fileInputCasos').addEventListener('change', (e) => {
-            const file = e.target.files[0]; if (!file) return;
-            document.getElementById('loaderCasos').classList.remove('hidden'); const r = new FileReader();
-            r.onload = (e) => {
-                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true });
-                casos_db = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
-                if (casos_db.length > 0) {
-                    const orig = Object.keys(casos_db[0]); casos_headers = ['Caso', 'Especialidad', 'tag_description', 'Rut'];
-                    orig.forEach(h => { if(!casos_headers.includes(h)) casos_headers.push(h); });
-                    populateUICasos(); processCasosData(); document.getElementById('dashboardCasos').classList.remove('hidden'); document.getElementById('filtersPanelCasos').classList.remove('hidden');
-                }
-                document.getElementById('loaderCasos').classList.add('hidden');
-            }; r.readAsArrayBuffer(file);
-        });
-
-        function populateUICasos() {
-            const crs = [...new Set(casos_db.map(i => i['Creado Por']))].filter(Boolean).sort(); const sps = [...new Set(casos_db.map(i => i['Especialidad']))].filter(Boolean).sort();
-            document.getElementById('filterCreator').innerHTML = '<option value="">Todos</option>' + crs.map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('filterSpecialty').innerHTML = '<option value="">Todas</option>' + sps.map(s => `<option value="${s}">${s}</option>`).join('');
-        }
-
-        function toggleAlertFilter(type) { activeFilterCasos = (activeFilterCasos === type) ? null : type; document.querySelectorAll('.card-stat, #btnMagic, #btnError').forEach(c => c.classList.remove('card-active', 'ring-4', 'ring-blue-400')); if (activeFilterCasos) { const el = document.getElementById(type === 'magic' ? 'btnMagic' : (type === 'error' ? 'btnError' : `card-${type}`)); if(el) el.classList.add('ring-4', 'ring-blue-400'); } processCasosData(); }
-
-        function processCasosData() {
-            const sV = document.getElementById('filterSpecialty').value, cV = document.getElementById('filterCreator').value, dV = document.getElementById('filterDate').value, gV = normalizeTxt(document.getElementById('filterGlobal').value);
-            casos_viewData = casos_db.filter(row => {
-                const esp = normalizeTxt(row['Especialidad']), desc = normalizeTxt(row['tag_description']), rut = getRutBody(row['Rut']);
-                const isPed = esp.includes('infantil') || esp.includes('pediatri'), isTrau = esp.includes('traumatologia adulto'); const isDia = DIALYSIS_SPECIALTIES.includes(esp), isCri = CRITICAL_SPECS.map(s => normalizeTxt(s)).includes(esp);
-                const hasPart = BODY_PARTS.some(p => desc.includes(normalizeTxt(p))), hasDia = DIALYSIS_TERMS.some(t => desc.includes(normalizeTxt(t)));
-                const isRutAlrt = isPed && rut < 19000000 && rut > 0; const isTrauAlrt = isTrau && !hasPart; const isDiaAlrt = isDia && !hasDia; const isFinalError = isRutAlrt || isTrauAlrt || isDiaAlrt || isCri;
-                const matchStd = (!sV || row['Especialidad'] === sV) && (!cV || row['Creado Por'] === cV) && (!gV || desc.includes(gV)) && (!dV || (row['Fecha Creación'] && new Date(row['Fecha Creación']).toISOString().split('T')[0] === dV));
-                if (!matchStd) return false;
-                if (activeFilterCasos === 'rut') return isPed; if (activeFilterCasos === 'trauma') return isTrauAlrt; if (activeFilterCasos === 'dialysis') return isDiaAlrt; if (activeFilterCasos === 'critical') return isCri; if (activeFilterCasos === 'error') return isFinalError; if (activeFilterCasos === 'magic') return isFinalError || hasPart || hasDia;
-                return true;
-            }); renderCasos();
-        }
-
-        function highlightTxt(text, list, className) { if (!text) return ""; let html = text.toString(); [...list].sort((a,b) => b.length - a.length).forEach(term => { if(!term || term.length < 2) return; const pattern = term.replace(/[aá]/gi, '[aá]').replace(/[eé]/gi, '[eé]').replace(/[ií]/gi, '[ií]').replace(/[oó]/gi, '[oó]').replace(/[uú]/gi, '[uú]').replace(/[nñ]/gi, '[nñ]'); html = html.replace(new RegExp(`(${pattern})`, 'gi'), `<span class="${className}">$1</span>`); }); return html; }
-
-        function renderCasos() {
-            const tbody = document.getElementById('tableBodyCasos'), gS = document.getElementById('filterGlobal').value; let s = { rut: 0, tNo: 0, tT: 0, dNo: 0, dT: 0, cr: 0 };
-            document.getElementById('tableHeaderCasos').innerHTML = `<tr>${casos_headers.map(h => `<th onclick="sortCasos('${h}')" class="px-4 py-3 text-left text-[10px] font-black uppercase text-slate-400 cursor-pointer hover:bg-slate-100 ${EXTRA_COLS.includes(h) && !showExtraCols ? 'column-hidden' : ''}">${h} ${currentSortCasos.key === h ? (currentSortCasos.dir === 'asc' ? '↑' : '↓') : ''}</th>`).join('')}</tr>`;
-            tbody.innerHTML = casos_viewData.map(row => {
-                const esp = normalizeTxt(row['Especialidad']), desc = normalizeTxt(row['tag_description']), rut = getRutBody(row['Rut']); let rC = "", rS = "", pD = row['tag_description'] || "";
-                const isPed = esp.includes('infantil') || esp.includes('pediatri'), isTrau = esp.includes('traumatologia adulto'); const isDia = DIALYSIS_SPECIALTIES.includes(esp), isCri = CRITICAL_SPECS.map(x => normalizeTxt(x)).includes(esp);
-                const hasPart = BODY_PARTS.some(p => desc.includes(normalizeTxt(p))), hasDia = DIALYSIS_TERMS.some(t => desc.includes(normalizeTxt(t)));
-                if (isPed) { if(rut < 19000000 && rut > 0) { rC = "alert-row"; rS = "alert-text"; s.rut++; } if(activeFilterCasos === 'rut') rS = "rut-focus-alert"; }
-                if (isTrau) { s.tT++; if(!hasPart) { rC = "alert-row"; s.tNo++; } } if (esp.includes('trauma')) pD = highlightTxt(pD, BODY_PARTS, 'highlight-part');
-                if (isDia) { s.dT++; if(!hasDia) { rC = "alert-row"; s.dNo++; } } if (hasDia) pD = highlightTxt(pD, DIALYSIS_TERMS, 'highlight-dialysis');
-                if (isCri) { s.cr++; rC = "alert-row"; } if (gS && gS.length >= 2) pD = highlightTxt(pD, [gS], 'highlight-search');
-                return `<tr class="${rC} hover:bg-slate-50 border-b border-slate-100">${casos_headers.map(h => { let v = row[h], c = EXTRA_COLS.includes(h) && !showExtraCols ? 'column-hidden' : ''; if (h.includes('Fecha')) v = formatDateCasos(v); if (h === 'tag_description') { v = pD; c += ' col-description'; } if (h === 'Especialidad') c += ' col-spec text-[10px] uppercase'; if (h === 'Rut') c += ` ${rS}`; return `<td class="px-4 py-2 text-xs ${c}">${v}</td>`; }).join('')}</tr>`;
-            }).join('');
-            document.getElementById('stat-rut').textContent = s.rut; document.getElementById('stat-trauma-ratio').textContent = `${s.tNo}/${s.tT}`; document.getElementById('stat-dialysis-ratio').textContent = `${s.dNo}/${s.dT}`; document.getElementById('stat-critical').textContent = s.cr; document.getElementById('stat-total').textContent = casos_viewData.length;
-        }
-
-        function sortCasos(k) { currentSortCasos.dir = (currentSortCasos.key === k && currentSortCasos.dir === 'asc') ? 'desc' : 'asc'; currentSortCasos.key = k; casos_viewData.sort((a, b) => (a[k] > b[k] ? 1 : -1) * (currentSortCasos.dir === 'asc' ? 1 : -1)); renderCasos(); }
-        document.getElementById('btnResetCasos').addEventListener('click', () => { document.getElementById('filterSpecialty').value = ""; document.getElementById('filterCreator').value = ""; document.getElementById('filterDate').value = ""; document.getElementById('filterGlobal').value = ""; activeFilterCasos = null; document.querySelectorAll('.card-stat, #btnMagic, #btnError').forEach(c => c.classList.remove('card-active', 'ring-4', 'ring-blue-400')); processCasosData(); });
-        document.getElementById('btnMagic').addEventListener('click', () => toggleAlertFilter('magic')); document.getElementById('btnError').addEventListener('click', () => toggleAlertFilter('error')); document.getElementById('btnToggleCols').addEventListener('click', () => { showExtraCols = !showExtraCols; renderCasos(); });
-        document.getElementById('btnDownloadCasos').addEventListener('click', () => { if(casos_viewData.length === 0) return Swal.fire("Aviso", "No hay datos para descargar", "info"); const ws = XLSX.utils.json_to_sheet(casos_viewData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Casos_Validados"); XLSX.writeFile(wb, `Revision_Casos_${new Date().toISOString().split('T')[0]}.xlsx`); });
-        ['filterSpecialty', 'filterCreator', 'filterDate', 'filterGlobal'].forEach(id => document.getElementById(id).addEventListener('input', processCasosData));
-
-        // =========================================================================
-        // MASTER FEEDBACK DASHBOARD & TRACKER (PESTAÑA 4)
-        // =========================================================================
-
-        function abrirTabFeedback() { cambiarTab('tabFeedbackExtra'); }
-
-        function renderFeedbackDashboard() {
-            const today = new Date();
-            const currMonth = today.toISOString().slice(0,7);
-            
-            let totales = 0, abiertos = 0, vencidos = 0;
-            const indMap = {};
-            const execMap = {}; 
-
-            FEEDBACK_DATA.forEach(d => {
-                const fechaAud = getProp(d, 'Fecha_Auditoria') || getProp(d, 'FECHA_AUDITORIA');
-                const estado = getProp(d, 'Estado_Auditoria') || getProp(d, 'ESTADO_AUDITORIA');
-                const fRev = getProp(d, 'Fecha_Programada_Revision') || getProp(d, 'FECHA_PROGRAMADA_REVISION');
-                const indEsp = getProp(d, 'Indicador_Especifico') || getProp(d, 'INDICADOR_ESPECIFICO');
-                const ejec = getProp(d, 'Nombre_Ejecutivo') || getProp(d, 'NOMBRE_EJECUTIVO');
-
-                if (String(fechaAud).startsWith(currMonth)) totales++;
-                
-                const stLower = String(estado).toLowerCase();
-                if (stLower.includes('abiert') || stLower.includes('pendiente') || stLower === '') abiertos++;
-                if (stLower !== 'cerrada' && stLower !== 'cerrado' && fRev) {
-                    if (new Date(fRev) < today) vencidos++;
-                }
-
-                if (indEsp) indMap[indEsp] = (indMap[indEsp] || 0) + 1;
-
-                if (ejec) {
-                    if (!execMap[ejec]) execMap[ejec] = { count: 0, inds: new Set() };
-                    execMap[ejec].count++;
-                    if(indEsp) indEsp.split('|').forEach(i => execMap[ejec].inds.add(i.trim()));
-                }
-            });
-
-            const topInd = Object.keys(indMap).sort((a,b) => indMap[b] - indMap[a])[0] || 'N/A';
-
-            document.getElementById('fb_kpi_total').innerText = totales;
-            document.getElementById('fb_kpi_abiertos').innerText = abiertos;
-            document.getElementById('fb_kpi_vencidos').innerText = vencidos;
-            document.getElementById('fb_kpi_top').innerText = topInd.split('|')[0];
-
-            // Tabla Resumen (Ejecutivos)
-            const tbodyRes = document.getElementById('fb_tabla_resumen');
-            tbodyRes.innerHTML = "";
-            Object.keys(execMap).sort().forEach(ejec => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-blue-50 border-b border-slate-100";
-                const indsArr = Array.from(execMap[ejec].inds).slice(0, 3).join(', ') + (execMap[ejec].inds.size > 3 ? '...' : '');
-                tr.innerHTML = `
-                    <td class="p-2 font-bold text-slate-700 truncate max-w-[150px]" title="${ejec}">${ejec}</td>
-                    <td class="p-2 text-center font-black text-blue-600">${execMap[ejec].count}</td>
-                    <td class="p-2 text-slate-500 truncate max-w-[200px]" title="${Array.from(execMap[ejec].inds).join(', ')}">${indsArr}</td>
-                `;
-                tbodyRes.appendChild(tr);
-            });
-
-            // Tabla Historial General
-            const tbodyHist = document.getElementById('fb_tabla_historial');
-            tbodyHist.innerHTML = "";
-            [...FEEDBACK_DATA].reverse().forEach(d => {
-                const idReg = getProp(d, 'ID_Registro') || getProp(d, 'ID_REGISTRO');
-                if(!idReg) return;
-
-                const fechaAud = getProp(d, 'Fecha_Auditoria') || getProp(d, 'FECHA_AUDITORIA');
-                const ejec = getProp(d, 'Nombre_Ejecutivo') || getProp(d, 'NOMBRE_EJECUTIVO');
-                const sup = getProp(d, 'Nombre_Supervisor') || getProp(d, 'NOMBRE_SUPERVISOR');
-                const indEsp = getProp(d, 'Indicador_Especifico') || getProp(d, 'INDICADOR_ESPECIFICO');
-                const estado = getProp(d, 'Estado_Auditoria') || getProp(d, 'ESTADO_AUDITORIA') || "Abierta";
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b border-slate-100 cursor-pointer transition";
-                tr.onclick = () => verDetalleFeedback(idReg);
-
-                const stLower = String(estado).toLowerCase();
-                let stClass = 'bg-amber-100 text-amber-700'; 
-                if(stLower.includes('cerrad')) stClass = 'bg-green-100 text-green-700';
-                else if(stLower.includes('abiert')) stClass = 'bg-red-100 text-red-700';
-
-                tr.innerHTML = `
-                    <td class="p-3">${fechaAud ? String(fechaAud).split('T')[0] : ''}</td>
-                    <td class="p-3 font-bold text-slate-700 truncate">${ejec}</td>
-                    <td class="p-3 text-slate-500 truncate">${sup}</td>
-                    <td class="p-3 text-[10px] uppercase truncate" title="${indEsp}">${indEsp ? indEsp.split('|')[0] : ''}</td>
-                    <td class="p-3 text-center"><span class="px-2 py-1 rounded font-bold text-[9px] block w-full text-center ${stClass}">${estado.toUpperCase()}</span></td>
-                `;
-                tbodyHist.appendChild(tr);
-            });
-        }
-
-        // --- VISOR DE DETALLE Y EXPORTACIÓN A PDF ---
-        function verDetalleFeedback(id) {
-            const d = FEEDBACK_DATA.find(x => (getProp(x, 'ID_Registro') || getProp(x, 'ID_REGISTRO')) === id);
-            if(!d) return;
-
-            const ejec = getProp(d, 'Nombre_Ejecutivo') || getProp(d, 'NOMBRE_EJECUTIVO');
-            const sup = getProp(d, 'Nombre_Supervisor') || getProp(d, 'NOMBRE_SUPERVISOR');
-            const indEsp = getProp(d, 'Indicador_Especifico') || getProp(d, 'INDICADOR_ESPECIFICO');
-            const hallazgo = getProp(d, 'Detalle_Hallazgo') || getProp(d, 'DETALLE_HALLAZGO');
-            const compromiso = getProp(d, 'Compromiso_Ejecutivo') || getProp(d, 'COMPROMISO_EJECUTIVO');
-            const estado = getProp(d, 'Estado_Auditoria') || getProp(d, 'ESTADO_AUDITORIA') || 'Abierta';
-            
-            Swal.fire({
-                title: `<div class="text-blue-600 font-black text-xl border-b pb-2">Feedback: ${ejec}</div>`,
-                html: `
-                    <div class="text-left text-sm space-y-3 mt-4">
-                        <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2 rounded border">
-                            <div><p class="text-[9px] font-bold text-gray-400 uppercase">Supervisor</p><p class="font-bold">${sup}</p></div>
-                            <div><p class="text-[9px] font-bold text-gray-400 uppercase">Estado</p><p class="font-bold text-red-500">${estado}</p></div>
-                        </div>
-                        <div><p class="text-[9px] font-bold text-gray-400 uppercase">Indicadores Tratados</p><p class="text-xs bg-blue-50 p-1 rounded text-blue-800">${(indEsp||"").replace(/\|/g, '<br>')}</p></div>
-                        <div><p class="text-[9px] font-bold text-gray-400 uppercase">Quiebre (Supervisor)</p><div class="text-xs p-2 bg-gray-50 border rounded italic">${hallazgo}</div></div>
-                        <div><p class="text-[9px] font-bold text-gray-400 uppercase">Compromiso (Ejecutivo)</p><div class="text-xs p-2 bg-green-50 border border-green-200 rounded text-green-800 font-bold">${compromiso}</div></div>
-                        
-                        ${!String(estado).toLowerCase().includes('cerrad') ? 
-                            `<button onclick="fb_cerrarSeguimiento('${id}')" class="w-full bg-amber-500 text-white p-2 rounded font-bold shadow hover:bg-amber-600 mt-2">Cerrar Seguimiento</button>` : ''}
-                        
-                        <button onclick="descargarPDF('${id}')" class="w-full bg-slate-800 text-white p-2 rounded font-bold shadow hover:bg-slate-700 mt-2 flex justify-center items-center gap-2">
-                            <i class="fas fa-file-pdf text-red-400"></i> Descargar Acta PDF
-                        </button>
-                    </div>
-                `,
-                showConfirmButton: false, showCloseButton: true, width: '600px'
-            });
-        }
-
-        function descargarPDF(id) {
-            const d = FEEDBACK_DATA.find(x => (getProp(x, 'ID_Registro') || getProp(x, 'ID_REGISTRO')) === id);
-            if(!d) return;
-
-            const element = document.createElement('div');
-            element.innerHTML = `
-                <div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e293b; line-height: 1.5;">
-                    <div style="display: flex; justify-content: space-between; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 30px;">
-                        <h2 style="margin:0; color:#1e3a8a; font-size:26px; font-weight:900; letter-spacing: 1px;">ESPEX</h2>
-                        <h2 style="margin:0; color:#64748b; font-size:26px; font-weight:900; letter-spacing: 1px;">HLF</h2>
-                    </div>
-                    <h3 style="text-align:center; text-transform:uppercase; font-size: 18px; margin-bottom: 30px; letter-spacing: 1px;">Acta Formal de Retroalimentación</h3>
-                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <table style="width: 100%; font-size: 12px;">
-                            <tr>
-                                <td style="padding: 5px; width: 50%;"><strong>Fecha de Sesión:</strong> ${getProp(d, 'Fecha_Auditoria') ? String(getProp(d, 'Fecha_Auditoria')).split('T')[0] : 'N/A'}</td>
-                                <td style="padding: 5px; width: 50%;"><strong>Tipo Feedback:</strong> ${getProp(d, 'Tipo_Feedback') || 'N/A'}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px;"><strong>Supervisor Responsable:</strong> ${getProp(d, 'Nombre_Supervisor') || 'N/A'}</td>
-                                <td style="padding: 5px;"><strong>Ejecutivo Evaluado:</strong> ${getProp(d, 'Nombre_Ejecutivo') || 'N/A'}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px;" colspan="2"><strong>ID Llamada / Referencia:</strong> ${getProp(d, 'ID_Llamada_Ticket') || 'N/A'}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <h4 style="margin-bottom: 5px; color:#1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">1. Indicadores Evaluados</h4>
-                    <p style="font-size: 12px; margin-top: 0;">${(getProp(d, 'Indicador_Especifico') || 'N/A').replace(/\|/g, '<br>• ')}</p>
-                    <h4 style="margin-bottom: 5px; color:#1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">2. Detalle del Hallazgo</h4>
-                    <p style="font-size: 12px; margin-top: 0; background-color: #f1f5f9; padding: 10px; border-radius: 5px;">${getProp(d, 'Detalle_Hallazgo') || 'Sin detalles'}</p>
-                    <h4 style="margin-bottom: 5px; color:#1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">3. Descargo / Réplica del Ejecutivo</h4>
-                    <p style="font-size: 12px; margin-top: 0; background-color: #f1f5f9; padding: 10px; border-radius: 5px;">${getProp(d, 'Replica_Ejecutivo') || 'Sin réplica registrada'}</p>
-                    <h4 style="margin-bottom: 5px; color:#16a34a; border-bottom: 1px solid #bbf7d0; padding-bottom: 3px;">4. Compromiso de Mejora</h4>
-                    <p style="font-size: 12px; margin-top: 0; background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 5px; color: #166534;">${getProp(d, 'Compromiso_Ejecutivo') || 'Sin compromiso registrado'}</p>
-                    <p style="font-size: 11px; text-align: right;"><strong>¿Reconoce Quiebre?</strong> ${getProp(d, 'Reconoce_Quiebre') || 'N/A'}</p>
-                    <div style="margin-top: 80px; display: flex; justify-content: space-around; text-align: center;">
-                        <div style="width: 40%;"><div style="border-bottom: 1px solid #000; height: 40px; margin-bottom: 5px;"></div><p style="margin: 0; font-size: 11px; font-weight: bold;">Firma Supervisor</p><p style="margin: 0; font-size: 10px; color: #64748b;">${getProp(d, 'Nombre_Supervisor') || ''}</p></div>
-                        <div style="width: 40%;"><div style="border-bottom: 1px solid #000; height: 40px; margin-bottom: 5px;"></div><p style="margin: 0; font-size: 11px; font-weight: bold;">Firma Ejecutivo</p><p style="margin: 0; font-size: 10px; color: #64748b;">${getProp(d, 'Nombre_Ejecutivo') || ''}</p></div>
-                    </div>
-                </div>
-            `;
-
-            // Configuración PDF optimizada
-            const opt = {
-                margin:       10,
-                filename:     `Acta_${getProp(d, 'Nombre_Ejecutivo').replace(/\s+/g, '_')}_${String(getProp(d, 'Fecha_Auditoria')).split('T')[0]}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                // foreignObjectRendering evita fallos de CORS en Chrome cuando corre como local
-                html2canvas:  { scale: 2, useCORS: true, foreignObjectRendering: false },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            Swal.fire({ title: 'Generando PDF...', text: 'Por favor espera', allowOutsideClick: false, willOpen: () => Swal.showLoading() });
-            html2pdf().set(opt).from(element).save().then(() => Swal.close()).catch(err => {
-                Swal.fire('Atención', 'Si estás abriendo el archivo directo desde tu PC, Chrome puede bloquear el PDF. Súbelo a un servidor web o GitHub Pages.', 'warning');
-            });
-        }
-
-        // --- FORMULARIO LOGIC ---
-        function abrirFormularioFeedback() {
-            document.getElementById('fb_dashboard_view').classList.add('hidden');
-            document.getElementById('fb_form_view').classList.remove('hidden');
-            document.getElementById('fb_Nombre_Supervisor').value = CURRENT_USER;
-        }
-
-        function cerrarFormularioFeedback() {
-            document.getElementById('fb_form_view').classList.add('hidden');
-            document.getElementById('fb_dashboard_view').classList.remove('hidden');
-        }
-
-        function fb_mostrarCodigoEjec() {
-            const nom = document.getElementById('fb_Nombre_Ejecutivo').value;
-            const data = baseEjecutivos.find(e => getProp(e, 'Nombre') === nom);
-            const span = document.getElementById('fb_Codigo_Ejecutivo');
-            span.innerText = data ? `Cód: ${getProp(data, 'Código') || 'N/A'}` : "";
-        }
-
-        let fb_ind_count = 1;
-        function fb_autoFillCategory(num) {
-            const val = document.getElementById(`fb_ind_${num}`).value;
-            const obj = diccIndicadores.find(i => (i.Indicador || i.ind) === val);
-            document.getElementById(`fb_cat_${num}`).value = obj ? (obj.Categoría || obj.cat) : "Otra";
-        }
-        function fb_addIndicador() {
-            if(fb_ind_count < 3) {
-                fb_ind_count++;
-                document.getElementById(`fb_row_ind_${fb_ind_count}`).classList.remove('hidden');
-                document.getElementById(`fb_ind_${fb_ind_count}`).required = true;
-            } else { Swal.fire('Aviso', 'Máximo 3 indicadores permitidos', 'info'); }
-        }
-
-        document.getElementById('fb_Plazo_Seguimiento').addEventListener('change', (e) => {
-            const p = e.target.value; const f = document.getElementById('fb_Fecha_Programada_Revision');
-            if(!p){f.value="";return;} let d = new Date();
-            if(p==="24h") d.setDate(d.getDate()+1); else if(p==="48h") d.setDate(d.getDate()+2); else if(p==="1 semana") d.setDate(d.getDate()+7);
-            f.value = d.toISOString().split('T')[0];
-        });
-
-        document.getElementById('fb_auditForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const dur = document.getElementById('fb_Duracion_Feedback').value;
-            if(!dur || dur <= 0) return Swal.fire("Aviso", "Ingresa la duración.", "warning");
-            let c = document.getElementById('fb_cat_1').value, i = document.getElementById('fb_ind_1').value, g = document.getElementById('fb_grav_1').value;
-            if(fb_ind_count >= 2) { c += ` | ${document.getElementById('fb_cat_2').value}`; i += ` | ${document.getElementById('fb_ind_2').value}`; g += ` | ${document.getElementById('fb_grav_2').value}`; }
-            if(fb_ind_count === 3) { c += ` | ${document.getElementById('fb_cat_3').value}`; i += ` | ${document.getElementById('fb_ind_3').value}`; g += ` | ${document.getElementById('fb_grav_3').value}`; }
-            
-            Swal.fire({ title: 'Procesando...', allowOutsideClick: false, willOpen: () => Swal.showLoading() });
-            const payload = {
-                ID_Registro: crypto.randomUUID(), Fecha_Auditoria: new Date().toISOString().split('T')[0], Nombre_Supervisor: document.getElementById('fb_Nombre_Supervisor').value,
-                Nombre_Ejecutivo: document.getElementById('fb_Nombre_Ejecutivo').value, Campaña: document.getElementById('fb_Campaña').value, ID_Llamada_Ticket: document.getElementById('fb_ID_Llamada_Ticket').value,
-                Fecha_Llamada: document.getElementById('fb_Fecha_Llamada').value, Hora_Llamada: document.getElementById('fb_Hora_Llamada').value, Fecha_Quiebre: document.getElementById('fb_Fecha_Quiebre').value || "",
-                Categoria_Indicador: c, Indicador_Especifico: i, Gravedad: g, Tipo_Feedback: document.getElementById('fb_Tipo_Feedback').value,
-                Duracion_Feedback: dur, Detalle_Hallazgo: document.getElementById('fb_Detalle_Hallazgo').value, Reconoce_Quiebre: document.getElementById('fb_Reconoce_Quiebre').value,
-                Replica_Ejecutivo: document.getElementById('fb_Replica_Ejecutivo').value || "", Compromiso_Ejecutivo: document.getElementById('fb_Compromiso_Ejecutivo').value,
-                Plazo_Seguimiento: document.getElementById('fb_Plazo_Seguimiento').value, Fecha_Programada_Revision: document.getElementById('fb_Fecha_Programada_Revision').value,
-                Estado_Auditoria: document.getElementById('fb_Estado_Auditoria').value, Observaciones_Finales: `[Actitud: ${document.getElementById('fb_Actitud').value}] ${document.getElementById('fb_Observaciones_Finales').value}`
-            };
-            try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); Swal.fire('¡Guardado!', `Feedback registrado.`, 'success'); document.getElementById('fb_auditForm').reset(); cerrarFormularioFeedback(); actualizarDatosServidor(); } catch (err) { Swal.fire("Error", "Fallo al enviar.", "error"); }
-        });
-
-        async function fb_cerrarSeguimiento(id) {
-            const { value: v } = await Swal.fire({
-                title: 'Cerrar Seguimiento', html: `<textarea id="s_not" class="swal2-textarea w-full text-sm" placeholder="Notas..."></textarea><select id="s_est" class="swal2-select w-full text-sm font-bold text-green-600"><option value="Cerrada">Cerrada</option></select>`,
-                showCancelButton: true, confirmButtonText: 'Guardar', preConfirm: () => { return { n: document.getElementById('s_not').value, e: document.getElementById('s_est').value } }
-            });
-            if (v) {
-                Swal.fire({ title: 'Actualizando...', willOpen: () => Swal.showLoading() });
-                try { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "UPDATE_FEEDBACK", ID_Registro: id, Notas_Cierre: v.n, Estado_Auditoria: v.e }) }); Swal.fire("Enviado", "La petición de cierre fue enviada. Asegúrate de actualizar la hoja manual o configurar el GAS para procesar UPDATES.", "success"); } catch (e) { Swal.fire("Error", "No se pudo actualizar", "error"); }
-            }
-        }
     </script>
 </body>
 </html>
