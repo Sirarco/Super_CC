@@ -306,7 +306,13 @@
                             <div id="card-rut" class="card-stat bg-corp-50 p-4 rounded-xl border-l-4 border-red-500" onclick="toggleAlertFilter('rut')"><p class="text-[10px] font-bold text-corp-400 uppercase tracking-wide">RUT Infantil</p><p id="stat-rut" class="text-2xl font-black text-corp-800 mt-1">0</p></div>
                             <div id="card-trauma" class="card-stat bg-corp-50 p-4 rounded-xl border-l-4 border-amber-500" onclick="toggleAlertFilter('trauma')"><p class="text-[10px] font-bold text-corp-400 uppercase tracking-wide">Trauma Adulto</p><p id="stat-trauma-ratio" class="text-2xl font-black text-corp-800 mt-1">0/0</p></div>
                             <div id="card-dialysis" class="card-stat bg-corp-50 p-4 rounded-xl border-l-4 border-blue-500" onclick="toggleAlertFilter('dialysis')"><p class="text-[10px] font-bold text-corp-400 uppercase tracking-wide">Diálisis</p><p id="stat-dialysis-ratio" class="text-2xl font-black text-corp-800 mt-1">0/0</p></div>
-                            <div id="card-critical" class="card-stat bg-corp-50 p-4 rounded-xl border-l-4 border-purple-600" onclick="toggleAlertFilter('critical')"><p class="text-[10px] font-bold text-corp-400 uppercase tracking-wide">Esp. Críticas</p><p id="stat-critical" class="text-2xl font-black text-corp-800 mt-1">0</p></div>
+<div id="card-critical" class="card-stat bg-corp-50 p-4 rounded-xl border-l-4 border-purple-600 relative" onclick="toggleAlertFilter('critical')">
+                                <div class="absolute top-2 right-2 text-corp-400 hover:text-purple-600 cursor-help transition" onclick="event.stopPropagation(); mostrarLeyendaCriticas();" title="Ver Criterios y Leyenda">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <p class="text-[10px] font-bold text-corp-400 uppercase tracking-wide pr-4">Esp. Críticas</p>
+                                <p id="stat-critical" class="text-2xl font-black text-corp-800 mt-1">0</p>
+                            </div>
                             <div id="card-otras" class="card-stat bg-corp-50 p-4 rounded-xl border-l-4 border-pink-500" onclick="toggleAlertFilter('otras')"><p class="text-[10px] font-bold text-corp-400 uppercase tracking-wide">Otras</p><p id="stat-otras" class="text-2xl font-black text-corp-800 mt-1">0</p></div>
                         </div>
                     </div>
@@ -638,7 +644,7 @@
         const BODY_PARTS = ['columna', 'pie', 'mano', 'hombro', 'muñeca', 'rodilla', 'cadera', 'codo', 'tobillo', 'dedo', 'pelvis', 'brazo', 'pierna', 'cuello', 'espalda', 'talon', 'planta', 'hueso', 'musculo', 'tendon', 'ligamento', 'escapula', 'vertebra', 'lumbar', 'sacro', 'cervical', 'pantorrilla', 'coxis', 'femur'];
         const DIALYSIS_TERMS = ['no se dializa', 'se dializa', 'dializa', 'dializo', 'dialisis', 'hemodialisis', 'peritoneal', 'dializando', 'dialisa', 'fistula', 'fav', 'cateter', 'vascular', 'bypass'];
         const DIALYSIS_SPECIALTIES = ['nefrologia infantil', 'nefrologia adulto', 'cirugia vascular periferica'];
-        const CRITICAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIATRIA ADULTO E INFANTIL (SALUD MENTAL)', 'NUTRICIONISTA INFANTIL', 'NUTRICIONISTA ADULTO', 'Salud Ocupacional', 'KINESIOLOGIA MFR', 'cuidados paliativos', 'HOSPITAL DE DÍA', 'ENDODONCIA', 'SERVICIO SOCIAL (ASISTENTE SOCIAL)', 'CRITERIOS CONTROL', 'HISTORICO', 'JUNTA MEDICA', 'HORMONOTERAPIA', 'ENFERMERA', 'UNIDAD PATOLOGICA CERVICAL', 'TERAPIA OCUPACIONAL', 'T TEMPOROMANDIBULAR Y DOLO ORO FACIAL', 'TACO', 'REHABBILITACION PROTESIS FIJAS Y REMOVIBLES', 'PERIODONCIA', 'ORTODONCIA', 'OPERATORIA', 'ODONTOPEDIATRIA', 'IMPLANTOLOGIA', 'FONOAUDIOLOGIA MFR', 'BRONCOPULMONAR INFANTIL'];
+const CRITICAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIATRIA ADULTO E INFANTIL (SALUD MENTAL)', 'NUTRICIONISTA INFANTIL', 'NUTRICIONISTA ADULTO', 'Salud Ocupacional', 'KINESIOLOGIA MFR', 'cuidados paliativos', 'HOSPITAL DE DÍA', 'ENDODONCIA', 'SERVICIO SOCIAL (ASISTENTE SOCIAL)', 'CRITERIOS CONTROL', 'HISTORICO', 'JUNTA MEDICA', 'HORMONOTERAPIA', 'ENFERMERA', 'UNIDAD PATOLOGICA CERVICAL', 'TERAPIA OCUPACIONAL', 'T TEMPOROMANDIBULAR Y DOLO ORO FACIAL', 'TACO', 'REHABBILITACION PROTESIS FIJAS Y REMOVIBLES', 'PERIODONCIA', 'ORTODONCIA', 'OPERATORIA', 'ODONTOPEDIATRIA', 'IMPLANTOLOGIA', 'FONOAUDIOLOGIA MFR', 'BRONCOPULMONAR INFANTIL', 'ENDOCRINOLOGIA ADULTO', 'NEUROLOGIA INFANTIL', 'NEFROLOGIA ADULTO', 'GINECOLOGIA ADULTO', 'GINECOLOGIA INFANTIL'];
         const EXTRA_COLS = ['Lista Espera', 'Resuelto', 'Informado'];
         const REUMA_TERMS = ['lesli casanova']; const ADOLES_TERMS = ['correa', 'etchegaray']; const OFTALMO_TERMS = ['petour', 'leppe', 'bagolini', 'pereira', 'torrealba', 'nazar', 'muñoz', 'henriquez', 'perez', 'guevara', 'gajardo']; const OTORRINO_TERMS = ['silva', 'poblete'];
         const RECETAS_PERMITIDAS = ['cirugia de mamas', 'med. fisica y rehab. adultos', 'taco'];
@@ -896,6 +902,33 @@
         function cerrarAudioFlotante() { stopAudio(); pipPlayer.classList.add('hidden'); }
         function togglePlay() { if(audioEl.paused) { audioEl.play(); playBtn.innerHTML = '<i class="fas fa-pause text-xs"></i>'; } else { audioEl.pause(); playBtn.innerHTML = '<i class="fas fa-play text-xs"></i>'; } }
         function stopAudio() { audioEl.pause(); audioEl.currentTime = 0; playBtn.innerHTML = '<i class="fas fa-play text-xs"></i>'; }
+
+        function mostrarLeyendaCriticas() {
+            Swal.fire({
+                title: '<span class="text-purple-600 font-black text-lg">Criterios: Esp. Críticas</span>',
+                html: `
+                    <div class="text-left text-xs bg-corp-50 dark:bg-slate-800 p-4 rounded-lg border border-corp-200 dark:border-slate-700 mt-2">
+                        <table class="w-full text-[10px]">
+                            <thead class="text-corp-500 border-b border-corp-200 dark:border-slate-600">
+                                <tr><th class="pb-2 text-left">Título</th><th class="pb-2 text-left">OBV</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-corp-100 dark:divide-slate-700 font-bold text-corp-700 dark:text-slate-300">
+                                <tr><td class="py-2 pr-2 text-purple-600 dark:text-purple-400">GINECOLOGIA INFANTIL</td><td class="py-2">Sin atenciones desde 2023 se solicita IC desde APS</td></tr>
+                                <tr><td class="py-2 pr-2 text-purple-600 dark:text-purple-400">GINECOLOGIA ADULTO</td><td class="py-2">Sin atenciones desde 2023 se solicita IC desde APS</td></tr>
+                                <tr><td class="py-2 pr-2 text-purple-600 dark:text-purple-400">NEFROLOGIA ADULTO</td><td class="py-2">No puede exceder 2 años desde la última atención</td></tr>
+                                <tr><td class="py-2 pr-2 text-purple-600 dark:text-purple-400">NEUROLOGIA INFANTIL</td><td class="py-2">No puede exceder 2 años desde la última atención</td></tr>
+                                <tr><td class="py-2 pr-2 text-purple-600 dark:text-purple-400">ENDOCRINOLOGIA ADULTO</td><td class="py-2">No puede exceder 2 años desde la última atención</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="mt-3 text-corp-400 italic font-semibold">* Para el resto de especialidades, el criterio es general.</p>
+                    </div>
+                `,
+                showCloseButton: true,
+                showConfirmButton: false,
+                background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
+                width: '550px'
+            });
+        }
     </script>
 </body>
 </html>
