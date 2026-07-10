@@ -83,6 +83,8 @@
         .highlight-dialysis { background-color: #bfdbfe; font-weight: bold; padding: 0 2px; border-radius: 2px; color: #1e3a8a; }
         .highlight-search { background-color: #00FF00 !important; color: #FF0000 !important; font-weight: 900; padding: 0 2px; border: 1px solid #FF0000; }
         .alert-row { background-color: #fee2e2 !important; }
+        .alert-row-special { background-color: #fef3c7 !important; } /* Color Ámbar/Amarillo claro */
+        html.dark .alert-row-special { background-color: #78350f !important; } /* Color Ámbar oscuro para Dark Mode */
         html.dark .alert-row { background-color: #450a0a !important; }
         .alert-text { color: #dc2626; font-weight: bold; }
         html.dark .alert-text { color: #f87171; font-weight: bold; }
@@ -645,6 +647,7 @@
         const DIALYSIS_TERMS = ['no se dializa', 'se dializa', 'dializa', 'dializo', 'dialisis', 'hemodialisis', 'peritoneal', 'dializando', 'dialisa', 'fistula', 'fav', 'cateter', 'vascular', 'bypass'];
         const DIALYSIS_SPECIALTIES = ['nefrologia infantil', 'nefrologia adulto', 'cirugia vascular periferica'];
 const CRITICAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIATRIA ADULTO E INFANTIL (SALUD MENTAL)', 'NUTRICIONISTA INFANTIL', 'NUTRICIONISTA ADULTO', 'Salud Ocupacional', 'KINESIOLOGIA MFR', 'cuidados paliativos', 'HOSPITAL DE DÍA', 'ENDODONCIA', 'SERVICIO SOCIAL (ASISTENTE SOCIAL)', 'CRITERIOS CONTROL', 'HISTORICO', 'JUNTA MEDICA', 'HORMONOTERAPIA', 'ENFERMERA', 'UNIDAD DE PATOLOGIA CERVICAL', 'TERAPIA OCUPACIONAL', 'T TEMPOROMANDIBULAR Y DOLO ORO FACIAL', 'TACO', 'REHABBILITACION PROTESIS FIJAS Y REMOVIBLES', 'PERIODONCIA', 'ORTODONCIA', 'OPERATORIA', 'ODONTOPEDIATRIA', 'IMPLANTOLOGIA', 'FONOAUDIOLOGIA MFR', 'BRONCOPULMONAR INFANTIL', 'ENDOCRINOLOGIA ADULTO', 'NEUROLOGIA INFANTIL', 'NEFROLOGIA ADULTO', 'GINECOLOGIA ADULTO', 'GINECOLOGIA INFANTIL'];
+        const SPECIAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIATRIA ADULTO E INFANTIL (SALUD MENTAL)', 'NUTRICIONISTA INFANTIL', 'NUTRICIONISTA ADULTO', 'Salud Ocupacional', 'KINESIOLOGIA MFR', 'cuidados paliativos', 'HOSPITAL DE DÍA', 'ENDODONCIA', 'SERVICIO SOCIAL (ASISTENTE SOCIAL)', 'CRITERIOS CONTROL', 'HISTORICO', 'JUNTA MEDICA', 'HORMONOTERAPIA', 'ENFERMERA', 'UNIDAD PATOLOGICA CERVICAL', 'UNIDAD DE PATOLOGIA CERVICAL', 'TERAPIA OCUPACIONAL', 'T TEMPOROMANDIBULAR Y DOLO ORO FACIAL', 'TACO', 'REHABBILITACION PROTESIS FIJAS Y REMOVIBLES', 'PERIODONCIA', 'ORTODONCIA', 'OPERATORIA', 'ODONTOPEDIATRIA', 'IMPLANTOLOGIA', 'FONOAUDIOLOGIA MFR', 'BRONCOPULMONAR INFANTIL'];
         const EXTRA_COLS = ['Lista Espera', 'Resuelto', 'Informado'];
         const REUMA_TERMS = ['lesli casanova']; const ADOLES_TERMS = ['correa', 'etchegaray']; const OFTALMO_TERMS = ['petour', 'leppe', 'bagolini', 'pereira', 'torrealba', 'nazar', 'muñoz', 'henriquez', 'perez', 'guevara', 'gajardo']; const OTORRINO_TERMS = ['silva', 'poblete'];
         const RECETAS_PERMITIDAS = ['cirugia de mamas', 'med. fisica y rehab. adultos', 'taco'];
@@ -697,7 +700,13 @@ const CRITICAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIAT
                 let rC = "", rS = "", pD = getProp(row, 'tag_description') || ""; 
                 const isPed = esp.includes('infantil') || esp.includes('pediatri'), isTrau = esp.includes('traumatologia adulto'); const isDia = DIALYSIS_SPECIALTIES.includes(esp), isCri = CRITICAL_SPECS.map(x => normalizeTxt(x)).includes(esp); const hasPart = BODY_PARTS.some(p => desc.includes(normalizeTxt(p))), hasDia = DIALYSIS_TERMS.some(t => desc.includes(normalizeTxt(t))); const isReumaAlrt = (esp === 'reumatologia') && !REUMA_TERMS.some(t => desc.includes(normalizeTxt(t))); const isAdolesAlrt = (esp === 'adolescencia') && !ADOLES_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOftalmoAlrt = (esp === 'oftalmologia') && !OFTALMO_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOtorrinoAlrt = (esp === 'otorrinolaringologia') && OTORRINO_TERMS.some(t => desc.includes(normalizeTxt(t))); const isOtrasAlertas = isReumaAlrt || isAdolesAlrt || isOftalmoAlrt || isOtorrinoAlrt; const isReceta = catNorm === 'renovacion de receta'; const isRecetaAlrt = isReceta && !RECETAS_PERMITIDAS.some(permitida => esp.includes(permitida)); const isFarmacia = catNorm === 'farmacia'; 
                 
-                if (isPed) { if(rut < 19000000 && rut > 0) { rC = "alert-row"; rS = "alert-text"; s.rut++; } if(activeFilterCasos === 'rut') rS = "rut-focus-alert"; } if (isTrau) { s.tT++; if(!hasPart) { rC = "alert-row"; s.tNo++; } } if (esp.includes('trauma')) pD = highlightTxt(pD, BODY_PARTS, 'highlight-part'); if (isDia) { s.dT++; if(!hasDia) { rC = "alert-row"; s.dNo++; } } if (hasDia) pD = highlightTxt(pD, DIALYSIS_TERMS, 'highlight-dialysis'); if (isCri) { s.cr++; rC = "alert-row"; } if (isOtrasAlertas) { s.otras++; rC = "alert-row"; } if (isRecetaAlrt) { s.receta++; rC = "alert-row"; } if (isFarmacia) { s.farmacia++; } if (gS && gS.length >= 2) pD = highlightTxt(pD, [gS], 'highlight-search'); 
+                if (isPed) { if(rut < 19000000 && rut > 0) { rC = "alert-row"; rS = "alert-text"; s.rut++; } if(activeFilterCasos === 'rut') rS = "rut-focus-alert"; } if (isTrau) { s.tT++; if(!hasPart) { rC = "alert-row"; s.tNo++; } } if (esp.includes('trauma')) pD = highlightTxt(pD, BODY_PARTS, 'highlight-part'); if (isDia) { s.dT++; if(!hasDia) { rC = "alert-row"; s.dNo++; } } if (hasDia) pD = highlightTxt(pD, DIALYSIS_TERMS, 'highlight-dialysis'); 
+                if (isCri) { 
+                    s.cr++; 
+                    const isSpecial = SPECIAL_SPECS.map(x => normalizeTxt(x)).includes(esp);
+                    rC = isSpecial ? "alert-row-special" : "alert-row"; 
+                }
+                if (isOtrasAlertas) { s.otras++; rC = "alert-row"; } if (isRecetaAlrt) { s.receta++; rC = "alert-row"; } if (isFarmacia) { s.farmacia++; } if (gS && gS.length >= 2) pD = highlightTxt(pD, [gS], 'highlight-search'); 
                 
                 return `<tr class="${rC} hover:bg-corp-50 dark:hover:bg-slate-800 border-b border-corp-100 dark:border-slate-700 transition">${casos_headers.map(h => { 
                     let v = getProp(row, h), c = EXTRA_COLS.includes(h) && !showExtraCols ? 'column-hidden' : ''; 
