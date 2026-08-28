@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cruce de Especialidades y Cupos Médicos</title>
+<style>
+  body { 
+    font-family: sans-serif; 
+    padding: 20px; 
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  h2, h3 {
+    color: #0056b3;
+  }
+  textarea { 
+    width: 100%; 
+    height: 120px; 
+    margin-bottom: 10px; 
+    padding: 10px;
+    font-family: monospace;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  button { 
+    padding: 10px 20px; 
+    font-size: 15px; 
+    cursor: pointer; 
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  button:hover { background-color: #004494; }
+  .btn-secondary { background-color: #6c757d; }
+  .btn-secondary:hover { background-color: #5a6268; }
+  .btn-danger { background-color: #dc3545; }
+  .btn-danger:hover { background-color: #c82333; }
+  
+  .search-container {
+    margin-bottom: 15px;
+  }
+  .search-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  table { 
+    border-collapse: collapse; 
+    width: 100%; 
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    font-size: 14px;
+  }
+  th, td { 
+    border: 1px solid #ddd; 
+    padding: 10px; 
+    text-align: left; 
+  }
+  th { 
+    background-color: #0056b3; 
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+  }
+  th:hover { background-color: #004494; }
+  tr:nth-child(even) { background-color: #f2f2f2; }
+  tr:hover { background-color: #e9ecef; }
+  mark { background-color: #ffeb3b; color: black; font-weight: bold; padding: 0 2px; }
+  
+  .sort-icon { font-size: 12px; margin-left: 5px; }
+</style>
+</head>
+<body>
+
+<h2>Cruce de Especialidades y Horarios</h2>
+<p>Pega el texto de tu portapapeles y presiona "Procesar".</p>
+
+<textarea id="inputText" placeholder="Ejemplo:
+28/08/2026
+DR. IVÁN ANDRÉS CONTESSE ACOSTA
+INGRESO V PM
+V
+13:00 a las 14:00"></textarea>
+
+<div class="toolbar">
+  <button onclick="procesarDatos()">Procesar Información</button>
+  <button class="btn-secondary" onclick="limpiarTexto()">Limpiar Texto</button>
+</div>
+
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Buscador global: Escribe para filtrar y resaltar (ej. nombre, fecha, diagnóstico...)" oninput="renderTable()">
+</div>
+
+<div id="resultado"></div>
+
+<div class="toolbar" style="margin-top: 20px;">
+  <button class="btn-danger" onclick="limpiarResultados()">Limpiar Registros de la Tabla</button>
+</div>
+
+<script>
+
+let baseDeDatosMedicos = [];
+let tableData = [];
+let sortCol = null;
+let sortAsc = true;
+
+function limpiarNombre(nombre) {
+  return nombre.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/^(dr\.|dra\.|dr\s|dra\s)\s*/g, '')
+    .trim();
+}
+
+function buscarCoincidenciaMedico(nombrePegado) {
+  const palabrasPegado = limpiarNombre(nombrePegado).split(/\s+/);
+  let mejorMatch = null;
+  let puntuacionMaxima = 0;
+
+  for (const doc of baseDeDatosMedicos) {
+    const palabrasBD = limpiarNombre(doc.medico).split(/\s+/);
+    let puntuacion = 0;
+    
+    for (const palabraBD of palabrasBD) {
+      if (palabraBD.length < 3) continue; 
+      for (const palabraPegado of palabrasPegado) {
+          if (palabraPegado.includes(palabraBD) || palabraBD.includes(palabraPegado)) {
+              puntuacion++;
+              break; 
+          }
+      }
+    }
+    
+    if (puntuacion > puntuacionMaxima) {
+      puntuacionMaxima = puntuacion;
+      mejorMatch = doc;
+    }
+  }
+  return mejorMatch;
+}
+
+function limpiarTexto() {
+    document.getElementById('inputText').value = '';
+}
+function limpiarResultados() {
+    tableData = [];
+    document.getElementById('searchInput').value = '';
+    renderTable();
+}
+
+function procesarDatos() {
+  const texto = document.getElementById('inputText').value;
+  const lineas = texto.split('\n').map(l => l.trim()).filter(l => l !== '');
+  
+  let currentRecord = null;
+  for (let i = 0; i < lineas.length; i++) {
+    const linea = lineas[i];
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(linea)) {
+      if (currentRecord) extraerRegistro(currentRecord);
+      currentRecord = { fecha: linea, lineasExtra: [] };
+    } else if (currentRecord) {
+      currentRecord.lineasExtra.push(linea);
+    }
+  }
+  if (currentRecord) extraerRegistro(currentRecord);
+  
+  renderTable();
+}
+
+function extraerRegistro(record) {
+    if (record.lineasExtra.length === 0) return;
+    
+    const nombreOriginal = record.lineasExtra[0];
+    const medicoBD = buscarCoincidenciaMedico(nombreOriginal);
+    
+    let indexHora = record.lineasExtra.findIndex(l => l.includes("a las") || /^\d{2}:\d{2}/.test(l));
+    let cupoHorario = "No especificado";
+    let cuposAprox = "N/A";
+    
+    if (indexHora !== -1) {
+        cupoHorario = record.lineasExtra.slice(1, indexHora + 1).join(" | ");
+        
+        // Calcular cupos basados en la columna "Libres" (indexHora + 2)
+        if (record.lineasExtra.length > indexHora + 2) {
+            let libresStr = record.lineasExtra[indexHora + 2];
+            let libresNum = parseInt(libresStr, 10);
+            if (!isNaN(libresNum)) {
+                cuposAprox = Math.floor(libresNum / 20);
+            }
+        }
+    } else if (record.lineasExtra.length > 1) {
+        cupoHorario = record.lineasExtra.slice(1, 3).join(" | ");
+    }
+    
+    let nombreBase = "⚠️ No Encontrado";
+    let especialidad = "N/A";
+    let diagnostico = "N/A";
+    
+    if (medicoBD) {
+        nombreBase = medicoBD.medico;
+        especialidad = medicoBD.especialidad;
+        diagnostico = medicoBD.detalle;
+    }
+    
+    tableData.push({
+        fecha: record.fecha,
+        medicoBase: nombreBase,
+        medicoOrig: nombreOriginal,
+        especialidad: especialidad,
+        diagnostico: diagnostico,
+        cupo: cupoHorario,
+        cuposAprox: cuposAprox,
+        searchField: `${record.fecha} ${nombreBase} ${nombreOriginal} ${especialidad} ${diagnostico} ${cupoHorario} ${cuposAprox}`.toLowerCase()
+    });
+}
+
+function parseDateString(dateStr) {
+    const parts = dateStr.split('/');
+    if(parts.length === 3) {
+        return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).getTime();
+    }
+    return 0;
+}
+
+function setSort(columna) {
+    if (sortCol === columna) {
+        sortAsc = !sortAsc;
+    } else {
+        sortCol = columna;
+        sortAsc = true;
+    }
+    renderTable();
+}
+
+function getSortIcon(columna) {
+    if (sortCol !== columna) return '<span class="sort-icon">↕️</span>';
+    return sortAsc ? '<span class="sort-icon">⬆️</span>' : '<span class="sort-icon">⬇️</span>';
+}
+
+function highlight(text, term) {
+    if (!term) return text;
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedTerm})`, "gi");
+    return text.replace(regex, "<mark>$1</mark>");
+}
+
+function renderTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    
+    let datosFiltrados = tableData;
+    if (searchTerm !== "") {
+        datosFiltrados = tableData.filter(row => row.searchField.includes(searchTerm));
+    }
+    
+    if (sortCol) {
+        datosFiltrados.sort((a, b) => {
+            let valA = a[sortCol];
+            let valB = b[sortCol];
+            
+            if (sortCol === 'fecha') {
+                valA = parseDateString(valA);
+                valB = parseDateString(valB);
+            } else if (sortCol === 'cuposAprox') {
+                valA = isNaN(valA) ? -1 : parseInt(valA);
+                valB = isNaN(valB) ? -1 : parseInt(valB);
+            } else {
+                valA = valA.toString().toLowerCase();
+                valB = valB.toString().toLowerCase();
+            }
+
+            if (valA < valB) return sortAsc ? -1 : 1;
+            if (valA > valB) return sortAsc ? 1 : -1;
+            return 0;
+        });
+    }
+    
+    let tablaHTML = `<table>
+        <thead>
+            <tr>
+                <th onclick="setSort('fecha')">Fecha ${getSortIcon('fecha')}</th>
+                <th onclick="setSort('medicoBase')">Médico (Base) ${getSortIcon('medicoBase')}</th>
+                <th onclick="setSort('medicoOrig')">Médico Original (Pegado) ${getSortIcon('medicoOrig')}</th>
+                <th onclick="setSort('especialidad')">Especialidad ${getSortIcon('especialidad')}</th>
+                <th onclick="setSort('diagnostico')">Diagnóstico / Observación ${getSortIcon('diagnostico')}</th>
+                <th onclick="setSort('cupo')">Cupo (Horario) ${getSortIcon('cupo')}</th>
+                <th onclick="setSort('cuposAprox')">Cupos Aproximados ${getSortIcon('cuposAprox')}</th>
+            </tr>
+        </thead>
+        <tbody>`;
+        
+    if (datosFiltrados.length === 0) {
+        tablaHTML += `<tr><td colspan="7" style="text-align:center;">No hay resultados que coincidan.</td></tr>`;
+    } else {
+        for (const row of datosFiltrados) {
+            tablaHTML += `<tr>
+                <td><strong>${highlight(row.fecha, searchTerm)}</strong></td>
+                <td><strong>${highlight(row.medicoBase, searchTerm)}</strong></td>
+                <td style="color: #666; font-size: 13px;">${highlight(row.medicoOrig, searchTerm)}</td>
+                <td>${highlight(row.especialidad, searchTerm)}</td>
+                <td>${highlight(row.diagnostico, searchTerm)}</td>
+                <td style="color: #0056b3; font-weight: bold;">${highlight(row.cupo, searchTerm)}</td>
+                <td style="text-align:center; font-weight: bold; font-size: 16px;">${highlight(row.cuposAprox.toString(), searchTerm)}</td>
+            </tr>`;
+        }
+    }
+    
+    tablaHTML += '</tbody></table>';
+    document.getElementById('resultado').innerHTML = tablaHTML;
+}
+function cargarEspecialidades(datosEspecialidades) {
+  baseDeDatosMedicos = datosEspecialidades.map(fila => ({
+    medico: fila.Medico,
+    especialidad: fila.Especialidad,
+    detalle: fila.Diagnosticos
+  }));
+}
+renderTable();
+</script>
+</body>
+</html>

@@ -166,6 +166,7 @@
             <p class="text-[10px] font-bold text-corp-500 uppercase tracking-widest mb-2 mt-6 px-2 section-title sidebar-text">Operaciones</p>
             <a onclick="modulos_Switch('viewAuditar', this)" class="sidebar-link"><i class="fas fa-clipboard-check w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Auditar Llamada</span></a>
             <a onclick="modulos_Switch('viewFeedback', this)" class="sidebar-link"><i class="fas fa-comments w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Centro Feedback</span></a>
+            <a onclick="modulos_Switch('viewAgendamientos', this)" class="sidebar-link"><i class="fas fa-calendar-alt w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Agendamientos</span></a>
             <a onclick="modulos_Switch('viewCasos', this)" class="sidebar-link"><i class="fas fa-file-medical w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Revisión Casos</span></a>
             
             <p class="text-[10px] font-bold text-corp-500 uppercase tracking-widest mb-2 mt-6 px-2 section-title sidebar-text">Gestión Interna</p>
@@ -357,7 +358,30 @@
                     </div>
                 </div>
             </div>
-
+<!-- MÓDULO AGENDAMIENTOS -->
+            <div id="viewAgendamientos" class="view-section max-w-[1400px] mx-auto space-y-4">
+                <div class="mb-4 flex justify-between items-end">
+                    <h1 class="text-2xl font-black text-corp-800"><i class="fas fa-calendar-alt text-blue-500 mr-2"></i> Cruce de Especialidades</h1>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-corp-100">
+                    <p class="text-[10px] text-corp-400 font-bold uppercase mb-2">Pega el texto de tu portapapeles y presiona "Procesar"</p>
+                    <textarea id="inputText" class="w-full border-corp-200 border rounded-xl p-3 text-sm outline-none bg-corp-50 mb-4 h-32 font-mono" placeholder="Ejemplo: 28/08/2026 DR. IVÁN..."></textarea>
+                    <div class="flex gap-2 mb-4">
+                        <button onclick="procesarDatos()" class="bg-corp-blue text-white px-4 py-2 rounded-xl font-bold shadow hover:bg-blue-700 btn-press">Procesar Información</button>
+                        <button onclick="limpiarTexto()" class="bg-corp-500 text-white px-4 py-2 rounded-xl font-bold shadow hover:bg-slate-600 btn-press">Limpiar Texto</button>
+                    </div>
+                    <div class="relative w-full mb-4">
+                        <i class="fas fa-search absolute left-3 top-3 text-corp-400"></i>
+                        <input type="text" id="searchInput" oninput="renderTable()" class="w-full pl-9 pr-3 py-2 bg-corp-50 border border-corp-200 rounded-xl text-sm outline-none focus:border-blue-500" placeholder="Buscador global...">
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <div id="resultado"></div> 
+                    </div>
+                    <div class="mt-4">
+                        <button onclick="limpiarResultados()" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-600 shadow btn-press">Limpiar Registros</button>
+                    </div>
+                </div>
+            </div>
             <!-- FEEDBACK (PRD V2: Fechas robustas y Modal Ejecutiva) -->
             <div id="viewFeedback" class="view-section max-w-[1400px] mx-auto space-y-4">
                 <div id="fb_dashboard_view" class="space-y-4">
@@ -452,6 +476,7 @@
 
         let CURRENT_USER = sessionStorage.getItem('siperQA_Token') || ""; 
         let FULL_DATA = [], FEEDBACK_DATA = [], baseEjecutivos = [], pautaItems = [], diccIndicadores = [];
+        let baseDeDatosMedicos = [], tableDataAg = [], sortColAg = null, sortAscAg = true;
         let acuerdosData = []; let homeAcuerdosData = [];
         
         const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -489,6 +514,7 @@
 
                 FULL_DATA = data.auditorias || []; FEEDBACK_DATA = data.otras_auditorias || data.registro_auditorias || []; 
                 baseEjecutivos = data.ejecutivos || []; diccIndicadores = data.indicadores_fb || []; homeAcuerdosData = data.acuerdos_indicaciones || []; 
+                cargarEspecialidades(data.especialidades || []);
                 pautaItems = (data.pauta || []).map((p, index) => ({ cat: p.Categoría, id: p.ID || ID_MAPEO_ORIGINAL[index] || "item_dinamico_" + index, label: p.Indicador, type: String(p.Peso).toUpperCase() === "PEC" ? "PEC" : "PENC", weight: String(p.Peso).toUpperCase() !== "PEC" ? parseInt(p.Peso) : 0, ok: p.Criterio_SI, fail: p.Criterio_NO }));
 
                 const supervisores = baseEjecutivos.filter(e => e.Servicio === "Supervisor" || e.SERVICIO === "Supervisor").map(e => e.Nombre || e.NOMBRE).sort();
@@ -937,6 +963,90 @@ const CRITICAL_SPECS = ['CIRUGIA Y TRAUMA MAXILOFACIAL', 'ONCOLOGÍA', 'PSIQUIAT
                 background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
                 width: '550px'
             });
+        }
+        // --- LÓGICA DE AGENDAMIENTOS ---
+        function cargarEspecialidades(datosEspecialidades) {
+            baseDeDatosMedicos = datosEspecialidades.map(fila => ({
+                medico: fila.Medico, especialidad: fila.Especialidad, detalle: fila.Diagnosticos
+            }));
+        }
+        function limpiarNombre(nombre) { return nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/^(dr\.|dra\.|dr\s|dra\s)\s*/g, '').trim(); }
+        function buscarCoincidenciaMedico(nombrePegado) {
+            const palabrasPegado = limpiarNombre(nombrePegado).split(/\s+/); let mejorMatch = null; let puntuacionMaxima = 0;
+            for (const doc of baseDeDatosMedicos) {
+                const palabrasBD = limpiarNombre(doc.medico).split(/\s+/); let puntuacion = 0;
+                for (const palabraBD of palabrasBD) {
+                    if (palabraBD.length < 3) continue;
+                    for (const palabraPegado of palabrasPegado) {
+                        if (palabraPegado.includes(palabraBD) || palabraBD.includes(palabraPegado)) { puntuacion++; break; }
+                    }
+                }
+                if (puntuacion > puntuacionMaxima) { puntuacionMaxima = puntuacion; mejorMatch = doc; }
+            }
+            return mejorMatch;
+        }
+        function limpiarTexto() { document.getElementById('inputText').value = ''; }
+        function limpiarResultados() { tableDataAg = []; document.getElementById('searchInput').value = ''; renderTable(); }
+        function procesarDatos() {
+            const texto = document.getElementById('inputText').value;
+            const lineas = texto.split('\n').map(l => l.trim()).filter(l => l !== '');
+            let currentRecord = null;
+            for (let i = 0; i < lineas.length; i++) {
+                const linea = lineas[i];
+                if (/^\d{2}\/\d{2}\/\d{4}$/.test(linea)) {
+                    if (currentRecord) extraerRegistro(currentRecord);
+                    currentRecord = { fecha: linea, lineasExtra: [] };
+                } else if (currentRecord) { currentRecord.lineasExtra.push(linea); }
+            }
+            if (currentRecord) extraerRegistro(currentRecord);
+            renderTable();
+        }
+        function extraerRegistro(record) {
+            if (record.lineasExtra.length === 0) return;
+            const nombreOriginal = record.lineasExtra[0]; const medicoBD = buscarCoincidenciaMedico(nombreOriginal);
+            let indexHora = record.lineasExtra.findIndex(l => l.includes("a las") || /^\d{2}:\d{2}/.test(l));
+            let cupoHorario = "No especificado"; let cuposAprox = "N/A";
+            if (indexHora !== -1) {
+                cupoHorario = record.lineasExtra.slice(1, indexHora + 1).join(" | ");
+                if (record.lineasExtra.length > indexHora + 2) {
+                    let libresNum = parseInt(record.lineasExtra[indexHora + 2], 10);
+                    if (!isNaN(libresNum)) cuposAprox = Math.floor(libresNum / 20);
+                }
+            } else if (record.lineasExtra.length > 1) { cupoHorario = record.lineasExtra.slice(1, 3).join(" | "); }
+            tableDataAg.push({
+                fecha: record.fecha, medicoBase: medicoBD ? medicoBD.medico : "  No Encontrado", medicoOrig: nombreOriginal,
+                especialidad: medicoBD ? medicoBD.especialidad : "N/A", diagnostico: medicoBD ? medicoBD.detalle : "N/A",
+                cupo: cupoHorario, cuposAprox: cuposAprox,
+                searchField: `${record.fecha} ${medicoBD?medicoBD.medico:""} ${nombreOriginal} ${medicoBD?medicoBD.especialidad:""} ${medicoBD?medicoBD.detalle:""} ${cupoHorario} ${cuposAprox}`.toLowerCase()
+            });
+        }
+        function setSortAg(columna) { if (sortColAg === columna) sortAscAg = !sortAscAg; else { sortColAg = columna; sortAscAg = true; } renderTable(); }
+        function highlight(text, term) {
+            if (!term) return text; const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return text.toString().replace(new RegExp(`(${escaped})`, "gi"), '<span class="bg-yellow-300 text-yellow-900 font-bold px-1 rounded">$1</span>');
+        }
+        function parseDateStringAg(dateStr) { const p = dateStr.split('/'); return p.length===3 ? new Date(`${p[2]}-${p[1]}-${p[0]}`).getTime() : 0; }
+        function renderTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            let filtrados = searchTerm === "" ? tableDataAg : tableDataAg.filter(r => r.searchField.includes(searchTerm));
+            if (sortColAg) {
+                filtrados.sort((a, b) => {
+                    let vA = a[sortColAg], vB = b[sortColAg];
+                    if (sortColAg === 'fecha') { vA = parseDateStringAg(vA); vB = parseDateStringAg(vB); } 
+                    else if (sortColAg === 'cuposAprox') { vA = isNaN(vA)?-1:parseInt(vA); vB = isNaN(vB)?-1:parseInt(vB); } 
+                    else { vA = vA.toString().toLowerCase(); vB = vB.toString().toLowerCase(); }
+                    return (vA < vB ? -1 : (vA > vB ? 1 : 0)) * (sortAscAg ? 1 : -1);
+                });
+            }
+            let html = `<table class="w-full text-left text-sm border-collapse"><thead class="bg-corp-50 dark:bg-slate-800 text-corp-500 dark:text-slate-400 text-[10px] uppercase font-black"><tr>`;
+            const cols = [['fecha','Fecha'],['medicoBase','Médico Base'],['medicoOrig','Médico Original'],['especialidad','Especialidad'],['diagnostico','Diagnóstico'],['cupo','Cupo'],['cuposAprox','Cupos']];
+            cols.forEach(c => html += `<th class="p-3 cursor-pointer hover:bg-corp-100" onclick="setSortAg('${c[0]}')">${c[1]} ${sortColAg===c[0]?(sortAscAg?' ':' '):''}</th>`);
+            html += `</tr></thead><tbody class="divide-y divide-corp-100 dark:divide-slate-700 bg-white dark:bg-slate-900">`;
+            if (filtrados.length === 0) html += `<tr><td colspan="7" class="p-6 text-center italic text-corp-400">Sin resultados.</td></tr>`;
+            else filtrados.forEach(r => {
+                html += `<tr class="hover:bg-corp-50 dark:hover:bg-slate-800"><td class="p-3 font-bold dark:text-slate-200">${highlight(r.fecha, searchTerm)}</td><td class="p-3 font-bold dark:text-slate-200">${highlight(r.medicoBase, searchTerm)}</td><td class="p-3 text-xs text-corp-500">${highlight(r.medicoOrig, searchTerm)}</td><td class="p-3 text-xs dark:text-slate-300">${highlight(r.especialidad, searchTerm)}</td><td class="p-3 text-xs dark:text-slate-300">${highlight(r.diagnostico, searchTerm)}</td><td class="p-3 text-corp-blue font-bold text-xs">${highlight(r.cupo, searchTerm)}</td><td class="p-3 text-center font-black text-lg dark:text-slate-200">${highlight(r.cuposAprox, searchTerm)}</td></tr>`;
+            });
+            document.getElementById('resultado').innerHTML = html + `</tbody></table>`;
         }
     </script>
 </body>
