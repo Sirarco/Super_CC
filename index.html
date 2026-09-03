@@ -166,16 +166,15 @@
             <p class="text-[10px] font-bold text-corp-500 uppercase tracking-widest mb-2 mt-6 px-2 section-title sidebar-text">Operaciones</p>
             <a onclick="modulos_Switch('viewAuditar', this)" class="sidebar-link"><i class="fas fa-clipboard-check w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Auditar Llamada</span></a>
             <a onclick="modulos_Switch('viewFeedback', this)" class="sidebar-link"><i class="fas fa-comments w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Centro Feedback</span></a>
-<!-- Menú Principal: Agendamientos -->
+<!-- Menú Principal: Agendamientos con Submenú Integrado -->
 <div class="space-y-1">
     <a onclick="modulos_Switch('viewAgendamientos', this)" class="sidebar-link">
         <i class="fas fa-calendar-alt w-6 text-center sidebar-icon mr-2"></i> 
         <span class="sidebar-text">Agendamientos</span>
     </a>
-    <!-- Submenú Anidado para Cruzador -->
     <div class="pl-8 space-y-1">
-        <a href="cruzador.html" class="sidebar-link !py-2 !text-xs !text-blue-400 hover:!text-white">
-            <i class="fas fa-external-link-alt w-4 text-center sidebar-icon mr-2"></i> 
+        <a onclick="modulos_Switch('viewCruzador', this)" class="sidebar-link !py-2 !text-xs !text-blue-400 hover:!text-white">
+            <i class="fas fa-columns w-4 text-center sidebar-icon mr-2"></i> 
             <span class="sidebar-text">Cruzador de Cupos</span>
         </a>
     </div>
@@ -394,6 +393,14 @@
                         <button onclick="limpiarResultados()" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-600 shadow btn-press">Limpiar Registros</button>
                     </div>
                 </div>
+            </div>
+<!-- MÓDULO CRUZADOR DE CUPOS INTEGRADO -->
+<div id="viewCruzador" class="view-section h-full w-full">
+    <iframe src="cruzador.html" class="w-full h-full border-0 rounded-2xl shadow-sm bg-white dark:bg-slate-900" style="min-height: calc(100vh - 80px);"></iframe>
+</div>
+
+            <div id="viewCruzador" class="view-section h-full w-full">
+                <iframe src="cruzador.html" class="w-full h-full border-0 rounded-2xl shadow-sm bg-white dark:bg-slate-900" style="min-height: calc(100vh - 80px);"></iframe>
             </div>
             <!-- FEEDBACK (PRD V2: Fechas robustas y Modal Ejecutiva) -->
             <div id="viewFeedback" class="view-section max-w-[1400px] mx-auto space-y-4">
