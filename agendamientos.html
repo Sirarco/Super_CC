@@ -88,6 +88,12 @@
 </head>
 <body>
 
+<!-- NUEVO SUB-MENÚ SUPERIOR -->
+<div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom: 15px;">
+  <button style="background-color: #0056b3; cursor: default;">Agendamientos (Actual)</button>
+  <button class="btn-secondary" onclick="window.location.href='cruzador.html'">Cruzador de Cupos ➔</button>
+</div>
+
 <h2>Cruce de Especialidades y Horarios</h2>
 <p>Pega el texto de tu portapapeles y presiona "Procesar".</p>
 
@@ -111,8 +117,6 @@ V
 
 <div class="toolbar" style="margin-top: 20px;">
   <button class="btn-danger" onclick="limpiarResultados()">Limpiar Registros de la Tabla</button>
-  <!-- Nuevo botón para abrir la herramienta en otra pestaña -->
-  <button class="btn-secondary" style="margin-left: 15px;" onclick="window.open('cruzador.html', '_blank')">Abrir Cruzador de Cupos</button>
 </div>
 
 <script>
