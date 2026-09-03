@@ -166,7 +166,20 @@
             <p class="text-[10px] font-bold text-corp-500 uppercase tracking-widest mb-2 mt-6 px-2 section-title sidebar-text">Operaciones</p>
             <a onclick="modulos_Switch('viewAuditar', this)" class="sidebar-link"><i class="fas fa-clipboard-check w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Auditar Llamada</span></a>
             <a onclick="modulos_Switch('viewFeedback', this)" class="sidebar-link"><i class="fas fa-comments w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Centro Feedback</span></a>
-            <a onclick="modulos_Switch('viewAgendamientos', this)" class="sidebar-link"><i class="fas fa-calendar-alt w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Agendamientos</span></a>
+<!-- Menú Principal: Agendamientos -->
+<div class="space-y-1">
+    <a onclick="modulos_Switch('viewAgendamientos', this)" class="sidebar-link">
+        <i class="fas fa-calendar-alt w-6 text-center sidebar-icon mr-2"></i> 
+        <span class="sidebar-text">Agendamientos</span>
+    </a>
+    <!-- Submenú Anidado para Cruzador -->
+    <div class="pl-8 space-y-1">
+        <a href="cruzador.html" class="sidebar-link !py-2 !text-xs !text-blue-400 hover:!text-white">
+            <i class="fas fa-external-link-alt w-4 text-center sidebar-icon mr-2"></i> 
+            <span class="sidebar-text">Cruzador de Cupos</span>
+        </a>
+    </div>
+</div>
             <a onclick="modulos_Switch('viewCasos', this)" class="sidebar-link"><i class="fas fa-file-medical w-6 text-center sidebar-icon mr-2"></i> <span class="sidebar-text">Revisión Casos</span></a>
             
             <p class="text-[10px] font-bold text-corp-500 uppercase tracking-widest mb-2 mt-6 px-2 section-title sidebar-text">Gestión Interna</p>
