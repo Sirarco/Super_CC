@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruce de Especialidades y Cupos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        textarea::-webkit-scrollbar, .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        textarea::-webkit-scrollbar-track, .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb, .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover, .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        tbody tr { transition: all 0.2s; }
+        tbody tr:hover { filter: brightness(0.97); cursor: pointer; }
+        th { cursor: pointer; user-select: none; }
+        th:hover { background-color: #e2e8f0; }
+
+        table { table-layout: fixed; width: 100%; }
+        td { white-space: normal; word-wrap: break-word; overflow-wrap: break-word; vertical-align: top; }
+        
+        .col-base { width: 6%; }
+        .col-espec { width: 14%; }
+        .col-estado { width: 8%; }
+        .col-obs { width: 15%; }
+        .col-obs2 { width: 22%; }
+        .col-cp1 { width: 8%; }
+        .col-fecha { width: 13%; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-2 md:p-6">
+
+    <div class="max-w-[1600px] mx-auto space-y-6">
+        <header class="text-center md:text-left flex flex-col md:flex-row justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2 justify-center md:justify-start">
+                    <i data-lucide="git-merge" class="text-indigo-500"></i>
+                    Cruzador de Cupos
+                </h1>
+                <p class="text-sm text-slate-500 mt-1">Pega los datos desde tu hoja de cálculo para analizar disponibilidades.</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex gap-3">
+                <button onclick="limpiarTodo()" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-2">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Limpiar Todo
+                </button>
+                <button onclick="procesarDatos()" class="px-6 py-2 text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded-lg transition-colors shadow-sm shadow-indigo-200 flex items-center gap-2">
+                    <i data-lucide="cpu" class="w-4 h-4"></i> Procesar Cruce
+                </button>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-md font-semibold text-slate-700 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                        Datos Izquierda (Bases)
+                    </h2>
+                    <button onclick="document.getElementById('inputIzq').value = ''" class="text-slate-400 hover:text-red-500" title="Limpiar panel izquierdo"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
+                </div>
+                <textarea id="inputIzq" class="w-full flex-grow p-3 text-xs md:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none resize-none font-mono text-slate-600 whitespace-pre custom-scroll" placeholder="Pega los datos de las bases aquí..."></textarea>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                 <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-md font-semibold text-slate-700 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                        Datos Derecha (Cupos Disponibles)
+                    </h2>
+                    <button onclick="document.getElementById('inputDer').value = ''" class="text-slate-400 hover:text-red-500" title="Limpiar panel derecho"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
+                </div>
+                <textarea id="inputDer" class="w-full flex-grow p-3 text-xs md:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none resize-none font-mono text-slate-600 whitespace-pre custom-scroll" placeholder="Pega los cupos disponibles aquí..."></textarea>
+            </div>
+        </main>
+
+        <section id="resultSection" class="bg-white rounded-2xl shadow-sm border border-slate-100 hidden">
+            <div class="p-4 md:p-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center bg-slate-50/50 rounded-t-2xl">
+                <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="table" class="text-indigo-500"></i> Resultado del Cruce
+                </h2>
+                <div class="flex flex-wrap gap-4 mt-3 md:mt-0 items-center justify-center">
+                    <label class="flex items-center gap-2 text-sm font-bold text-indigo-700 bg-indigo-100 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-indigo-200 transition-colors">
+                        <input type="checkbox" id="toggleActivas" class="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" onchange="renderTableActual()">
+                        Mostrar solo ACTIVAS
+                    </label>
+                    <div class="text-xs text-slate-600 flex flex-wrap gap-2 md:gap-3 font-medium bg-white px-3 py-2 rounded-lg border border-slate-200">
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm"></span> Hoy</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-sm"></span> Mañana</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-sm"></span> Pasado</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-100 border border-blue-200"></span> Futuro</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-100 border border-slate-200"></span> Sin Cupos</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contenedor scrollable INDEPENDIENTE para permitir thead sticky -->
+            <div class="w-full max-h-[600px] overflow-y-auto custom-scroll rounded-b-2xl relative">
+                <table class="w-full text-left text-[11px] md:text-xs text-slate-600 table-fixed" id="resultTable">
+                    <!-- Clases clave para que flote: sticky, top-0 y z-10 -->
+                    <thead class="sticky top-0 z-10 text-[10px] md:text-[11px] text-slate-500 uppercase bg-slate-100 shadow-sm">
+                        <tr id="tableHeaders">
+                            <!-- Headers -->
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-200">
+                        <!-- Rows -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="emptyState" class="p-12 text-center text-slate-500 hidden">
+                <i data-lucide="inbox" class="w-12 h-12 mx-auto text-slate-300 mb-3"></i>
+                <p>No se encontraron resultados para los filtros actuales.</p>
+            </div>
+        </section>
+    </div>
+
+    <div id="errorToast" class="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-start max-w-sm pointer-events-none">
+        <i data-lucide="alert-circle" class="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"></i>
+        <span id="errorMessage" class="text-sm font-medium leading-tight"></span>
+        <button onclick="cerrarError()" class="ml-4 text-red-200 hover:text-white pointer-events-auto flex-shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let tableDataGlobal = [];
+        let finalHeadersGlobal = [];
+        let sortDirections = {};
+
+        function mostrarError(mensaje) {
+            const toast = document.getElementById('errorToast');
+            document.getElementById('errorMessage').innerText = mensaje;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('pointer-events-auto');
+            setTimeout(cerrarError, 6000);
+        }
+
+        function cerrarError() {
+            const toast = document.getElementById('errorToast');
+            toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.remove('pointer-events-auto');
+        }
+
+        function normalizeText(text) {
+            if (text === null || text === undefined) return "";
+            let normalized = text.toString()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+                .toLowerCase()
+                .trim();
+                
+            // Homologación específica de términos
+            normalized = normalized.replace(/med\.\s*fisica/g, "medicina fisica");
+            normalized = normalized.replace(/rehab\./g, "rehabilitacion");
+            normalized = normalized.replace(/adultos/g, "adulto");
+            // Limpia dobles espacios generados por los reemplazos
+            normalized = normalized.replace(/\s+/g, " ");
+            
+            return normalized;
+        }
+
+        function cleanSpecialtyRight(text) {
+            if (!text) return "";
+            return text.toString().replace(/\s*\(\d+\)\s*$/, '').trim();
+        }
+
+        function isBusinessDay(date) {
+            const day = date.getDay();
+            return day !== 0 && day !== 6; 
+        }
+
+        function getBusinessDaysDiff(startDate, endDate) {
+            let curDate = new Date(startDate.getTime());
+            curDate.setHours(0,0,0,0);
+            let targetDate = new Date(endDate.getTime());
+            targetDate.setHours(0,0,0,0);
+
+            if (targetDate < curDate) return -1; // Pasado
+
+            let count = 0;
+            while (curDate < targetDate) {
+                curDate.setDate(curDate.getDate() + 1);
+                if (isBusinessDay(curDate)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        function determineDateWithYear(dayMonthStr) {
+            if(!dayMonthStr || !dayMonthStr.includes('/')) return null;
+            
+            const [day, month] = dayMonthStr.split('/');
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            
+            let targetYear = currentYear;
+            if (parseInt(month) < currentMonth - 2) {
+                targetYear = currentYear + 1;
+            }
+
+            // FORMATEO HOMOLOGADO EXIGIDO: dd-mm-aaaa
+            const formattedDateStr = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${targetYear}`;
+
+            return {
+                day: day.padStart(2, '0'),
+                month: month.padStart(2, '0'),
+                year: targetYear,
+                formatted: formattedDateStr,
+                dateObj: new Date(targetYear, parseInt(month)-1, parseInt(day))
+            };
+        }
+
+        function parseTSV(tsvText, origen) {
+            const lines = tsvText.trim().split(/\r?\n/);
+            if (lines.length < 1 || lines[0] === "") throw new Error(`Datos vacíos en ${origen}.`);
+            
+            let headers = [];
+            let startIndex = 0;
+            
+            if (!isNaN(parseInt(lines[0].split('\t')[0])) && origen === "Izquierda") {
+                const colCount = lines[0].split('\t').length;
+                headers = Array.from({length: colCount}, (_, i) => `Columna ${i+1}`);
+                headers[0] = "base";
+                if(headers.length > 2) headers[2] = "especialidad";
+            } else {
+                headers = lines[0].split('\t').map(h => h.trim());
+                startIndex = 1;
+            }
+
+            const data = [];
+            for (let i = startIndex; i < lines.length; i++) {
+                if (lines[i].trim() === "") continue;
+                const values = lines[i].split('\t');
+                
+                if (values.length < 3 && values[0].toLowerCase().includes("mostrando")) continue;
+                if (values.length === 1 && (values[0].toLowerCase() === "anterior" || !isNaN(values[0]) || values[0].toLowerCase() === "siguiente")) continue;
+
+                let row = {};
+                let hasData = false;
+                headers.forEach((h, index) => {
+                    const val = values[index] ? values[index].trim() : "";
+                    row[h] = val;
+                    if(val !== "") hasData = true;
+                });
+                
+                if(hasData) data.push(row);
+            }
+            return { headers, data };
+        }
+
+        function procesarDatos() {
+            try {
+                const rawLeft = document.getElementById('inputIzq').value;
+                const rawRight = document.getElementById('inputDer').value;
+
+                if (!rawLeft || !rawRight) return mostrarError("Pega datos en ambas secciones.");
+
+                const leftParsed = parseTSV(rawLeft, "Izquierda");
+                const rightParsed = parseTSV(rawRight, "Derecha");
+
+                const availabilityMap = {};
+                const dateHeadersRight = rightParsed.headers.filter(h => h && h.includes('/'));
+                
+                let rightSpecIndex = rightParsed.headers.findIndex(h => normalizeText(h).includes("especialidad"));
+                if (rightSpecIndex === -1) rightSpecIndex = 0; 
+
+                rightParsed.data.forEach(row => {
+                    const headerKeys = Object.keys(row);
+                    const rawSpec = row[headerKeys[rightSpecIndex]];
+                    if(!rawSpec) return;
+
+                    const cleanSpec = cleanSpecialtyRight(rawSpec);
+                    const normSpec = normalizeText(cleanSpec);
+                    
+                    availabilityMap[normSpec] = {
+                        originalName: cleanSpec,
+                        dates: [] 
+                    };
+
+                    dateHeadersRight.forEach(dateHeader => {
+                        const count = parseInt(row[dateHeader]);
+                        if (!isNaN(count) && count > 0) {
+                            const cleanDateHeader = dateHeader.replace(/[^\d/]/g, '');
+                            if(cleanDateHeader) {
+                                availabilityMap[normSpec].dates.push({
+                                    dateStr: cleanDateHeader,
+                                    count: count
+                                });
+                            }
+                        }
+                    });
+                });
+
+                // Extracción Quirúrgica: Índices 0, 2, 5, 8, 9 de la izquierda.
+                tableDataGlobal = leftParsed.data.map(leftRow => {
+                    const vals = Object.values(leftRow);
+                    const baseStr = vals[0] || "";
+                    const rawLeftSpec = vals[2] || "";
+                    const estadoStr = vals[5] || ""; 
+                    const obsOriginal = vals[8] || ""; 
+                    const cp1Original = vals[9] || ""; 
+
+                    const normLeftSpec = normalizeText(rawLeftSpec);
+                    const match = availabilityMap[normLeftSpec];
+                    
+                    let newObsArray = [];
+                    let closestDateFormatted = "SIN CUPOS";
+                    let matchedRightName = "NO ENCONTRADO";
+                    let bDaysUrgencia = -1;
+
+                    if (match) {
+                        matchedRightName = match.originalName;
+                        if (match.dates.length > 0) {
+                            
+                            // Determinar proximidad de todas las fechas para los Badges en OBS2
+                            const parsedDates = match.dates.map(d => {
+                                const dateInfo = determineDateWithYear(d.dateStr);
+                                if(dateInfo) {
+                                    const now = new Date();
+                                    const bDays = getBusinessDaysDiff(now, dateInfo.dateObj);
+                                    return { 
+                                        dateObj: dateInfo.dateObj, 
+                                        formattedDate: dateInfo.formatted, 
+                                        count: d.count, 
+                                        bDays: bDays 
+                                    };
+                                }
+                                return null;
+                            }).filter(d => d !== null);
+
+                            // Ordenar por fecha cronológica para mostrar primero los más cercanos
+                            parsedDates.sort((a,b) => a.dateObj - b.dateObj);
+
+                            // Tomar máximo 5 fechas para la columna OBS2
+                            newObsArray = parsedDates.slice(0, 5);
+
+                            // El primero del arreglo ordenado es el Cupo Próximo
+                            if (parsedDates.length > 0) {
+                                const closest = parsedDates[0];
+                                closestDateFormatted = closest.formattedDate; // FORMATO HOMOLOGADO: dd-mm-aaaa
+                                bDaysUrgencia = closest.bDays;
+                            }
+                        }
+                    }
+
+                    return {
+                        "Base": baseStr,
+                        "Espec. Izq": rawLeftSpec,
+                        "Espec. Der Cruzada": matchedRightName,
+                        "Estado de la base": estadoStr,
+                        "OBS": obsOriginal,
+                        "OBS2": newObsArray.length > 0 ? newObsArray : "SIN CUPOS",
+                        "CP1": cp1Original,
+                        "Cupos próximos": closestDateFormatted,
+                        "_bDays": bDaysUrgencia // Campo oculto para aplicar mapa de calor en la celda
+                    };
+                });
+
+                finalHeadersGlobal = [
+                    "Base", "Espec. Izq", "Espec. Der Cruzada", "Estado de la base", "OBS", "OBS2", "CP1", "Cupos próximos"
+                ];
+
+                renderTableActual();
+                
+                document.getElementById('resultSection').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+
+            } catch (error) {
+                console.error("Error:", error);
+                mostrarError("Hubo un problema de procesamiento: " + error.message);
+            }
+        }
+
+        function renderTableActual() {
+            let dataToRender = tableDataGlobal;
+            const onlyActive = document.getElementById('toggleActivas').checked;
+            
+            if (onlyActive) {
+                dataToRender = tableDataGlobal.filter(row => {
+                    const estado = row["Estado de la base"] || "";
+                    return estado.toString().toUpperCase().includes("ACTIVA");
+                });
+            }
+            renderTableHTML(finalHeadersGlobal, dataToRender);
+        }
+
+        function renderTableHTML(headers, data) {
+            const thead = document.getElementById('tableHeaders');
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            const tableElement = document.getElementById('resultTable');
+
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            const arrowSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block ml-1 text-slate-400"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>`;
+
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.className = "px-2 py-3 font-semibold text-slate-700 bg-slate-100 border-b border-slate-200 sticky top-0 z-10 shadow-sm";
+                
+                if(h === "Base") th.classList.add("col-base");
+                else if(h.includes("Espec")) th.classList.add("col-espec");
+                else if(h === "Estado de la base") th.classList.add("col-estado");
+                else if(h === "OBS") th.classList.add("col-obs");
+                else if(h === "OBS2") th.classList.add("col-obs2");
+                else if(h === "CP1") th.classList.add("col-cp1");
+                else if(h === "Cupos próximos") th.classList.add("col-fecha");
+
+                th.innerHTML = `${h} ${arrowSvg}`;
+                th.onclick = () => sortTableByColumn(h);
+                thead.appendChild(th);
+            });
+
+            if (data.length === 0) {
+                tableElement.style.display = 'none';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                tableElement.style.display = 'table';
+                emptyState.classList.add('hidden');
+            }
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = `border-b border-slate-100 bg-white`;
+                
+                headers.forEach(h => {
+                    const td = document.createElement('td');
+                    td.className = "px-2 py-2 font-mono align-top break-words whitespace-normal";
+                    
+                    let cellValue = row[h];
+
+                    // Aplicación de Mapas de Calor, Badges y Estilos Específicos
+                    if (h === "Estado de la base") {
+                        if(cellValue && cellValue.toString().toUpperCase().includes("ACTIVA")) {
+                            td.innerHTML = `<span class="text-emerald-700 font-bold">${cellValue}</span>`;
+                        } else {
+                            td.textContent = cellValue;
+                        }
+                    } else if (h === "OBS2") {
+                        if (Array.isArray(cellValue)) {
+                            // Renderiza Badges con formato homologado
+                            const badgesHtml = cellValue.map(part => {
+                                let badgeClass = "bg-blue-50 text-blue-700 border-blue-200"; // Futuro
+                                if (part.bDays === 0) badgeClass = "bg-red-100 text-red-700 border-red-200 font-bold"; // Hoy
+                                else if (part.bDays === 1) badgeClass = "bg-orange-100 text-orange-700 border-orange-200 font-bold"; // Mañana
+                                else if (part.bDays === 2) badgeClass = "bg-yellow-100 text-yellow-800 border-yellow-300 font-bold"; // Pasado
+
+                                return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] whitespace-nowrap mb-1 mr-1 ${badgeClass}">
+                                            ${part.formattedDate} <span class="text-slate-500 font-normal">/ ${part.count}c</span>
+                                        </span>`;
+                            }).join('');
+                            td.innerHTML = `<div class="flex flex-wrap">${badgesHtml}</div>`;
+                        } else {
+                            td.classList.add('font-semibold', 'text-slate-400', 'italic', 'text-[11px]');
+                            td.textContent = cellValue;
+                        }
+                    } else if (h === "Cupos próximos") {
+                        // Mapa de Calor aplicado directamente en la celda
+                        const bDays = row["_bDays"];
+                        let badgeClass = "bg-slate-100 text-slate-500 border border-slate-200"; // Sin cupos
+                        
+                        if (bDays === 0) badgeClass = "bg-red-500 text-white font-bold shadow-sm"; 
+                        else if (bDays === 1) badgeClass = "bg-orange-500 text-white font-bold shadow-sm"; 
+                        else if (bDays === 2) badgeClass = "bg-yellow-400 text-yellow-900 font-bold shadow-sm"; 
+                        else if (bDays > 2) badgeClass = "bg-blue-100 text-blue-800 border border-blue-200 font-semibold";
+
+                        td.innerHTML = `<div class="px-2 py-1.5 rounded inline-block text-center w-full ${badgeClass} text-[11px]">${cellValue}</div>`;
+                    } else if (h === "Espec. Der Cruzada" && cellValue === "NO ENCONTRADO") {
+                        // BLOQUE ROJO SOLICITADO
+                        td.innerHTML = `<div class="bg-red-50 text-red-600 font-bold px-2 py-1.5 rounded border border-red-200 w-full text-center tracking-wider text-[11px]">NO ENCONTRADO</div>`;
+                    } else if (h === "Base") {
+                        td.classList.add('font-bold', 'text-slate-800');
+                        td.textContent = cellValue;
+                    } else {
+                        td.textContent = cellValue || '-';
+                    }
+                    
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function sortTableByColumn(columnName) {
+            const currentDir = sortDirections[columnName] || 'asc';
+            const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+            sortDirections = { [columnName]: newDir }; 
+
+            tableDataGlobal.sort((a, b) => {
+                let valA = a[columnName] || '';
+                let valB = b[columnName] || '';
+                
+                if (!isNaN(Number(valA)) && !isNaN(Number(valB)) && valA !== '' && valB !== '') {
+                    valA = Number(valA);
+                    valB = Number(valB);
+                } else {
+                    valA = valA.toString().toLowerCase();
+                    valB = valB.toString().toLowerCase();
+                }
+
+                if (valA < valB) return newDir === 'asc' ? -1 : 1;
+                if (valA > valB) return newDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTableActual();
+        }
+
+        function limpiarTodo() {
+            document.getElementById('inputIzq').value = '';
+            document.getElementById('inputDer').value = '';
+            tableDataGlobal = [];
+            finalHeadersGlobal = [];
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
