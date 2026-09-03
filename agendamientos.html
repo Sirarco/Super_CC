@@ -112,6 +112,13 @@ V
 <div class="toolbar" style="margin-top: 20px;">
   <button class="btn-danger" onclick="limpiarResultados()">Limpiar Registros de la Tabla</button>
 </div>
+  <!-- Nuevo botón/pestaña para mostrar la herramienta (ajusta las clases a tu CSS) -->
+<button onclick="document.getElementById('cruzador-frame').style.display='block'">Ver Cruzador de Cupos</button>
+
+<!-- Contenedor del Iframe -->
+<div id="cruzador-frame" style="display: none; width: 100%; margin-top: 20px;">
+    <iframe src="cruzador.html" width="100%" height="800px" style="border: none;"></iframe>
+</div>
 
 <script>
 
